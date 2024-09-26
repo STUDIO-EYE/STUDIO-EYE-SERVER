@@ -12,7 +12,7 @@ import studio.studioeye.domain.recruitment.domain.Recruitment;
 import studio.studioeye.domain.recruitment.dto.request.CreateRecruitmentServiceRequestDto;
 import studio.studioeye.domain.recruitment.dto.request.UpdateRecruitmentServiceRequestDto;
 import studio.studioeye.global.common.response.ApiResponse;
-import studio.studioeye.global.error.ErrorCode;
+import studio.studioeye.global.exception.error.ErrorCode;
 
 import java.util.Optional;
 

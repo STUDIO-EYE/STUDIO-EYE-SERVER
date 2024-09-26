@@ -1,4 +1,4 @@
-package studio.studioeye.global.error;
+package studio.studioeye.global.exception.error;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

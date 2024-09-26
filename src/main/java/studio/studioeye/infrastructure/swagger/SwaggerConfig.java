@@ -1,4 +1,4 @@
-package studio.studioeye.global.config;
+package studio.studioeye.infrastructure.swagger;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;

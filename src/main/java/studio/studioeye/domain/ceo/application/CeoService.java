@@ -8,9 +8,9 @@ import studio.studioeye.domain.ceo.dao.CeoRepository;
 import studio.studioeye.domain.ceo.domain.Ceo;
 import studio.studioeye.domain.ceo.dto.request.CreateCeoServiceRequestDto;
 import studio.studioeye.domain.ceo.dto.request.UpdateCeoServiceRequestDto;
-import studio.studioeye.global.adapter.S3Adapter;
+import studio.studioeye.infrastructure.s3.S3Adapter;
 import studio.studioeye.global.common.response.ApiResponse;
-import studio.studioeye.global.error.ErrorCode;
+import studio.studioeye.global.exception.error.ErrorCode;
 
 import java.util.List;
 

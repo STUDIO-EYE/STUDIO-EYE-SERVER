@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import studio.studioeye.global.common.response.ApiResponse;
-import studio.studioeye.global.error.ErrorCode;
+import studio.studioeye.global.exception.error.ErrorCode;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {

@@ -11,9 +11,9 @@ import studio.studioeye.domain.client.dao.ClientRepository;
 import studio.studioeye.domain.client.domain.Client;
 import studio.studioeye.domain.client.dto.request.CreateClientServiceRequestDto;
 import studio.studioeye.domain.client.dto.request.UpdateClientServiceRequestDto;
-import studio.studioeye.global.adapter.S3Adapter;
+import studio.studioeye.infrastructure.s3.S3Adapter;
 import studio.studioeye.global.common.response.ApiResponse;
-import studio.studioeye.global.error.ErrorCode;
+import studio.studioeye.global.exception.error.ErrorCode;
 
 import java.util.*;
 

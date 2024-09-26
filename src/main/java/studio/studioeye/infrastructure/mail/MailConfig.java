@@ -1,4 +1,4 @@
-package studio.studioeye.global.config;
+package studio.studioeye.infrastructure.mail;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

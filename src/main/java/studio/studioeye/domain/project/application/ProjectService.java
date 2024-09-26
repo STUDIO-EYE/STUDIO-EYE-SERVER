@@ -12,9 +12,9 @@ import studio.studioeye.domain.project.domain.Project;
 import studio.studioeye.domain.project.domain.ProjectImage;
 import studio.studioeye.domain.project.dto.request.*;
 import studio.studioeye.domain.views.application.ViewsService;
-import studio.studioeye.global.adapter.S3Adapter;
+import studio.studioeye.infrastructure.s3.S3Adapter;
 import studio.studioeye.global.common.response.ApiResponse;
-import studio.studioeye.global.error.ErrorCode;
+import studio.studioeye.global.exception.error.ErrorCode;
 
 import java.util.ArrayList;
 import java.util.LinkedList;

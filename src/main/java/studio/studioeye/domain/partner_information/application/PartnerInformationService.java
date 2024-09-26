@@ -11,9 +11,9 @@ import studio.studioeye.domain.partner_information.dao.PartnerInformationReposit
 import studio.studioeye.domain.partner_information.domain.PartnerInformation;
 import studio.studioeye.domain.partner_information.dto.request.CreatePartnerInfoServiceRequestDto;
 import studio.studioeye.domain.partner_information.dto.request.UpdatePartnerInfoServiceRequestDto;
-import studio.studioeye.global.adapter.S3Adapter;
+import studio.studioeye.infrastructure.s3.S3Adapter;
 import studio.studioeye.global.common.response.ApiResponse;
-import studio.studioeye.global.error.ErrorCode;
+import studio.studioeye.global.exception.error.ErrorCode;
 
 import java.util.*;
 

@@ -16,9 +16,9 @@ import studio.studioeye.domain.request.domain.State;
 import studio.studioeye.domain.request.dto.request.CreateRequestServiceDto;
 import studio.studioeye.domain.request.dto.request.UpdateRequestCommentServiceDto;
 import studio.studioeye.domain.request.dto.request.UpdateRequestStateServiceDto;
-import studio.studioeye.global.adapter.S3Adapter;
+import studio.studioeye.infrastructure.s3.S3Adapter;
 import studio.studioeye.global.common.response.ApiResponse;
-import studio.studioeye.global.error.ErrorCode;
+import studio.studioeye.global.exception.error.ErrorCode;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;

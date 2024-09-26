@@ -13,9 +13,9 @@ import studio.studioeye.domain.faq.dao.FaqRepository;
 import studio.studioeye.domain.faq.domain.Faq;
 import studio.studioeye.domain.faq.dto.request.CreateFaqServiceRequestDto;
 import studio.studioeye.domain.faq.dto.request.UpdateFaqServiceRequestDto;
-import studio.studioeye.global.adapter.S3Adapter;
+import studio.studioeye.infrastructure.s3.S3Adapter;
 import studio.studioeye.global.common.response.ApiResponse;
-import studio.studioeye.global.error.ErrorCode;
+import studio.studioeye.global.exception.error.ErrorCode;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

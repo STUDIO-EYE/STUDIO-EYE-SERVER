@@ -11,9 +11,9 @@ import studio.studioeye.domain.company_information.dao.CompanyIntroductionInform
 import studio.studioeye.domain.company_information.domain.CompanyInformation;
 import studio.studioeye.domain.company_information.domain.CompanyInformationDetailInformation;
 import studio.studioeye.domain.company_information.dto.request.*;
-import studio.studioeye.global.adapter.S3Adapter;
+import studio.studioeye.infrastructure.s3.S3Adapter;
 import studio.studioeye.global.common.response.ApiResponse;
-import studio.studioeye.global.error.ErrorCode;
+import studio.studioeye.global.exception.error.ErrorCode;
 
 import java.io.IOException;
 import java.util.List;

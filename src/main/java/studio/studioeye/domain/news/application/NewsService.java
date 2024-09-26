@@ -13,9 +13,9 @@ import studio.studioeye.domain.news.domain.News;
 import studio.studioeye.domain.news.domain.NewsFile;
 import studio.studioeye.domain.news.dto.CreateNewsServiceRequestDto;
 import studio.studioeye.domain.news.dto.UpdateNewsServiceRequestDto;
-import studio.studioeye.global.adapter.S3Adapter;
+import studio.studioeye.infrastructure.s3.S3Adapter;
 import studio.studioeye.global.common.response.ApiResponse;
-import studio.studioeye.global.error.ErrorCode;
+import studio.studioeye.global.exception.error.ErrorCode;
 
 import java.io.IOException;
 import java.time.LocalDate;

@@ -8,10 +8,10 @@ import studio.studioeye.domain.notification.dao.EmitterRepository;
 import studio.studioeye.domain.notification.dao.NotificationRepository;
 import studio.studioeye.domain.notification.domain.Notification;
 import studio.studioeye.domain.notification.dto.request.CreateNotificationServiceRequestDto;
-import studio.studioeye.domain.user.service.UserServiceImpl;
+import studio.studioeye.domain.user.application.UserService;
 import studio.studioeye.domain.user_notification.application.UserNotificationService;
 import studio.studioeye.global.common.response.ApiResponse;
-import studio.studioeye.global.error.ErrorCode;
+import studio.studioeye.global.exception.error.ErrorCode;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -23,7 +23,7 @@ public class NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final EmitterRepository emitterRepository;
-    private final UserServiceImpl userServiceImpl;
+    private final UserService userService;
     private final UserNotificationService userNotificationService;
 
     // 기본 타임아웃 설정
@@ -31,7 +31,7 @@ public class NotificationService {
 
     public ApiResponse<Long> subscribe(Long requestId) {
         // 모든 유저 가져오기
-        List<Long> userIds = userServiceImpl.getAllApprovedUserIds();
+        List<Long> userIds = userService.getAllApprovedUserIds();
         if (userIds.isEmpty()) {
             return ApiResponse.withError(ErrorCode.USER_IS_EMPTY);
         } else {

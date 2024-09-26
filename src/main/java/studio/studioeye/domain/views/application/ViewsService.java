@@ -7,7 +7,7 @@ import studio.studioeye.domain.views.dao.ViewsRepository;
 import studio.studioeye.domain.views.domain.Views;
 import studio.studioeye.domain.views.dto.request.CreateViewsServiceDto;
 import studio.studioeye.global.common.response.ApiResponse;
-import studio.studioeye.global.error.ErrorCode;
+import studio.studioeye.global.exception.error.ErrorCode;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

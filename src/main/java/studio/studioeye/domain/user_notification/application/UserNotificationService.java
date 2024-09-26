@@ -9,7 +9,7 @@ import studio.studioeye.domain.user_notification.domain.UserNotification;
 import studio.studioeye.domain.user_notification.domain.UserNotificationPK;
 import studio.studioeye.domain.user_notification.dto.request.CreateUserNotificationServiceRequestDto;
 import studio.studioeye.global.common.response.ApiResponse;
-import studio.studioeye.global.error.ErrorCode;
+import studio.studioeye.global.exception.error.ErrorCode;
 
 import java.util.*;
 
