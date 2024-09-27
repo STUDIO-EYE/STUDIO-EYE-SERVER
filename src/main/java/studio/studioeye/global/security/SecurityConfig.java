@@ -31,8 +31,11 @@ public class SecurityConfig {
     private final JwtTokenProvider jwtTokenProvider;
 
     private static final String[] WHITE_LIST = {
-            "/swagger", "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**",
-            "/api/v1/auth/**", "/api/v1/auth/password", "/api/v1/auth/reissue",
+            "/user-service/**",
+            "/swagger-ui.html",
+            "/api-docs",
+            "/api-docs/**",
+            "/v3/api-docs/**", "/swagger-ui/**", "/swagger-resources/**", "/api/**", "/error/**", "/", "/swagger", "/swagger/**"
     };
 
     @Bean
@@ -46,7 +49,7 @@ public class SecurityConfig {
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(new AuthenticationEntryPointImpl()))
 
                 .authorizeHttpRequests(authorize -> authorize
-                                .requestMatchers("/auth/logout").authenticated()
+//                                .requestMatchers("/auth/logout").authenticated()
 //                                .requestMatchers(NEED_TOKEN).hasAnyRole("ADMIN", "MEMBER")
                                 .requestMatchers(WHITE_LIST).permitAll()
                                 .anyRequest().authenticated()
