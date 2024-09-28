@@ -1,12 +1,14 @@
 package studio.studioeye.domain.recruitment.domain;
 
+import studio.studioeye.domain.recruitment.dto.request.UpdateRecruitmentServiceRequestDto;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import studio.studioeye.domain.recruitment.dto.request.UpdateRecruitmentServiceRequestDto;
+
+import java.util.Date;
 
 @Data
 @Entity
@@ -21,17 +23,36 @@ public class Recruitment {
     private String title;
 
     @NotNull
+    private String period;
+
+    @NotNull
+    private Boolean status;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdAt;
+
+    @NotNull
     @Column(columnDefinition = "TEXT")
-    private String content;
+    private String qualifications;
+
+    @NotNull
+    @Column(columnDefinition = "TEXT")
+    private String preferential;
 
     @Builder
-    public Recruitment(String title, String content) {
+    public Recruitment(String title, String period, Date createdAt, String qualifications, String preferential) {
         this.title = title;
-        this.content = content;
+        this.period = period;
+        this.qualifications = qualifications;
+        this.preferential = preferential;
+        this.status = true;
+        this.createdAt = createdAt;
     }
 
     public void update(UpdateRecruitmentServiceRequestDto dto) {
         this.title = dto.title();
-        this.content = dto.content();
+        this.period = dto.period();
+        this.qualifications = dto.qualifications();
+        this.preferential = dto.preferential();
     }
 }

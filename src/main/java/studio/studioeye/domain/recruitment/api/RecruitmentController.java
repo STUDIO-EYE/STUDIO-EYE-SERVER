@@ -1,17 +1,17 @@
 package studio.studioeye.domain.recruitment.api;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.web.bind.annotation.*;
 import studio.studioeye.domain.recruitment.application.RecruitmentService;
 import studio.studioeye.domain.recruitment.dao.RecruitmentTitle;
 import studio.studioeye.domain.recruitment.domain.Recruitment;
 import studio.studioeye.domain.recruitment.dto.request.CreateRecruitmentRequestDto;
 import studio.studioeye.domain.recruitment.dto.request.UpdateRecruitmentRequestDto;
 import studio.studioeye.global.common.response.ApiResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "채용공고 게시판 API", description = "채용공고 게시물 등록 / 수정 / 삭제 / 조회")
 @RestController
@@ -38,6 +38,12 @@ public class RecruitmentController {
     @GetMapping("/recruitment/{id}")
     public ApiResponse<Recruitment> retrieveRecruitmentById(@PathVariable Long id) {
         return recruitmentService.retrieveRecruitmentById(id);
+    }
+
+    @Operation(summary = "최신 채용공고 1개만 조회 API")
+    @GetMapping("/recruitment/recent")
+    public ApiResponse<Recruitment> retrieveRecentRecruitment() {
+        return recruitmentService.retrieveRecentRecruitment();
     }
 
     @Operation(summary = "채용공고 게시물 수정 API")

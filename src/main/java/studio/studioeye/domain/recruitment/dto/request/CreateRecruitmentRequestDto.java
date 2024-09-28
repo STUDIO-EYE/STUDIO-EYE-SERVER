@@ -9,13 +9,21 @@ public record CreateRecruitmentRequestDto(
         @NotBlank(message = "제목은 필수 값입니다.")
         String title,
 
-        @Schema(description = "내용, 빈 값/공백/null 을 허용하지 않습니다.")
-        @NotBlank(message = "내용은 필수 값입니다.")
-        String content
+        @Schema(description = "기간, 빈 값/공백/null 을 허용하지 않습니다.")
+        @NotBlank(message = "기간은 필수 값입니다.")
+        String period,
+
+        @Schema(description = "자격요건, 빈 값/공백/null 을 허용하지 않습니다.")
+        @NotBlank(message = "자격요건은 필수 값입니다.")
+        String qualifications,
+
+        @Schema(description = "우대요건, 빈 값/공백/null 을 허용하지 않습니다.")
+        @NotBlank(message = "우대요건은 필수 값입니다.")
+        String preferential
 
 ) {
     public CreateRecruitmentServiceRequestDto toServiceRequest() {
         return new CreateRecruitmentServiceRequestDto(
-                title, content);
+                title, period, qualifications, preferential);
     }
 }

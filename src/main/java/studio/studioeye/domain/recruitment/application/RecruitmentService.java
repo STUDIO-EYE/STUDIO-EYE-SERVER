@@ -1,20 +1,22 @@
 package studio.studioeye.domain.recruitment.application;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import studio.studioeye.domain.recruitment.dao.RecruitmentRepository;
 import studio.studioeye.domain.recruitment.dao.RecruitmentTitle;
 import studio.studioeye.domain.recruitment.domain.Recruitment;
 import studio.studioeye.domain.recruitment.dto.request.CreateRecruitmentServiceRequestDto;
 import studio.studioeye.domain.recruitment.dto.request.UpdateRecruitmentServiceRequestDto;
 import studio.studioeye.global.common.response.ApiResponse;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import studio.studioeye.global.exception.error.ErrorCode;
 
+import java.util.Date;
 import java.util.Optional;
+import java.util.TimeZone;
 
 @Service
 @Transactional
@@ -23,7 +25,8 @@ public class RecruitmentService {
 
     private final RecruitmentRepository recruitmentRepository;
     public ApiResponse<Recruitment> createRecruitment(CreateRecruitmentServiceRequestDto dto) {
-        Recruitment recruitment = dto.toEntity();
+        TimeZone.setDefault(TimeZone.getTimeZone("Asia/Seoul"));
+        Recruitment recruitment = dto.toEntity(new Date());
 
         Recruitment savedRecruitment = recruitmentRepository.save(recruitment);
 
@@ -43,6 +46,16 @@ public class RecruitmentService {
         }
         Recruitment recruitment = optionalRecruitment.get();
         return ApiResponse.ok("채용공고를 성공적으로 조회했습니다.", recruitment);
+    }
+
+    public ApiResponse<Recruitment> retrieveRecentRecruitment() {
+        Optional<Recruitment> optionalRecruitment = recruitmentRepository.findTopByOrderByCreatedAtDesc();
+        if(optionalRecruitment.isEmpty()) {
+            return ApiResponse.ok(ErrorCode.RECRUITMENT_IS_EMPTY.getMessage());
+//            return ApiResponse.withError(ErrorCode.INVALID_RECRUITMENT_ID);
+        }
+        Recruitment recruitment = optionalRecruitment.get();
+        return ApiResponse.ok("가장 최근 채용공고를 성공적으로 조회했습니다.", recruitment);
     }
 
     public ApiResponse<Recruitment> updateRecruitment(UpdateRecruitmentServiceRequestDto dto) {

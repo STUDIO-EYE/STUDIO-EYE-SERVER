@@ -75,6 +75,7 @@ public enum ErrorCode {
 
 	// recruitment
 	INVALID_RECRUITMENT_ID(HttpStatus.BAD_REQUEST, "유효하지 않은 recruitment 식별자입니다."),
+	RECRUITMENT_IS_EMPTY(HttpStatus.BAD_REQUEST, "recruitment가 존재하지 않습니다."),
 
 	// news
 	NEWS_IS_EMPTY(HttpStatus.BAD_REQUEST, "입력된 내용이 없습니다" ),
