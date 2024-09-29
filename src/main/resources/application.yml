@@ -1,0 +1,9 @@
+spring:
+  profiles:
+    active: ["db", "infra", "jwt",  "swagger"]
+
+logging:
+  level:
+    org:
+      springframework:
+        security=DEBUG:
