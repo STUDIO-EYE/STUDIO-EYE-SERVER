@@ -7,7 +7,7 @@ public record UpdateNewsServiceRequestDto(
         String title,
         String source,
         LocalDate pubDate,
-        String content,
+        String url,
         Boolean visibility
 ) {
 

@@ -18,14 +18,14 @@ public record UpdateNewsRequestDto(
         @Schema(description = "News 날짜, 빈 값/공백/null 을 허용하지 않습니다.")
         @NotBlank(message = "News 날짜은 필수 값입니다.")
         LocalDate pubDate,
-        @Schema(description = "News 내용, 빈 값/공백/null 을 허용하지 않습니다.")
-        @NotBlank(message = "News 내용은 필수 값입니다.")
-        String content,
+        @Schema(description = "News 링크, 빈 값/공백/null 을 허용하지 않습니다.")
+        @NotBlank(message = "News 링크는 필수 값입니다.")
+        String url,
         @Schema(description = "News 공개여부, 빈 값/공백/null 을 허용하지 않습니다.")
         @NotBlank(message = "News 공개여부는 필수 값입니다.")
         Boolean visibility
 ) {
         public UpdateNewsServiceRequestDto toServiceRequest() {
-                return new UpdateNewsServiceRequestDto(id, title, source, pubDate, content, visibility);
+                return new UpdateNewsServiceRequestDto(id, title, source, pubDate, url, visibility);
         }
 }
