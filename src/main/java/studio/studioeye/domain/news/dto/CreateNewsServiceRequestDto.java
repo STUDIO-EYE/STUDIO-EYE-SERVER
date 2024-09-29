@@ -1,6 +1,6 @@
 package studio.studioeye.domain.news.dto;
 
-import com.example.promotionpage.domain.news.domain.News;
+import studio.studioeye.domain.news.domain.News;
 
 import java.time.LocalDate;
 

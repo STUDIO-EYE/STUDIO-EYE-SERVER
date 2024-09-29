@@ -1,11 +1,11 @@
 package studio.studioeye.domain.news.application;
 
-import com.example.promotionpage.domain.news.dao.NewsRepository;
-import com.example.promotionpage.domain.news.domain.News;
-import com.example.promotionpage.domain.news.dto.CreateNewsServiceRequestDto;
-import com.example.promotionpage.domain.news.dto.UpdateNewsServiceRequestDto;
-import com.example.promotionpage.global.common.response.ApiResponse;
-import com.example.promotionpage.global.error.ErrorCode;
+import studio.studioeye.domain.news.dao.NewsRepository;
+import studio.studioeye.domain.news.domain.News;
+import studio.studioeye.domain.news.dto.CreateNewsServiceRequestDto;
+import studio.studioeye.domain.news.dto.UpdateNewsServiceRequestDto;
+import studio.studioeye.global.common.response.ApiResponse;
+import studio.studioeye.global.exception.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

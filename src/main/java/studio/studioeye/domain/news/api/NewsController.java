@@ -1,10 +1,10 @@
 package studio.studioeye.domain.news.api;
 
-import com.example.promotionpage.domain.news.application.NewsService;
-import com.example.promotionpage.domain.news.domain.News;
-import com.example.promotionpage.domain.news.dto.CreateNewsRequestDto;
-import com.example.promotionpage.domain.news.dto.UpdateNewsRequestDto;
-import com.example.promotionpage.global.common.response.ApiResponse;
+import studio.studioeye.domain.news.application.NewsService;
+import studio.studioeye.domain.news.domain.News;
+import studio.studioeye.domain.news.dto.CreateNewsRequestDto;
+import studio.studioeye.domain.news.dto.UpdateNewsRequestDto;
+import studio.studioeye.global.common.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
