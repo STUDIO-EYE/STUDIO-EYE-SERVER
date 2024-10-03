@@ -1,11 +1,12 @@
 package studio.studioeye.domain.recruitment.dto.request;
 
+import java.util.Date;
+
 public record UpdateRecruitmentServiceRequestDto(
         Long id,
         String title,
-        String period,
-        String qualifications,
-        String preferential,
-        Boolean status
+        Date startDate,
+        Date deadline,
+        String link
 ) {
 }

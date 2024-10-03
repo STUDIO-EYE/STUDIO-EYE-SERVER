@@ -23,7 +23,10 @@ public class Recruitment {
     private String title;
 
     @NotNull
-    private String period;
+    private Date startDate;
+
+    @NotNull
+    private Date deadline;
 
     @NotNull
     private Boolean status;
@@ -32,27 +35,23 @@ public class Recruitment {
     private Date createdAt;
 
     @NotNull
-    @Column(columnDefinition = "TEXT")
-    private String qualifications;
-
-    @NotNull
-    @Column(columnDefinition = "TEXT")
-    private String preferential;
+    private String link;
 
     @Builder
-    public Recruitment(String title, String period, Date createdAt, String qualifications, String preferential) {
+    public Recruitment(String title, Date startDate, Date deadline, String link, Date createdAt, Boolean status) {
         this.title = title;
-        this.period = period;
-        this.qualifications = qualifications;
-        this.preferential = preferential;
-        this.status = true;
+        this.startDate = startDate;
+        this.deadline = deadline;
+        this.link = link;
         this.createdAt = createdAt;
+        this.status = status;
     }
 
-    public void update(UpdateRecruitmentServiceRequestDto dto) {
+    public void update(UpdateRecruitmentServiceRequestDto dto, Boolean status) {
         this.title = dto.title();
-        this.period = dto.period();
-        this.qualifications = dto.qualifications();
-        this.preferential = dto.preferential();
+        this.startDate = dto.startDate();;
+        this.deadline = dto.deadline();;
+        this.link = dto.link();
+        this.status = status;
     }
 }

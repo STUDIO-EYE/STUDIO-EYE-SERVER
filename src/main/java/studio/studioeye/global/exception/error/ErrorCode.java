@@ -82,7 +82,10 @@ public enum ErrorCode {
 	INVALID_NEWS_ID(HttpStatus.BAD_REQUEST,"유효하지 않은 news 식별자입니다." ),
 
 	// benefit
-	INVALID_BENEFIT_ID(HttpStatus.BAD_REQUEST, "유효하지 않은 benefit 식별자입니다.")
+	// benefit
+	INVALID_BENEFIT_ID(HttpStatus.BAD_REQUEST, "유효하지 않은 benefit 식별자입니다."),
+	// menu
+	INVALID_MENU_ID(HttpStatus.BAD_REQUEST, "유효하지 않은 menu 식별자입니다.")
 
 	;
 
