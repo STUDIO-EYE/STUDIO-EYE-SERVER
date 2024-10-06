@@ -1,12 +1,5 @@
 package studio.studioeye.domain.request.api;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import studio.studioeye.domain.request.application.RequestService;
 import studio.studioeye.domain.request.dao.RequestCount;
 import studio.studioeye.domain.request.domain.Request;
@@ -14,6 +7,13 @@ import studio.studioeye.domain.request.dto.request.CreateRequestDto;
 import studio.studioeye.domain.request.dto.request.UpdateRequestCommentDto;
 import studio.studioeye.domain.request.dto.request.UpdateRequestStateDto;
 import studio.studioeye.global.common.response.ApiResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
@@ -71,7 +71,14 @@ public class RequestController {
 																					   @PathVariable Integer endYear, @PathVariable Integer endMonth) {
 		return requestService.retrieveCategoryRequestCountByPeriod(startYear, startMonth, endYear, endMonth);
 	}
-
+	@Operation(summary = "기간(시작점(연도, 월)~종료점(연도, 월))으로 완료여부(상태)에 따른 문의 수 조회 API")
+	@GetMapping("/requests/state/{startYear}/{startMonth}/{endYear}/{endMonth}")
+	public ApiResponse<List<Map<String, Object>>> retrieveStateRequestCountByPeriod(@PathVariable Integer startYear,
+																					@PathVariable Integer startMonth,
+																					@PathVariable Integer endYear,
+																					@PathVariable Integer endMonth) {
+		return requestService.retrieveStateRequestCountByPeriod(startYear, startMonth, endYear, endMonth);
+	}
 	@Operation(summary = "접수 대기 중인 문의 수 조회 API")
 	@GetMapping("/requests/waiting/count")
 	public ApiResponse<Long> retrieveWaitingRequestCount() {

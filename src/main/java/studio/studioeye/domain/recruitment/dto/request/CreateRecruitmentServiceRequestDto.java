@@ -1,6 +1,7 @@
 package studio.studioeye.domain.recruitment.dto.request;
 
 import studio.studioeye.domain.recruitment.domain.Recruitment;
+import studio.studioeye.domain.recruitment.domain.Status;
 
 import java.util.Date;
 
@@ -10,7 +11,7 @@ public record CreateRecruitmentServiceRequestDto(
         Date deadline,
         String link
 ) {
-    public Recruitment toEntity(Date date, Boolean status) {
+    public Recruitment toEntity(Date date, Status status) {
         return Recruitment.builder()
                 .title(title)
                 .startDate(startDate)

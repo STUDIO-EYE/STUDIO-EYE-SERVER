@@ -1,12 +1,5 @@
 package studio.studioeye.domain.request.application;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 import studio.studioeye.domain.email.service.EmailService;
 import studio.studioeye.domain.notification.application.NotificationService;
 import studio.studioeye.domain.request.dao.*;
@@ -16,9 +9,16 @@ import studio.studioeye.domain.request.domain.State;
 import studio.studioeye.domain.request.dto.request.CreateRequestServiceDto;
 import studio.studioeye.domain.request.dto.request.UpdateRequestCommentServiceDto;
 import studio.studioeye.domain.request.dto.request.UpdateRequestStateServiceDto;
-import studio.studioeye.infrastructure.s3.S3Adapter;
 import studio.studioeye.global.common.response.ApiResponse;
 import studio.studioeye.global.exception.error.ErrorCode;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+import studio.studioeye.infrastructure.s3.S3Adapter;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -225,6 +225,57 @@ public class RequestService {
 		return ApiResponse.ok("문의수 목록을 성공적으로 조회했습니다.", responseList);
 	}
 
+	public ApiResponse<List<Map<String, Object>>> retrieveStateRequestCountByPeriod(Integer startYear, Integer startMonth, Integer endYear, Integer endMonth) {
+		// 월 형식 검사
+		if(!checkMonth(startMonth) || !checkMonth(endMonth)) return ApiResponse.withError(ErrorCode.INVALID_REQUEST_MONTH);
+		// 종료점이 시작점보다 앞에 있을 경우 제한 걸기
+		if(startYear > endYear || (startYear.equals(endYear) && startMonth > endMonth)) {
+			return ApiResponse.withError(ErrorCode.INVALID_PERIOD_FORMAT);
+		}
+		// 2~12달로 제한 걸기
+		Integer months = (endYear - startYear) * 12 + (endMonth - startMonth) + 1;
+		if(months < 2 || months > 12) {
+			return ApiResponse.withError(ErrorCode.INVALID_REQUEST_PERIOD);
+		}
+
+		List<RequestStateCount> requestCountList =
+				requestRepository.findStateReqNumByYearAndMonthBetween(startYear, startMonth, endYear, endMonth);
+
+		if (requestCountList.isEmpty()) {
+			System.out.println("No data found for the given period.");
+		} else {
+			requestCountList.forEach(count -> {
+				System.out.printf("Year: %d, Month: %d, State: %s, Count: %d%n",
+						count.getYear(), count.getMonth(), count.getState(), count.getRequestCount());
+			});
+		} //logging
+
+		List<Map<String, Object>> responseList = new ArrayList<>();
+		for (int year = startYear; year <= endYear; year++) {
+			int monthStart = (year == startYear) ? startMonth : 1;
+			int monthEnd = (year == endYear) ? endMonth : 12;
+
+			for (int month = monthStart; month <= monthEnd; month++) {
+				// 해당 연도와 월에 대한 stateRequestCount 초기화.
+				Map<String, Long> stateRequestCount = new HashMap<>();
+
+				for (RequestStateCount requestCount : requestCountList) {
+					if (requestCount.getYear() == year && requestCount.getMonth() == month) {
+						stateRequestCount.put(requestCount.getState(), requestCount.getRequestCount());
+					}
+				}
+
+				Map<String, Object> responseItem = new HashMap<>();
+				responseItem.put("year", year);
+				responseItem.put("month", month);
+				responseItem.put("stateRequestCount", stateRequestCount);
+				responseList.add(responseItem);
+			}
+		}
+
+
+		return ApiResponse.ok("문의수 목록을 성공적으로 조회했습니다.", responseList);
+	}
 	public ApiResponse<Long> retrieveWaitingRequestCount() {
 		Long requestCount = requestRepository.countByState(State.WAITING);
 		return ApiResponse.ok("접수 대기 중인 문의 수를 성공적으로 조회했습니다.", requestCount);

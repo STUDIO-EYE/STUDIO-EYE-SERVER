@@ -1,10 +1,7 @@
 package studio.studioeye.domain.menu.domain;
 
-import studio.studioeye.domain.menu.dto.request.UpdateMenuServiceRequestDto;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import studio.studioeye.domain.menu.dto.request.UpdateMenuRequestDto;
+import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,18 +15,22 @@ public class Menu {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String title;
+    @Enumerated(EnumType.STRING)
+    private MenuTitle menuTitle;
 
     private Boolean visibility;
 
-    public void update(UpdateMenuServiceRequestDto dto) {
-        title = dto.title();
+    private Integer sequence;
+
+    public void update(UpdateMenuRequestDto dto) {
         visibility = dto.visibility();
+        sequence = dto.sequence();
     }
 
     @Builder
-    public Menu(String title, Boolean visibility) {
-        this.title = title;
+    public Menu(MenuTitle menuTitle, Boolean visibility, Integer sequence) {
+        this.menuTitle = menuTitle;
         this.visibility = visibility;
+        this.sequence = sequence;
     }
 }
