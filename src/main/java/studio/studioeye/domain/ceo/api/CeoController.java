@@ -1,16 +1,16 @@
 package studio.studioeye.domain.ceo.api;
 
+import studio.studioeye.domain.ceo.application.CeoService;
+import studio.studioeye.domain.ceo.domain.Ceo;
+import studio.studioeye.domain.ceo.dto.request.CreateCeoRequestDto;
+import studio.studioeye.domain.ceo.dto.request.UpdateCeoRequestDto;
+import studio.studioeye.global.common.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import studio.studioeye.domain.ceo.application.CeoService;
-import studio.studioeye.domain.ceo.domain.Ceo;
-import studio.studioeye.domain.ceo.dto.request.CreateCeoRequestDto;
-import studio.studioeye.domain.ceo.dto.request.UpdateCeoRequestDto;
-import studio.studioeye.global.common.response.ApiResponse;
 
 @Tag(name = "CEO 정보 API", description = "CEO 정보 등록 / 수정 / 삭제 / 조회")
 @RestController
@@ -45,7 +45,7 @@ public class CeoController {
         return ceoService.updateCeoTextInformation(dto.toServiceRequest());
     }
 
-    @Operation(summary = "CEO 텍스트(이미지 제외) 정보 수정 API")
+    @Operation(summary = "CEO 이미지 정보 수정 API")
     @PutMapping("/ceo/image")
     public ApiResponse<Ceo> updateCeoImageInformation(@RequestPart(value = "file", required = false) MultipartFile file) {
         return ceoService.updateCeoImageInformation(file);
