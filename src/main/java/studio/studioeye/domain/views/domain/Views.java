@@ -1,5 +1,7 @@
 package studio.studioeye.domain.views.domain;
 
+import com.example.promotionpage.domain.menu.domain.MenuTitle;
+import com.example.promotionpage.domain.project.domain.ArtworkCategory;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -25,16 +27,32 @@ public class Views {
 
 	private Long views;
 
+	@Enumerated(EnumType.STRING)
+	private MenuTitle menu;
+
+	@Enumerated(EnumType.STRING)
+	private ArtworkCategory category;
+
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date createdAt;
 
 	@Builder
-	public Views(Integer year, Integer month, Long views, Date createdAt) {
+	public Views(Integer year, Integer month, Long views, MenuTitle menu, ArtworkCategory category, Date createdAt) {
 		this.year = year;
 		this.month = month;
 		this.views = views;
+		this.menu = menu;
+		this.category = category;
 		this.createdAt = createdAt;
 	}
+
+//	@Builder
+//	public Views(Integer year, Integer month, Long views, Date createdAt) {
+//		this.year = year;
+//		this.month = month;
+//		this.views = views;
+//		this.createdAt = createdAt;
+//	}
 
 	public void updateViews(Long views) {
 		this.views = views;
