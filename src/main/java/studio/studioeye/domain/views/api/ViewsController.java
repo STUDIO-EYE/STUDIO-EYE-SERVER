@@ -1,13 +1,13 @@
 package studio.studioeye.domain.views.api;
 
-import com.example.promotionpage.domain.menu.domain.MenuTitle;
-import com.example.promotionpage.domain.project.domain.ArtworkCategory;
-import com.example.promotionpage.domain.views.application.ViewsService;
-import com.example.promotionpage.domain.views.dao.ViewsSummary;
-import com.example.promotionpage.domain.views.domain.Views;
-import com.example.promotionpage.domain.views.dto.request.CreateViewsRequestDto;
-import com.example.promotionpage.domain.views.dto.request.UpdateViewsRequestDto;
-import com.example.promotionpage.global.common.response.ApiResponse;
+import studio.studioeye.domain.menu.domain.MenuTitle;
+import studio.studioeye.domain.project.domain.ArtworkCategory;
+import studio.studioeye.domain.views.application.ViewsService;
+import studio.studioeye.domain.views.dao.ViewsSummary;
+import studio.studioeye.domain.views.domain.Views;
+import studio.studioeye.domain.views.dto.request.CreateViewsRequestDto;
+import studio.studioeye.domain.views.dto.request.UpdateViewsRequestDto;
+import studio.studioeye.global.common.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;

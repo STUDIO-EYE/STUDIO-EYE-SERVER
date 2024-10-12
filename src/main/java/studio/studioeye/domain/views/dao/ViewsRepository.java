@@ -1,8 +1,8 @@
 package studio.studioeye.domain.views.dao;
 
-import com.example.promotionpage.domain.menu.domain.MenuTitle;
-import com.example.promotionpage.domain.project.domain.ArtworkCategory;
-import com.example.promotionpage.domain.views.domain.Views;
+import studio.studioeye.domain.menu.domain.MenuTitle;
+import studio.studioeye.domain.project.domain.ArtworkCategory;
+import studio.studioeye.domain.views.domain.Views;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

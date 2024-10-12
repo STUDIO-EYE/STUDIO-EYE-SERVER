@@ -1,7 +1,7 @@
 package studio.studioeye.domain.views.dto.request;
 
-import com.example.promotionpage.domain.menu.domain.MenuTitle;
-import com.example.promotionpage.domain.project.domain.ArtworkCategory;
+import studio.studioeye.domain.menu.domain.MenuTitle;
+import studio.studioeye.domain.project.domain.ArtworkCategory;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 

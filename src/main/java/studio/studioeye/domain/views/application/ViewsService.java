@@ -1,14 +1,14 @@
 package studio.studioeye.domain.views.application;
 
-import com.example.promotionpage.domain.menu.domain.MenuTitle;
-import com.example.promotionpage.domain.project.domain.ArtworkCategory;
-import com.example.promotionpage.domain.views.dao.ViewsRepository;
-import com.example.promotionpage.domain.views.dao.ViewsSummary;
-import com.example.promotionpage.domain.views.domain.Views;
-import com.example.promotionpage.domain.views.dto.request.CreateViewsServiceRequestDto;
-import com.example.promotionpage.domain.views.dto.request.UpdateViewsServiceRequestDto;
-import com.example.promotionpage.global.common.response.ApiResponse;
-import com.example.promotionpage.global.error.ErrorCode;
+import studio.studioeye.domain.menu.domain.MenuTitle;
+import studio.studioeye.domain.project.domain.ArtworkCategory;
+import studio.studioeye.domain.views.dao.ViewsRepository;
+import studio.studioeye.domain.views.dao.ViewsSummary;
+import studio.studioeye.domain.views.domain.Views;
+import studio.studioeye.domain.views.dto.request.CreateViewsServiceRequestDto;
+import studio.studioeye.domain.views.dto.request.UpdateViewsServiceRequestDto;
+import studio.studioeye.global.common.response.ApiResponse;
+import studio.studioeye.global.exception.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

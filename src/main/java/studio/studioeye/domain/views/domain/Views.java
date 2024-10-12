@@ -1,7 +1,7 @@
 package studio.studioeye.domain.views.domain;
 
-import com.example.promotionpage.domain.menu.domain.MenuTitle;
-import com.example.promotionpage.domain.project.domain.ArtworkCategory;
+import studio.studioeye.domain.menu.domain.MenuTitle;
+import studio.studioeye.domain.project.domain.ArtworkCategory;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
