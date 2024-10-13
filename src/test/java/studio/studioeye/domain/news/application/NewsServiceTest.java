@@ -17,6 +17,7 @@ import studio.studioeye.global.exception.error.ErrorCode;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -188,4 +189,32 @@ class NewsServiceTest {
         // method call verify
         Mockito.verify(newsRepository, Mockito.never()).delete(Mockito.any());
     }
+
+    @Test
+    @DisplayName("뉴스 리스트 삭제 성공 테스트")
+    void deleteNewsListSuccess() {
+        // given
+        List<News> newsList = new ArrayList<>();
+        newsList.add(new News("Test Title1", "Test Source1",  LocalDate.now(), "Test URL1", true));
+        newsList.add(new News("Test Title2", "Test Source2",  LocalDate.now(), "Test URL2", true));
+        newsList.add(new News("Test Title3", "Test Source3",  LocalDate.now(), "Test URL3", true));
+
+        List<Long> ids = Arrays.asList(1L, 2L, 3L);
+
+        // stub
+        when(newsRepository.findById(1L)).thenReturn(Optional.of(newsList.get(0)));
+        when(newsRepository.findById(2L)).thenReturn(Optional.of(newsList.get(1)));
+        when(newsRepository.findById(3L)).thenReturn(Optional.of(newsList.get(2)));
+
+        // when
+        ApiResponse<String> response = newsService.deleteNewsList(ids);
+
+        // then
+        Assertions.assertThat(response.getMessage()).isEqualTo("News를 성공적으로 삭제했습니다.");
+        // method call verify
+        Mockito.verify(newsRepository, times(1)).delete(newsList.get(0));
+        Mockito.verify(newsRepository, times(1)).delete(newsList.get(1));
+        Mockito.verify(newsRepository, times(1)).delete(newsList.get(2));
+    }
+
 }
