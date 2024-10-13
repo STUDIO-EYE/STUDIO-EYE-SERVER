@@ -98,7 +98,22 @@ class NewsServiceTest {
         Assertions.assertThat(findNews.size()).isEqualTo(3);
     }
 
+    @Test
+    @DisplayName("뉴스 전체 조회 실패 테스트 - 데이터 없음")
+    void retrieveAllNewsFail() {
+        // given
+        List<News> newsList = new ArrayList<>();
 
+        // stub
+        when(newsRepository.findAll()).thenReturn(newsList);
+
+        // when
+        ApiResponse<List<News>> response = newsService.retrieveAllNews();
+
+        // then
+        Assertions.assertThat(response.getData()).isNull();
+        Assertions.assertThat(response.getMessage()).isEqualTo("News가 존재하지 않습니다.");
+    }
     @Test
     @DisplayName("단일 뉴스 조회 성공 테스트")
     void retrieveNewsByIdSuccess() {
