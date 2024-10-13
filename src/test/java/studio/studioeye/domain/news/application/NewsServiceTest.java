@@ -217,4 +217,25 @@ class NewsServiceTest {
         Mockito.verify(newsRepository, times(1)).delete(newsList.get(2));
     }
 
+    @Test
+    @DisplayName("뉴스 리스트 삭제 실패 테스트 - 존재하지 않는 ID")
+    void deleteNewsListFail() {
+        // given
+        List<Long> ids = Arrays.asList(1L, 2L);
+        News news = new News("Test Title1", "Test Source1", LocalDate.now(), "Test URL1", true);
+
+        // stub
+        when(newsRepository.findById(1L)).thenReturn(Optional.of(news));
+        when(newsRepository.findById(2L)).thenReturn(Optional.empty()); //2번 ID 존재X
+
+        // when
+        ApiResponse<String> response = newsService.deleteNewsList(ids);
+
+        // then
+        Assertions.assertThat(response.getStatus()).isEqualTo(ErrorCode.INVALID_NEWS_ID.getStatus());
+        Assertions.assertThat(response.getMessage()).isEqualTo(ErrorCode.INVALID_NEWS_ID.getMessage());
+        // method call verify
+//        Mockito.verify(newsRepository, Mockito.never()).delete(Mockito.any());
+        Mockito.verify(newsRepository, times(1)).delete(Mockito.any());
+    }
 }
