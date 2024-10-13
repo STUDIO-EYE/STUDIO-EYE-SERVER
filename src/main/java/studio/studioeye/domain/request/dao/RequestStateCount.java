@@ -1,8 +1,9 @@
-package studio.studioeye.domain.request.dao;
-
-public interface RequestStateCount {
-    Integer getYear();
-    Integer getMonth();
-    String getState();
-    Long getRequestCount();
-}
+package studio.studioeye.domain.request.dao;//package studio.studioeye.domain.request.dao;
+//
+//
+//public interface RequestStateCount {
+//    Integer getYear();
+//    Integer getMonth();
+//    String getState();
+//    Long getRequestCount();
+//}

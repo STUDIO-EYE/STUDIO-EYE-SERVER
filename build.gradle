@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.2.10'
     id 'io.spring.dependency-management' version '1.1.6'
+    id 'jacoco'
 }
 
 group = 'studio'
@@ -74,12 +75,78 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-
-    testImplementation "org.junit.platform:junit-platform-launcher:1.5.2"
-    testImplementation "org.junit.jupiter:junit-jupiter:5.5.2"
-    testImplementation "org.mockito:mockito-core:3.12.4"
 }
 
-//tasks.named('test') {
-//    useJUnitPlatform()
-//}
+test {
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport // Generates report after tests are run
+}
+
+// JaCoCo configuration
+jacoco {
+    toolVersion = "0.8.11"
+    reportsDirectory = layout.buildDirectory.dir('jacocoReport')
+}
+
+jacocoTestReport {
+    dependsOn test // 테스트가 실행된 후 커버리지 리포트 생성
+    reports {
+        xml.required.set(false)
+        csv.required.set(true)
+        html.required.set(true)
+    }
+
+    afterEvaluate {
+        classDirectories.setFrom(
+                // 그 외의 매칭되는 클래스도 제외 대상
+                files(classDirectories.files.collect {
+                    fileTree(dir: it, excludes: [
+                            "**/*Application*",
+                            "**/*Config*",
+                            "**/*Interceptor*",
+                            "**/*Exception*",
+                            "**/global*",
+                            "**/dto*",
+                            "**/dao*",
+//                            "**/domain*",
+                            "**/api*"
+                    ])
+                })
+        )
+    }
+}
+
+jacocoTestCoverageVerification {
+    // QueryDSL QDomain 제외시키기
+    def QDomains = []
+    // qPattern = "*.QA","*.QB","*.QC", ... "*.QZ"
+    for (qPattern in '*.QA'..'*.QZ') {
+        QDomains.add(qPattern + '*')
+    }
+
+    violationRules {
+        rule {
+            // rule 활성화
+            enabled = true
+            // 클래스 단위로 룰 체크
+            element = 'CLASS'
+            // 라인 커버리지를 최소 80% 만족
+//            limit {
+//                counter = 'LINE'
+//                value = 'COVEREDRATIO'
+//                minimum = 0.80
+//            }
+            // 마찬가지로 제거 대상 지정
+            excludes = [
+                    "co.kirikiri.domain.**.**",
+                    "**.*Application*",
+                    "**.*Config*",
+                    "**.*Interceptor*",
+                    "**.*Exception*",
+                    "**.*Controller*",
+                    "**.*Repository*",
+                    "**.*Dto*"
+            ]
+        }
+    }
+}
