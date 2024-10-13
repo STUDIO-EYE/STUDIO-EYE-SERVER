@@ -16,6 +16,8 @@ import studio.studioeye.global.common.response.ApiResponse;
 import studio.studioeye.global.exception.error.ErrorCode;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -73,6 +75,29 @@ class NewsServiceTest {
         assertEquals(ErrorCode.NEWS_IS_EMPTY.getStatus(), response.getStatus()); // 에러 코드 검증
         assertEquals(ErrorCode.NEWS_IS_EMPTY.getMessage(), response.getMessage()); // 에러 메시지 검증
     }
+    @Test
+    @DisplayName("뉴스 전체 조회 성공 테스트")
+    void retrieveAllNewsSuccess() {
+        // given
+        List<News> newsList = new ArrayList<>();
+        newsList.add(new News("Test Title1", "Test Source1",  LocalDate.now(), "Test URL1", true));
+        newsList.add(new News("Test Title2", "Test Source2",  LocalDate.now(), "Test URL2", true));
+        newsList.add(new News("Test Title3", "Test Source3",  LocalDate.now(), "Test URL3", true));
+
+        List<News> savedNews = newsList;
+
+        // stub
+        when(newsRepository.findAll()).thenReturn(savedNews);
+
+        // when
+        ApiResponse<List<News>> response = newsService.retrieveAllNews();
+        List<News> findNews = response.getData();
+
+        // then
+        Assertions.assertThat(findNews).isEqualTo(savedNews);
+        Assertions.assertThat(findNews.size()).isEqualTo(3);
+    }
+
 
     @Test
     @DisplayName("단일 뉴스 조회 성공 테스트")
