@@ -14,9 +14,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import studio.studioeye.domain.news.dao.NewsRepository;
 import studio.studioeye.domain.news.domain.News;
+import studio.studioeye.domain.news.dto.UpdateNewsServiceRequestDto;
 import studio.studioeye.global.common.response.ApiResponse;
 import studio.studioeye.global.exception.error.ErrorCode;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -67,6 +69,36 @@ class NewsServiceTest {
         // then
         Assertions.assertThat(result).isNotNull();
         Assertions.assertThat(result).isEqualTo(newsPage);
+    }
+
+    @Test
+    @DisplayName("News 수정 성공 테스트")
+    void updateNewsSuccess() throws IOException {
+        // given
+        Long id = 1L;
+        String newTitle = "Test Title2";
+        String newSource = "Test Source2";
+        LocalDate newPubDate = LocalDate.now();
+        String newUrl = "Test URL2";
+        Boolean newVisibility = false;
+        News savedNews = new News("Test Title1", "Test Source1", LocalDate.of(2022, 1, 1), "Test URL1", true);
+
+        // stub
+        when(newsRepository.findById(id)).thenReturn(Optional.of(savedNews));
+        UpdateNewsServiceRequestDto dto = new UpdateNewsServiceRequestDto(id, newTitle, newSource, newPubDate, newUrl, newVisibility);
+
+        // when
+        ApiResponse<News> response = newsService.updateNews(dto);
+
+        // then
+        Assertions.assertThat(response.getMessage()).isEqualTo("News를 성공적으로 수정하였습니다.");
+        Assertions.assertThat(newTitle).isEqualTo(savedNews.getTitle());
+        Assertions.assertThat(newSource).isEqualTo(savedNews.getSource());
+        Assertions.assertThat(newPubDate).isEqualTo(savedNews.getPubDate());
+        Assertions.assertThat(newUrl).isEqualTo(savedNews.getUrl());
+        Assertions.assertThat(newVisibility).isEqualTo(savedNews.getVisibility());
+
+        Mockito.verify(newsRepository, times(1)).findById(id);
     }
 
     @Test
