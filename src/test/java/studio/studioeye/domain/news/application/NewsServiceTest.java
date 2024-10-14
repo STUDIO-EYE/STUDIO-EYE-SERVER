@@ -8,12 +8,18 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import studio.studioeye.domain.news.dao.NewsRepository;
 import studio.studioeye.domain.news.domain.News;
 import studio.studioeye.global.common.response.ApiResponse;
 import studio.studioeye.global.exception.error.ErrorCode;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.Mockito.times;
@@ -27,6 +33,41 @@ class NewsServiceTest {
 
     @Mock
     private NewsRepository newsRepository;
+
+    @Test
+    @DisplayName("뉴스 전체 조회 성공 테스트")
+    void retrieveAllNewsSuccess() {
+        // given
+
+        int page = 0;
+        int size = 2;
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        List<News> newsList = new ArrayList<>();
+        newsList.add(new News("Test Title1", "Test Source1",  LocalDate.now(), "Test URL1", true));
+        newsList.add(new News("Test Title2", "Test Source2",  LocalDate.now(), "Test URL2", true));
+        newsList.add(new News("Test Title3", "Test Source3",  LocalDate.now(), "Test URL3", true));
+        newsList.add(new News("Test Title4", "Test Source4",  LocalDate.now(), "Test URL4", true));
+        newsList.add(new News("Test Title5", "Test Source5",  LocalDate.now(), "Test URL5", true));
+        newsList.add(new News("Test Title6", "Test Source6",  LocalDate.now(), "Test URL6", true));
+        newsList.add(new News("Test Title7", "Test Source7",  LocalDate.now(), "Test URL7", true));
+        newsList.add(new News("Test Title8", "Test Source8",  LocalDate.now(), "Test URL8", true));
+        newsList.add(new News("Test Title9", "Test Source9",  LocalDate.now(), "Test URL9", true));
+        newsList.add(new News("Test Title10", "Test Source10",  LocalDate.now(), "Test URL10", true));
+
+        Page<News> newsPage = new PageImpl<>(newsList, pageable, newsList.size());
+
+        // stub
+        when(newsRepository.findAll(pageable)).thenReturn(newsPage);
+
+        // when
+        Page<News> result = newsService.retrieveNewsPage(page, size);
+
+        // then
+        Assertions.assertThat(result).isNotNull();
+        Assertions.assertThat(result).isEqualTo(newsPage);
+    }
 
     @Test
     @DisplayName("단일 뉴스 조회 성공 테스트")
