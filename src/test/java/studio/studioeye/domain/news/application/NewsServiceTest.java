@@ -38,7 +38,38 @@ class NewsServiceTest {
 
     @Test
     @DisplayName("News 페이지네이션 조회 성공 테스트")
-    void retrieveAllNewsSuccess() {
+    void retrieveNewsPageSuccess() {
+        // given
+
+        int page = 0;
+        int size = 2;
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        List<News> newsList = new ArrayList<>();
+        newsList.add(new News("Test Title1", "Test Source1",  LocalDate.now(), "Test URL1", true));
+        newsList.add(new News("Test Title2", "Test Source2",  LocalDate.now(), "Test URL2", true));
+        newsList.add(new News("Test Title3", "Test Source3",  LocalDate.now(), "Test URL3", true));
+        newsList.add(new News("Test Title4", "Test Source4",  LocalDate.now(), "Test URL4", true));
+        newsList.add(new News("Test Title5", "Test Source5",  LocalDate.now(), "Test URL5", true));
+        newsList.add(new News("Test Title6", "Test Source6",  LocalDate.now(), "Test URL6", true));
+        newsList.add(new News("Test Title7", "Test Source7",  LocalDate.now(), "Test URL7", true));
+        newsList.add(new News("Test Title8", "Test Source8",  LocalDate.now(), "Test URL8", true));
+        newsList.add(new News("Test Title9", "Test Source9",  LocalDate.now(), "Test URL9", true));
+        newsList.add(new News("Test Title10", "Test Source10",  LocalDate.now(), "Test URL10", true));
+
+        Page<News> newsPage = new PageImpl<>(newsList, pageable, newsList.size());
+
+        // stub
+        when(newsRepository.findAll(pageable)).thenReturn(newsPage);
+
+        // when
+        Page<News> result = newsService.retrieveNewsPage(page, size);
+
+        // then
+        Assertions.assertThat(result).isNotNull();
+        Assertions.assertThat(result).isEqualTo(newsPage);
+    }
         // given
 
         int page = 0;
