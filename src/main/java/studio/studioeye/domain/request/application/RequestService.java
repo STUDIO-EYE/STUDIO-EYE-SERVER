@@ -1,5 +1,18 @@
 package studio.studioeye.domain.request.application;
 
+import studio.studioeye.domain.email.service.EmailService;
+import studio.studioeye.domain.notification.application.NotificationService;
+import studio.studioeye.domain.request.dao.AnswerRepository;
+import studio.studioeye.domain.request.dao.RequestCount;
+import studio.studioeye.domain.request.dao.RequestRepository;
+import studio.studioeye.domain.request.domain.Answer;
+import studio.studioeye.domain.request.domain.Request;
+import studio.studioeye.domain.request.domain.State;
+import studio.studioeye.domain.request.dto.request.CreateRequestServiceDto;
+import studio.studioeye.domain.request.dto.request.UpdateRequestCommentServiceDto;
+import studio.studioeye.domain.request.dto.request.UpdateRequestStateServiceDto;
+import studio.studioeye.global.common.response.ApiResponse;
+import studio.studioeye.global.exception.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -7,18 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import studio.studioeye.domain.email.service.EmailService;
-import studio.studioeye.domain.notification.application.NotificationService;
-import studio.studioeye.domain.request.dao.*;
-import studio.studioeye.domain.request.domain.Answer;
-import studio.studioeye.domain.request.domain.Request;
-import studio.studioeye.domain.request.domain.State;
-import studio.studioeye.domain.request.dto.request.CreateRequestServiceDto;
-import studio.studioeye.domain.request.dto.request.UpdateRequestCommentServiceDto;
-import studio.studioeye.domain.request.dto.request.UpdateRequestStateServiceDto;
 import studio.studioeye.infrastructure.s3.S3Adapter;
-import studio.studioeye.global.common.response.ApiResponse;
-import studio.studioeye.global.exception.error.ErrorCode;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -139,88 +141,66 @@ public class RequestService {
 		return ApiResponse.ok("전체 문의수를 성공적으로 조회했습니다.", requestCount);
 	}
 
-	public ApiResponse<List<RequestCount>> retrieveRequestCountByPeriod(Integer startYear, Integer startMonth, Integer endYear, Integer endMonth) {
-		// 월 형식 검사
-		if(!checkMonth(startMonth) || !checkMonth(endMonth)) return ApiResponse.withError(ErrorCode.INVALID_REQUEST_MONTH);
-		// 종료점이 시작점보다 앞에 있을 경우 제한 걸기
-		if(startYear > endYear || (startYear.equals(endYear) && startMonth > endMonth)) {
+	public ApiResponse<List<Map<String, Object>>> retrieveRequestCountByCategoryAndState(String category, String state,
+																						 Integer startYear,
+																						 Integer startMonth,
+																						 Integer endYear,
+																						 Integer endMonth) {
+		// State enum으로 변환
+		State stateEnum;
+		try {
+			// 상태가 "all"일 경우 null로 설정
+			stateEnum = (state == null || state.equalsIgnoreCase("all")) ? null : State.valueOf(state.toUpperCase());
+		} catch (IllegalArgumentException e) {
+			return ApiResponse.withError(ErrorCode.INVALID_INPUT_VALUE);
+		}
+		// 카테고리 변환
+		if (category == null || category.equalsIgnoreCase("all")) {
+			category = null; // "all"일 때 null로 설정
+		}
+
+		// 월 형식 검사 및 유효성 검사 통합
+		if (startMonth < 1 || startMonth > 12 || endMonth < 1 || endMonth > 12) {
+			return ApiResponse.withError(ErrorCode.INVALID_REQUEST_MONTH);
+		}
+
+		// 종료점이 시작점보다 앞에 있을 경우 제한
+		if (startYear > endYear || (startYear.equals(endYear) && startMonth > endMonth)) {
 			return ApiResponse.withError(ErrorCode.INVALID_PERIOD_FORMAT);
 		}
-		// 2~12달로 제한 걸기
+
+		// 2~12달로 제한
 		Integer months = (endYear - startYear) * 12 + (endMonth - startMonth) + 1;
-		if(months < 2 || months > 12) {
-			return ApiResponse.withError(ErrorCode.INVALID_REQUEST_PERIOD);
-		}
-		List<RequestCount> requestCountList = requestRepository.findByYearAndMonthBetween(startYear, startMonth, endYear, endMonth);
-		for (int year = startYear; year <= endYear; year++) {
-			int monthStart = (year == startYear) ? startMonth : 1;
-			int monthEnd = (year == endYear) ? endMonth : 12;
-
-			for (int month = monthStart; month <= monthEnd; month++) {
-				boolean found = false;
-
-				// 현재 조회할 연도와 월에 해당하는 인덱스 찾기
-				int index = 0;
-				for (RequestCount requestCount : requestCountList) {
-					// 이미 해당 연도와 월에 대한 데이터가 존재하는 경우
-					if (requestCount.getYear() == year && requestCount.getMonth() == month) {
-						found = true;
-						break;
-					}
-					// 현재 연도보다 작은 경우 삽입 위치 찾기
-					else if (requestCount.getYear() < year || (requestCount.getYear() == year && requestCount.getMonth() < month)) {
-						// 삽입 위치 계산
-						index++;
-					}
-				}
-
-				// 해당 연도와 월에 대한 데이터가 존재하지 않는 경우, 0으로 데이터 추가
-				if (!found) {
-					// 데이터를 삽입한 후에는 인덱스를 증가시킴
-					requestCountList.add(index, new RequestCountImpl(year, month, 0L));
-				}
-			}
-		}
-		return ApiResponse.ok("문의수 목록을 성공적으로 조회했습니다.", requestCountList);
-	}
-
-	public ApiResponse<List<Map<String, Object>>> retrieveCategoryRequestCountByPeriod(Integer startYear, Integer startMonth, Integer endYear, Integer endMonth) {
-		// 월 형식 검사
-		if(!checkMonth(startMonth) || !checkMonth(endMonth)) return ApiResponse.withError(ErrorCode.INVALID_REQUEST_MONTH);
-		// 종료점이 시작점보다 앞에 있을 경우 제한 걸기
-		if(startYear > endYear || (startYear.equals(endYear) && startMonth > endMonth)) {
-			return ApiResponse.withError(ErrorCode.INVALID_PERIOD_FORMAT);
-		}
-		// 2~12달로 제한 걸기
-		Integer months = (endYear - startYear) * 12 + (endMonth - startMonth) + 1;
-		if(months < 2 || months > 12) {
+		if (months < 2 || months > 12) {
 			return ApiResponse.withError(ErrorCode.INVALID_REQUEST_PERIOD);
 		}
 
-		List<RequestCategoryCount> requestCountList = requestRepository.findCategoryReqNumByYearAndMonthBetween(startYear, startMonth, endYear, endMonth);
+		// 데이터 조회
+		List<RequestCount> requestCountList = requestRepository.findReqNumByYearAndMonthBetweenWithCategoryAndState(
+				startYear, startMonth, endYear, endMonth, category, stateEnum);
+
+		// 응답 데이터 초기화
 		List<Map<String, Object>> responseList = new ArrayList<>();
 		for (int year = startYear; year <= endYear; year++) {
 			int monthStart = (year == startYear) ? startMonth : 1;
 			int monthEnd = (year == endYear) ? endMonth : 12;
 
 			for (int month = monthStart; month <= monthEnd; month++) {
-				// 해당 연도와 월에 대한 categoryRequestCount 초기화.
-				Map<String, Long> categoryRequestCount = new HashMap<>();
-
-				for (RequestCategoryCount requestCount : requestCountList) {
+				// 해당 연도와 월에 대한 stateRequestCount 초기화
+				Map<String, Long> stateRequestCount = new HashMap<>();
+				for (RequestCount requestCount : requestCountList) {
 					if (requestCount.getYear() == year && requestCount.getMonth() == month) {
-						categoryRequestCount.put(requestCount.getCategory(), requestCount.getRequestCount());
+						stateRequestCount.put(String.valueOf(requestCount.getState()), requestCount.getRequestCount());
 					}
 				}
 
 				Map<String, Object> responseItem = new HashMap<>();
 				responseItem.put("year", year);
 				responseItem.put("month", month);
-				responseItem.put("categoryRequestCount", categoryRequestCount);
+				responseItem.put("RequestCount", stateRequestCount);
 				responseList.add(responseItem);
 			}
 		}
-
 
 		return ApiResponse.ok("문의수 목록을 성공적으로 조회했습니다.", responseList);
 	}

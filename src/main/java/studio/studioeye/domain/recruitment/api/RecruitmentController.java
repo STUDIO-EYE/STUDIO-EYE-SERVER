@@ -57,6 +57,4 @@ public class RecruitmentController {
     public ApiResponse<String> deleteRecruitment(@PathVariable Long id) {
         return recruitmentService.deleteRecruitment(id);
     }
-
-
 }

@@ -1,11 +1,5 @@
 package studio.studioeye.domain.recruitment.application;
 
-import studio.studioeye.domain.recruitment.dao.RecruitmentRepository;
-import studio.studioeye.domain.recruitment.dao.RecruitmentTitle;
-import studio.studioeye.domain.recruitment.domain.Recruitment;
-import studio.studioeye.domain.recruitment.dto.request.CreateRecruitmentServiceRequestDto;
-import studio.studioeye.domain.recruitment.dto.request.UpdateRecruitmentServiceRequestDto;
-import studio.studioeye.global.common.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -13,6 +7,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import studio.studioeye.domain.recruitment.dao.RecruitmentRepository;
+import studio.studioeye.domain.recruitment.dao.RecruitmentTitle;
+import studio.studioeye.domain.recruitment.domain.Recruitment;
+import studio.studioeye.domain.recruitment.domain.Status;
+import studio.studioeye.domain.recruitment.dto.request.CreateRecruitmentServiceRequestDto;
+import studio.studioeye.domain.recruitment.dto.request.UpdateRecruitmentServiceRequestDto;
+import studio.studioeye.global.common.response.ApiResponse;
 import studio.studioeye.global.exception.error.ErrorCode;
 
 import java.util.Date;
@@ -80,15 +81,18 @@ public class RecruitmentService {
         return ApiResponse.ok("채용공고를 성공적으로 삭제하였습니다.");
     }
 
-    private Boolean calculateStatus(Date startDate, Date deadline) {
+    private Status calculateStatus(Date startDate, Date deadline) {
         TimeZone.setDefault(TimeZone.getTimeZone("Asia/Seoul"));
         Date now = new Date();
-        return now.compareTo(startDate) >= 0 && now.compareTo(deadline) <= 0;
+//        return now.compareTo(startDate) >= 0 && now.compareTo(deadline) <= 0;
+        if(now.compareTo(startDate) < 0) return Status.PREPARING;
+        if(now.compareTo(startDate) >= 0 && now.compareTo(deadline) <= 0) return Status.OPEN;
+        return Status.CLOSE;
     }
 
     @Scheduled(cron = "0 0 0 * * *") // 자정
     public void autoUpdate() {
-        List<Recruitment> recruitmentList = recruitmentRepository.findByStatusTrue();
+        List<Recruitment> recruitmentList = recruitmentRepository.findByStatusNotClose();
         for(Recruitment recruitment : recruitmentList) {
             recruitment.setStatus(calculateStatus(recruitment.getStartDate(), recruitment.getDeadline()));
             recruitmentRepository.save(recruitment);

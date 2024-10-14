@@ -1,5 +1,11 @@
 package studio.studioeye.domain.request.api;
 
+import studio.studioeye.domain.request.application.RequestService;
+import studio.studioeye.domain.request.domain.Request;
+import studio.studioeye.domain.request.dto.request.CreateRequestDto;
+import studio.studioeye.domain.request.dto.request.UpdateRequestCommentDto;
+import studio.studioeye.domain.request.dto.request.UpdateRequestStateDto;
+import studio.studioeye.global.common.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -7,13 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import studio.studioeye.domain.request.application.RequestService;
-import studio.studioeye.domain.request.dao.RequestCount;
-import studio.studioeye.domain.request.domain.Request;
-import studio.studioeye.domain.request.dto.request.CreateRequestDto;
-import studio.studioeye.domain.request.dto.request.UpdateRequestCommentDto;
-import studio.studioeye.domain.request.dto.request.UpdateRequestStateDto;
-import studio.studioeye.global.common.response.ApiResponse;
 
 import java.io.IOException;
 import java.util.List;
@@ -57,21 +56,18 @@ public class RequestController {
 	public ApiResponse<Long> retrieveRequestCount() {
 		return requestService.retrieveRequestCount();
 	}
-
-	@Operation(summary = "기간(시작점(연도, 월)~종료점(연도, 월))으로 문의 수 조회 API")
-	@GetMapping("/requests/{startYear}/{startMonth}/{endYear}/{endMonth}")
-	public ApiResponse<List<RequestCount>> retrieveRequestCountByPeriod(@PathVariable Integer startYear, @PathVariable Integer startMonth,
-																		@PathVariable Integer endYear, @PathVariable Integer endMonth) {
-		return requestService.retrieveRequestCountByPeriod(startYear, startMonth, endYear, endMonth);
+	
+	@Operation(summary = "기간(시작점(연도, 월)~종료점(연도, 월))으로 완료여부(상태), 카테고리에 따른 문의 수 조회 API")
+	@GetMapping("/requests/{category}/{state}/{startYear}/{startMonth}/{endYear}/{endMonth}")
+	public ApiResponse<List<Map<String, Object>>> retrieveStateRequestCountByPeriod(@PathVariable String category,
+																					@PathVariable String state,
+																					@PathVariable Integer startYear,
+																					@PathVariable Integer startMonth,
+																					@PathVariable Integer endYear,
+																					@PathVariable Integer endMonth) {
+		return requestService.retrieveRequestCountByCategoryAndState(
+				category, state, startYear, startMonth, endYear, endMonth);
 	}
-
-	@Operation(summary = "기간(시작점(연도, 월)~종료점(연도, 월))으로 카테고리별 문의 수 조회 API")
-	@GetMapping("/requests/category/{startYear}/{startMonth}/{endYear}/{endMonth}")
-	public ApiResponse<List<Map<String, Object>>> retrieveCategoryRequestCountByPeriod(@PathVariable Integer startYear, @PathVariable Integer startMonth,
-																					   @PathVariable Integer endYear, @PathVariable Integer endMonth) {
-		return requestService.retrieveCategoryRequestCountByPeriod(startYear, startMonth, endYear, endMonth);
-	}
-
 	@Operation(summary = "접수 대기 중인 문의 수 조회 API")
 	@GetMapping("/requests/waiting/count")
 	public ApiResponse<Long> retrieveWaitingRequestCount() {

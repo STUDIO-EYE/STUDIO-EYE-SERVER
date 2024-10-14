@@ -4,13 +4,13 @@ import studio.studioeye.domain.benefit.dao.BenefitRepository;
 import studio.studioeye.domain.benefit.domain.Benefit;
 import studio.studioeye.domain.benefit.dto.request.CreateBenefitServiceRequestDto;
 import studio.studioeye.domain.benefit.dto.request.UpdateBenefitServiceRequestDto;
-import studio.studioeye.infrastructure.s3.S3Adapter;
 import studio.studioeye.global.common.response.ApiResponse;
-import studio.studioeye.global.exception.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import studio.studioeye.global.exception.error.ErrorCode;
+import studio.studioeye.infrastructure.s3.S3Adapter;
 
 import java.io.IOException;
 import java.util.List;
@@ -65,6 +65,18 @@ public class BenefitService {
         benefit.setContent(dto.content());
         Benefit savedBenefit = benefitRepository.save(benefit);
         return ApiResponse.ok("혜택 정보를 성공적으로 수정했습니다.", savedBenefit);
+    }
+
+    public ApiResponse<Benefit> updateBenefitText(UpdateBenefitServiceRequestDto dto) {
+        Optional<Benefit> optionalBenefit = benefitRepository.findById(dto.id());
+        if(optionalBenefit.isEmpty()) {
+            return ApiResponse.withError(ErrorCode.INVALID_BENEFIT_ID);
+        }
+        Benefit benefit = optionalBenefit.get();
+        benefit.setTitle(dto.title());
+        benefit.setContent(dto.content());
+        Benefit savedBenefit = benefitRepository.save(benefit);
+        return ApiResponse.ok("혜택 텍스트 정보를 성공적으로 수정했습니다.", savedBenefit);
     }
 
     public ApiResponse<String> deleteBenefit(Long benefitId) {
