@@ -82,10 +82,10 @@ class NewsServiceTest {
         String newUrl = "Test URL2";
         Boolean newVisibility = false;
         News savedNews = new News("Test Title1", "Test Source1", LocalDate.of(2022, 1, 1), "Test URL1", true);
+        UpdateNewsServiceRequestDto dto = new UpdateNewsServiceRequestDto(id, newTitle, newSource, newPubDate, newUrl, newVisibility);
 
         // stub
         when(newsRepository.findById(id)).thenReturn(Optional.of(savedNews));
-        UpdateNewsServiceRequestDto dto = new UpdateNewsServiceRequestDto(id, newTitle, newSource, newPubDate, newUrl, newVisibility);
 
         // when
         ApiResponse<News> response = newsService.updateNews(dto);
@@ -99,6 +99,27 @@ class NewsServiceTest {
         Assertions.assertThat(newVisibility).isEqualTo(savedNews.getVisibility());
 
         Mockito.verify(newsRepository, times(1)).findById(id);
+    }
+
+    @Test
+    @DisplayName("News 수정 실패 테스트")
+    void updateNewsFail() throws IOException {
+        // given
+        Long invalidId = 999L;
+        News savedNews = new News("Test Title1", "Test Source1", LocalDate.of(2022, 1, 1), "Test URL1", true);
+        UpdateNewsServiceRequestDto dto = new UpdateNewsServiceRequestDto(invalidId, "Title", "Source", LocalDate.now(), "https://url.com", true);
+
+        // stub
+        when(newsRepository.findById(invalidId)).thenReturn(Optional.empty());
+
+        // when
+        ApiResponse<News> response = newsService.updateNews(dto);
+        News findNews = response.getData();
+
+        // then
+        Assertions.assertThat(response.getStatus()).isEqualTo(ErrorCode.INVALID_NEWS_ID.getStatus());
+        Assertions.assertThat(findNews).isNotEqualTo(savedNews);
+        Mockito.verify(newsRepository, times(1)).findById(invalidId);  // repository 메소드 호출 검증
     }
 
     @Test
