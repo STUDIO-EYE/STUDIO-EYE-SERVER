@@ -78,9 +78,7 @@ class NewsServiceTest {
         // given
         int invalidPage = -1;
         int invalidSize = 0;
-        Pageable pageable = PageRequest.of(invalidPage, invalidSize);
 
-        when(newsRepository.findAll(pageable)).thenThrow(new RuntimeException("Database Error"));
         // when & then
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             newsService.retrieveNewsPage(invalidPage, invalidSize);
@@ -94,7 +92,7 @@ class NewsServiceTest {
 
     @Test
     @DisplayName("News 페이지네이션 조회 실패 테스트 - Repository 호출 문제 발생 테스트")
-    void retrieveNewsPageFail() {
+    void retrieveNewsPageFail_callRepository() {
         // given
         int page = 0;
         int size = 2;
