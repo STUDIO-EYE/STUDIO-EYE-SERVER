@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 
@@ -40,7 +42,6 @@ class NewsServiceTest {
     @DisplayName("News 페이지네이션 조회 성공 테스트")
     void retrieveNewsPageSuccess() {
         // given
-
         int page = 0;
         int size = 2;
 
@@ -70,36 +71,46 @@ class NewsServiceTest {
         Assertions.assertThat(result).isNotNull();
         Assertions.assertThat(result).isEqualTo(newsPage);
     }
-        // given
 
+    @Test
+    @DisplayName("News 페이지네이션 조회 실패 테스트 - 유효하지 않은 page, size")
+    void retrieveNewsPageFail_invalidPageSize() {
+        // given
+        int invalidPage = -1;
+        int invalidSize = 0;
+        Pageable pageable = PageRequest.of(invalidPage, invalidSize);
+
+        when(newsRepository.findAll(pageable)).thenThrow(new RuntimeException("Database Error"));
+        // when & then
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            newsService.retrieveNewsPage(invalidPage, invalidSize);
+        });
+
+        Assertions.assertThat(exception.getMessage()).isEqualTo("Page index must not be less than zero");
+
+        // 리포지토리가 호출되지 않았는지 확인
+        Mockito.verify(newsRepository, Mockito.never()).findAll(any(Pageable.class));
+    }
+
+    @Test
+    @DisplayName("News 페이지네이션 조회 실패 테스트 - Repository 호출 문제 발생 테스트")
+    void retrieveNewsPageFail() {
+        // given
         int page = 0;
         int size = 2;
-
         Pageable pageable = PageRequest.of(page, size);
 
-        List<News> newsList = new ArrayList<>();
-        newsList.add(new News("Test Title1", "Test Source1",  LocalDate.now(), "Test URL1", true));
-        newsList.add(new News("Test Title2", "Test Source2",  LocalDate.now(), "Test URL2", true));
-        newsList.add(new News("Test Title3", "Test Source3",  LocalDate.now(), "Test URL3", true));
-        newsList.add(new News("Test Title4", "Test Source4",  LocalDate.now(), "Test URL4", true));
-        newsList.add(new News("Test Title5", "Test Source5",  LocalDate.now(), "Test URL5", true));
-        newsList.add(new News("Test Title6", "Test Source6",  LocalDate.now(), "Test URL6", true));
-        newsList.add(new News("Test Title7", "Test Source7",  LocalDate.now(), "Test URL7", true));
-        newsList.add(new News("Test Title8", "Test Source8",  LocalDate.now(), "Test URL8", true));
-        newsList.add(new News("Test Title9", "Test Source9",  LocalDate.now(), "Test URL9", true));
-        newsList.add(new News("Test Title10", "Test Source10",  LocalDate.now(), "Test URL10", true));
-
-        Page<News> newsPage = new PageImpl<>(newsList, pageable, newsList.size());
-
-        // stub
-        when(newsRepository.findAll(pageable)).thenReturn(newsPage);
-
         // when
-        Page<News> result = newsService.retrieveNewsPage(page, size);
+        when(newsRepository.findAll(pageable)).thenThrow(new RuntimeException("Database Error"));
 
         // then
-        Assertions.assertThat(result).isNotNull();
-        Assertions.assertThat(result).isEqualTo(newsPage);
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+            newsService.retrieveNewsPage(page, size);
+        });
+
+        Assertions.assertThat("Database Error").isEqualTo(exception.getMessage());
+
+        Mockito.verify(newsRepository, times(1)).findAll(pageable);
     }
 
     @Test
@@ -208,7 +219,7 @@ class NewsServiceTest {
         Assertions.assertThat(response.getMessage()).isEqualTo("News를 성공적으로 삭제했습니다.");
         // method call verify
         Mockito.verify(newsRepository, times(1)).delete(savedNews);
-        Mockito.verify(newsRepository, times(1)).delete(Mockito.any()); // any argument
+        Mockito.verify(newsRepository, times(1)).delete(any()); // any argument
     }
 
     @Test
@@ -225,6 +236,6 @@ class NewsServiceTest {
         // then
         Assertions.assertThat(response.getStatus()).isEqualTo(ErrorCode.INVALID_NEWS_ID.getStatus());
         // method call verify
-        Mockito.verify(newsRepository, Mockito.never()).delete(Mockito.any());
+        Mockito.verify(newsRepository, Mockito.never()).delete(any());
     }
 }
