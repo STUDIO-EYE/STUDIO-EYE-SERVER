@@ -65,26 +65,6 @@ public class RecruitmentServiceTest {
     }
 
     @Test
-    @DisplayName("채용공고 실패 테스트 - 제목이 비어 있는 경우")
-    public void createRecruitmentFail() {
-        // given
-        Date startDate = new Date(System.currentTimeMillis() + 100000);
-        Date deadline = new Date(System.currentTimeMillis());
-        CreateRecruitmentServiceRequestDto requestDto = new CreateRecruitmentServiceRequestDto(
-                "",
-                startDate,
-                deadline,
-                "https://www.naver.com"
-        );
-
-        // when & then
-        ApiResponse<Recruitment> response = recruitmentService.createRecruitment(requestDto);
-
-        assertNotNull(response);
-        assertEquals(ErrorCode.RECRUITMENT_TITLE_IS_EMPTY.getStatus(), response.getStatus()); // 에러 코드 검증
-        assertEquals(ErrorCode.RECRUITMENT_TITLE_IS_EMPTY.getMessage(), response.getMessage()); // 에러 메시지 검증
-    }
-
     @DisplayName("채용공고 생성 실패 테스트 - 제목이 비어 있는 경우")
     public void createRecruitmentFail_emptyTitle() {
         // given
