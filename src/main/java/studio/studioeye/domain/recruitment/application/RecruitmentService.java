@@ -35,7 +35,7 @@ public class RecruitmentService {
             return ApiResponse.withError(ErrorCode.RECRUITMENT_TITLE_IS_EMPTY);
         }
 
-        if (dto.startDate().after(dto.deadline())) {
+        if(dto.startDate().after(dto.deadline())) {
             return ApiResponse.withError(ErrorCode.INVALID_RECRUITMENT_DATE);
         }
 
