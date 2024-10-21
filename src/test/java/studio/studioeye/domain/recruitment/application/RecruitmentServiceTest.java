@@ -13,8 +13,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import studio.studioeye.domain.news.domain.News;
-import studio.studioeye.domain.news.dto.UpdateNewsServiceRequestDto;
 import studio.studioeye.domain.recruitment.dao.RecruitmentRepository;
 import studio.studioeye.domain.recruitment.dao.RecruitmentTitle;
 import studio.studioeye.domain.recruitment.domain.Recruitment;
@@ -24,7 +22,6 @@ import studio.studioeye.domain.recruitment.dto.request.UpdateRecruitmentServiceR
 import studio.studioeye.global.common.response.ApiResponse;
 import studio.studioeye.global.exception.error.ErrorCode;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
