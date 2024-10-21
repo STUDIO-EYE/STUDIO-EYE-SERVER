@@ -105,4 +105,25 @@ public class RecruitmentServiceTest {
         assertEquals(ErrorCode.RECRUITMENT_TITLE_IS_EMPTY.getStatus(), response.getStatus()); // 에러 코드 검증
         assertEquals(ErrorCode.RECRUITMENT_TITLE_IS_EMPTY.getMessage(), response.getMessage()); // 에러 메시지 검증
     }
+
+    @Test
+    @DisplayName("채용공고 실패 테스트 - 시작일이 마감일보다 이후인 경우")
+    public void createRecruitmentFail_invalidDate() {
+        // given
+        Date startDate = new Date(System.currentTimeMillis() + 100000);
+        Date deadline = new Date(System.currentTimeMillis());
+        CreateRecruitmentServiceRequestDto requestDto = new CreateRecruitmentServiceRequestDto(
+                "title",
+                startDate,
+                deadline,
+                "https://www.naver.com"
+        );
+
+        // when & then
+        ApiResponse<Recruitment> response = recruitmentService.createRecruitment(requestDto);
+
+        assertNotNull(response);
+        assertEquals(ErrorCode.INVALID_RECRUITMENT_DATE.getStatus(), response.getStatus()); // 에러 코드 검증
+        assertEquals(ErrorCode.INVALID_RECRUITMENT_DATE.getMessage(), response.getMessage()); // 에러 메시지 검증
+    }
 }
