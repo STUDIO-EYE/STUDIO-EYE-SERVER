@@ -217,4 +217,27 @@ public class BenefitServiceTest {
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatus());
         assertEquals(ErrorCode.INVALID_BENEFIT_ID.getMessage(), response.getMessage());
     }
+
+    @Test
+    @DisplayName("Benefit 삭제 성공 테스트")
+    void deleteBenefitSuccess() {
+        // given
+        Long benefitId = 1L;
+        Benefit benefitToDelete = new Benefit("Test ImageUrl", "Test ImageFileName", "Test Title", "Test Content");
+
+        // stub
+        when(benefitRepository.findById(benefitId)).thenReturn(Optional.of(benefitToDelete));
+        when(s3Adapter.deleteFile(benefitToDelete.getImageFileName())).thenReturn(ApiResponse.ok("S3에서 파일 삭제 성공"));
+
+        // when
+        ApiResponse<String> response = benefitService.deleteBenefit(benefitId);
+
+        // then
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatus());
+        assertEquals("혜택 정보를 성공적으로 삭제했습니다.", response.getMessage());
+
+        verify(benefitRepository).delete(benefitToDelete);
+    }
+
 }
