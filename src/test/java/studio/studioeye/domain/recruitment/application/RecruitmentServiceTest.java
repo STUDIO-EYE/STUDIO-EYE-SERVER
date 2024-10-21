@@ -14,6 +14,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import studio.studioeye.domain.news.domain.News;
+import studio.studioeye.domain.news.dto.UpdateNewsServiceRequestDto;
 import studio.studioeye.domain.recruitment.dao.RecruitmentRepository;
 import studio.studioeye.domain.recruitment.dao.RecruitmentTitle;
 import studio.studioeye.domain.recruitment.domain.Recruitment;
@@ -368,5 +369,40 @@ public class RecruitmentServiceTest {
 
         Mockito.verify(recruitmentRepository, times(1)).findById(requestDto.id());
         Mockito.verify(recruitmentRepository, times(1)).save(any(Recruitment.class));
+    }
+
+    @Test
+    @DisplayName("채용공고 수정 실패 테스트")
+    public void updateRecruitmentFail() {
+        // given
+        Long invalidId = 999L;
+
+        String startDateString = "2024-10-02 23:39:40.281000";
+        String deadLineString = "2024-10-31 13:39:40.281000";
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS");
+        LocalDateTime localStartDateTime = LocalDateTime.parse(startDateString, formatter);
+        LocalDateTime localDeadLineTime = LocalDateTime.parse(deadLineString, formatter);
+
+        Recruitment savedRecruitment = new Recruitment("Test Title1", new Date(System.currentTimeMillis() - 100000), new Date(System.currentTimeMillis() + 100000), "Test URL1", new Date(), Status.OPEN);
+        UpdateRecruitmentServiceRequestDto requestDto = new UpdateRecruitmentServiceRequestDto(
+                invalidId,
+                "title",
+                Date.from(localStartDateTime.atZone(ZoneId.systemDefault()).toInstant()),
+                Date.from(localDeadLineTime.atZone(ZoneId.systemDefault()).toInstant()),
+                "https://www.naver.com/"
+        );
+
+        // stub
+        when(recruitmentRepository.findById(invalidId)).thenReturn(Optional.empty());
+
+        // when
+        ApiResponse<Recruitment> response = recruitmentService.updateRecruitment(requestDto);
+        Recruitment findRecruitment = response.getData();
+
+        // then
+        Assertions.assertThat(response.getStatus()).isEqualTo(ErrorCode.INVALID_NEWS_ID.getStatus());
+        Assertions.assertThat(findRecruitment).isNotEqualTo(savedRecruitment);
+        Mockito.verify(recruitmentRepository, times(1)).findById(invalidId);  // repository 메소드 호출 검증
     }
 }
