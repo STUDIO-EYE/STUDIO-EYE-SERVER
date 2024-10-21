@@ -404,6 +404,7 @@ public class RecruitmentServiceTest {
         Assertions.assertThat(response.getStatus()).isEqualTo(ErrorCode.INVALID_NEWS_ID.getStatus());
         Assertions.assertThat(findRecruitment).isNotEqualTo(savedRecruitment);
         Mockito.verify(recruitmentRepository, times(1)).findById(invalidId);  // repository 메소드 호출 검증
+        Mockito.verify(recruitmentRepository, Mockito.never()).save(any());
     }
 
     @Test
