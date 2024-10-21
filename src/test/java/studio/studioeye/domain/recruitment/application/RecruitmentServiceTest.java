@@ -1,5 +1,6 @@
 package studio.studioeye.domain.recruitment.application;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,6 +13,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import studio.studioeye.domain.news.domain.News;
 import studio.studioeye.domain.recruitment.dao.RecruitmentRepository;
 import studio.studioeye.domain.recruitment.dao.RecruitmentTitle;
 import studio.studioeye.domain.recruitment.domain.Recruitment;
@@ -20,12 +22,14 @@ import studio.studioeye.domain.recruitment.dto.request.CreateRecruitmentServiceR
 import studio.studioeye.global.common.response.ApiResponse;
 import studio.studioeye.global.exception.error.ErrorCode;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -236,5 +240,30 @@ public class RecruitmentServiceTest {
         assertNotNull(response);
         assertEquals(ErrorCode.INVALID_RECRUITMENT_SIZE.getStatus(), response.getStatus()); // 에러 코드 검증
         assertEquals(ErrorCode.INVALID_RECRUITMENT_SIZE.getMessage(), response.getMessage()); // 에러 메시지 검증
+    }
+
+
+    @Test
+    @DisplayName("단일 채용공고 조회 성공 테스트")
+    public void retrieveRecruitmentByIdSuccess() {
+        // given
+        Long id = 1L;
+        Recruitment savedRecruitment = new Recruitment("Test Title1", new Date(System.currentTimeMillis() - 100000), new Date(System.currentTimeMillis() + 100000), "Test URL1", new Date(), Status.OPEN);
+        // stub
+        when(recruitmentRepository.findById(id)).thenReturn(Optional.of(savedRecruitment));
+
+        // when
+        ApiResponse<Recruitment> response = recruitmentService.retrieveRecruitmentById(id);
+        Recruitment findRecruitment = response.getData();
+
+        // then
+        Assertions.assertThat(findRecruitment).isEqualTo(savedRecruitment);
+        Assertions.assertThat(findRecruitment.getTitle()).isEqualTo(savedRecruitment.getTitle());
+        Assertions.assertThat(findRecruitment.getStartDate()).isEqualTo(savedRecruitment.getStartDate());
+        Assertions.assertThat(findRecruitment.getDeadline()).isEqualTo(savedRecruitment.getDeadline());
+        Assertions.assertThat(findRecruitment.getLink()).isEqualTo(savedRecruitment.getLink());
+        Assertions.assertThat(findRecruitment.getCreatedAt()).isEqualTo(savedRecruitment.getCreatedAt());
+        Assertions.assertThat(findRecruitment.getStatus()).isEqualTo(savedRecruitment.getStatus());
+        Mockito.verify(recruitmentRepository, times(1)).findById(id);
     }
 }
