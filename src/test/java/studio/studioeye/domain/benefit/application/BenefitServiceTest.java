@@ -240,4 +240,24 @@ public class BenefitServiceTest {
         verify(benefitRepository).delete(benefitToDelete);
     }
 
+    @Test
+    @DisplayName("Benefit 삭제 실패 - 유효하지 않은 ID")
+    void deleteBenefitFail() {
+        // given
+        Long benefitId = 1L;
+
+        // stub
+        when(benefitRepository.findById(benefitId)).thenReturn(Optional.empty());
+
+        // when
+        ApiResponse<String> response = benefitService.deleteBenefit(benefitId);
+
+        // then
+        assertNotNull(response);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatus());
+        assertEquals(ErrorCode.INVALID_BENEFIT_ID.getMessage(), response.getMessage());
+
+        verify(benefitRepository, never()).delete(any(Benefit.class));
+    }
+
 }
