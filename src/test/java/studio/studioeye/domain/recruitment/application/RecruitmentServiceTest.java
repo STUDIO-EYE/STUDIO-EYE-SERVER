@@ -103,9 +103,10 @@ public class RecruitmentServiceTest {
                 "https://www.naver.com"
         );
 
-        // when & then
+        // when
         ApiResponse<Recruitment> response = recruitmentService.createRecruitment(requestDto);
 
+        // then
         assertNotNull(response);
         assertEquals(ErrorCode.INVALID_RECRUITMENT_DATE.getStatus(), response.getStatus()); // 에러 코드 검증
         assertEquals(ErrorCode.INVALID_RECRUITMENT_DATE.getMessage(), response.getMessage()); // 에러 메시지 검증
@@ -114,6 +115,7 @@ public class RecruitmentServiceTest {
     @Test
     @DisplayName("채용공고 페이지네이션 조회 성공 테스트")
     public void retrieveRecruitmentListSuccess() {
+        // given
         int page = 0;
         int size = 2;
 
@@ -202,5 +204,21 @@ public class RecruitmentServiceTest {
         assertEquals("채용공고 목록을 성공적으로 조회했습니다.", response.getMessage());
         assertEquals(recruitmentTitlePage, response.getData());
         Mockito.verify(recruitmentRepository, times(1)).findAllRecruitments(pageable);
+    }
+
+    @Test
+    @DisplayName("채용공고 페이지네이션 조회 실패 테스트 - page가 음수인 경우")
+    public void retrieveRecruitmentListFail_InvalidPage() {
+        // given
+        int page = -1;
+        int size = 2;
+
+        // when
+        ApiResponse<Page<RecruitmentTitle>> response = recruitmentService.retrieveRecruitmentList(page, size);
+
+        // then
+        assertNotNull(response);
+        assertEquals(ErrorCode.INVALID_RECRUITMENT_PAGE.getStatus(), response.getStatus()); // 에러 코드 검증
+        assertEquals(ErrorCode.INVALID_RECRUITMENT_PAGE.getMessage(), response.getMessage()); // 에러 메시지 검증
     }
 }
