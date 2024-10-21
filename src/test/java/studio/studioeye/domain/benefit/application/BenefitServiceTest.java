@@ -68,4 +68,25 @@ public class BenefitServiceTest {
         assertEquals("혜택 정보를 성공적으로 등록하였습니다.", response.getMessage());
     }
 
+    @Test
+    @DisplayName("Benefit 생성 실패 - 이미지 업로드 실패")
+    public void createBenefitFailDueToImageUpload() throws IOException {
+        //given
+        CreateBenefitServiceRequestDto requestDto = new CreateBenefitServiceRequestDto(
+                "Test_Title",
+                "Test_Content"
+        );
+
+        //stub
+        when(s3Adapter.uploadFile(any(MultipartFile.class)))
+                .thenReturn(ApiResponse.withError(ErrorCode.ERROR_S3_UPDATE_OBJECT));
+
+        //when
+        ApiResponse<Benefit> response = benefitService.createBenefit(requestDto, mockFile);
+
+        //then
+        assertNotNull(response);
+        assertEquals(ErrorCode.ERROR_S3_UPDATE_OBJECT.getStatus(), response.getStatus());
+        assertEquals(ErrorCode.ERROR_S3_UPDATE_OBJECT.getMessage(), response.getMessage());
+    }
 }
