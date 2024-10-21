@@ -286,4 +286,28 @@ public class RecruitmentServiceTest {
         assertEquals(ErrorCode.INVALID_RECRUITMENT_ID.getStatus(), response.getStatus()); // 에러 코드 검증
         assertEquals(ErrorCode.INVALID_RECRUITMENT_ID.getMessage(), response.getMessage()); // 에러 메시지 검증
     }
+
+    @Test
+    @DisplayName("최근 채용공고 조회 성공 테스트")
+    public void retrieveRecentRecruitmentSuccess() {
+        // given
+        Recruitment savedRecruitment = new Recruitment("Test Title1", new Date(System.currentTimeMillis() - 100000), new Date(System.currentTimeMillis() + 100000), "Test URL1", new Date(), Status.OPEN);
+
+        // stub
+        when(recruitmentRepository.findTopByOrderByCreatedAtDesc()).thenReturn(Optional.of(savedRecruitment));
+
+        // when
+        ApiResponse<Recruitment> response = recruitmentService.retrieveRecentRecruitment();
+        Recruitment findRecruitment = response.getData();
+
+        // then
+        Assertions.assertThat(findRecruitment).isEqualTo(savedRecruitment);
+        Assertions.assertThat(findRecruitment.getTitle()).isEqualTo(savedRecruitment.getTitle());
+        Assertions.assertThat(findRecruitment.getStartDate()).isEqualTo(savedRecruitment.getStartDate());
+        Assertions.assertThat(findRecruitment.getDeadline()).isEqualTo(savedRecruitment.getDeadline());
+        Assertions.assertThat(findRecruitment.getLink()).isEqualTo(savedRecruitment.getLink());
+        Assertions.assertThat(findRecruitment.getCreatedAt()).isEqualTo(savedRecruitment.getCreatedAt());
+        Assertions.assertThat(findRecruitment.getStatus()).isEqualTo(savedRecruitment.getStatus());
+        Mockito.verify(recruitmentRepository, times(1)).findTopByOrderByCreatedAtDesc();
+    }
 }
