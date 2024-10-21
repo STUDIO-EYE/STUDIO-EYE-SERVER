@@ -129,4 +129,31 @@ public class BenefitServiceTest {
         Assertions.assertThat(response.getData()).isNull();
         Assertions.assertThat(response.getMessage()).isEqualTo("혜택 정보가 존재하지 않습니다.");
     }
+
+    @Test
+    @DisplayName("Benefit 수정 성공 테스트")
+    void updateNewsSuccess() throws IOException {
+        // given
+        Long id = 1L;
+        UpdateBenefitServiceRequestDto requestDto = new UpdateBenefitServiceRequestDto(
+                id, "Updated_Title","Updated_Content");
+        Benefit savedBenefit = new Benefit("Test ImageUrl1", "Test ImageFileName1", "Test Title1", "Test Content1");
+
+        // stub
+        when(benefitRepository.findById(requestDto.id())).thenReturn(Optional.of(savedBenefit));
+        when(s3Adapter.deleteFile(savedBenefit.getImageFileName())).thenReturn(ApiResponse.ok("S3에서 파일 삭제 성공"));
+        when(s3Adapter.uploadFile(any(MultipartFile.class)))
+                .thenReturn(ApiResponse.ok("S3에 이미지 업로드 성공", "Updated Test ImageUrl"));
+        when(benefitRepository.save(any(Benefit.class))).thenReturn(savedBenefit);
+
+        //when
+        ApiResponse<Benefit> response = benefitService.updateBenefit(requestDto, mockFile);
+
+        //then
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatus());
+        assertEquals("혜택 정보를 성공적으로 수정했습니다.", response.getMessage());
+        assertEquals("Updated Test ImageUrl", savedBenefit.getImageUrl());
+    }
+
 }
