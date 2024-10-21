@@ -86,7 +86,7 @@ public class RecruitmentServiceTest {
     }
 
     @Test
-    @DisplayName("채용공고 실패 테스트 - 시작일이 마감일보다 이후인 경우")
+    @DisplayName("채용공고 생성 실패 테스트 - 시작일이 마감일보다 이후인 경우")
     public void createRecruitmentFail_invalidDate() {
         // given
         Date startDate = new Date(System.currentTimeMillis() + 100000);
