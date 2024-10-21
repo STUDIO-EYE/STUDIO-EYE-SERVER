@@ -221,4 +221,20 @@ public class RecruitmentServiceTest {
         assertEquals(ErrorCode.INVALID_RECRUITMENT_PAGE.getStatus(), response.getStatus()); // 에러 코드 검증
         assertEquals(ErrorCode.INVALID_RECRUITMENT_PAGE.getMessage(), response.getMessage()); // 에러 메시지 검증
     }
+
+    @Test
+    @DisplayName("채용공고 페이지네이션 조회 실패 테스트 - size가 0이하인 경우")
+    public void retrieveRecruitmentListFail_InvalidSize() {
+        // given
+        int page = 0;
+        int size = 0;
+
+        // when
+        ApiResponse<Page<RecruitmentTitle>> response = recruitmentService.retrieveRecruitmentList(page, size);
+
+        // then
+        assertNotNull(response);
+        assertEquals(ErrorCode.INVALID_RECRUITMENT_SIZE.getStatus(), response.getStatus()); // 에러 코드 검증
+        assertEquals(ErrorCode.INVALID_RECRUITMENT_SIZE.getMessage(), response.getMessage()); // 에러 메시지 검증
+    }
 }
