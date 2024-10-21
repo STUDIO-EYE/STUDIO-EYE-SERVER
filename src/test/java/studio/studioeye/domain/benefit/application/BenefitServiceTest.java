@@ -112,4 +112,21 @@ public class BenefitServiceTest {
         Assertions.assertThat(findBenefit).isEqualTo(savedBenefit);
         Assertions.assertThat(findBenefit.size()).isEqualTo(3);
     }
+
+    @Test
+    @DisplayName("Benefit 전체 조회 실패 테스트 - 데이터 없음")
+    void retrieveNewsByIdFail() {
+        // given
+        List<Benefit> benefitList = new ArrayList<>();
+
+        // stub
+        when(benefitRepository.findAll()).thenReturn(benefitList);
+
+        // when
+        ApiResponse<List<Benefit>> response = benefitService.retrieveBenefit();
+
+        // then
+        Assertions.assertThat(response.getData()).isNull();
+        Assertions.assertThat(response.getMessage()).isEqualTo("혜택 정보가 존재하지 않습니다.");
+    }
 }
