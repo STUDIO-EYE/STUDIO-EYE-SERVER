@@ -310,4 +310,23 @@ public class RecruitmentServiceTest {
         Assertions.assertThat(findRecruitment.getStatus()).isEqualTo(savedRecruitment.getStatus());
         Mockito.verify(recruitmentRepository, times(1)).findTopByOrderByCreatedAtDesc();
     }
+
+    @Test
+    @DisplayName("최근 채용공고 조회 실패 테스트")
+    public void retrieveRecentRecruitmentFail() {
+        // given
+        Recruitment savedRecruitment = new Recruitment("Test Title1", new Date(System.currentTimeMillis() - 100000), new Date(System.currentTimeMillis() + 100000), "Test URL1", new Date(), Status.OPEN);
+
+        // stub
+        when(recruitmentRepository.findTopByOrderByCreatedAtDesc()).thenReturn(Optional.empty());
+
+        // when
+        ApiResponse<Recruitment> response = recruitmentService.retrieveRecentRecruitment();
+        Recruitment findRecruitment = response.getData();
+
+        // then
+        assertNotNull(response);
+        Assertions.assertThat(findRecruitment).isNotEqualTo(savedRecruitment);
+        assertEquals(ErrorCode.RECRUITMENT_IS_EMPTY.getMessage(), response.getMessage()); // 에러 메시지 검증
+    }
 }
