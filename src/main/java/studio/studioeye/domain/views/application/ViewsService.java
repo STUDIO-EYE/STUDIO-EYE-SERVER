@@ -251,11 +251,6 @@ public class ViewsService {
             return ApiResponse.withError(ErrorCode.INVALID_VIEWS_CATEGORY);
         }
 
-        // menu가 ALL이라면 기간으로 전체 조회수 조회 메소드로 연결 (이미 위에서 카테고리는 ALL로 제한해둠)
-        if(menu.equals(MenuTitle.ALL)) {
-            return retrieveAllViewsByPeriod(startYear, startMonth, endYear, endMonth);
-        }
-
         // 월 형식 검사
         if(checkMonth(startMonth) || checkMonth(endMonth)) return ApiResponse.withError(ErrorCode.INVALID_VIEWS_MONTH);
         // 종료점이 시작점보다 앞에 있을 경우 제한 걸기

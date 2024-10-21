@@ -10,4 +10,6 @@ import java.util.List;
 public interface MenuRepository extends JpaRepository<Menu, Long> {
     @Query("SELECT m.menuTitle AS menuTitle FROM Menu m WHERE m.visibility = true ORDER BY m.sequence ASC")
     List<MenuTitle> findTitleByVisibilityTrue();
+
+    boolean existsByMenuTitle(MenuTitle menuTitle);
 }
