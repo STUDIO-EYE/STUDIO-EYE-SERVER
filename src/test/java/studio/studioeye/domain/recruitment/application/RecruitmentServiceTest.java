@@ -37,7 +37,7 @@ public class RecruitmentServiceTest {
     private RecruitmentRepository recruitmentRepository;
 
     @Test
-    @DisplayName("채용공고 생성 성공")
+    @DisplayName("채용공고 생성 성공 테스트")
     public void createRecruitmentSuccess() {
         //given
         String startDateString = "2024-10-02 23:39:40.281000";
@@ -85,8 +85,7 @@ public class RecruitmentServiceTest {
         assertEquals(ErrorCode.RECRUITMENT_TITLE_IS_EMPTY.getMessage(), response.getMessage()); // 에러 메시지 검증
     }
 
-    @Test
-    @DisplayName("채용공고 실패 테스트 - 제목이 비어 있는 경우")
+    @DisplayName("채용공고 생성 실패 테스트 - 제목이 비어 있는 경우")
     public void createRecruitmentFail_emptyTitle() {
         // given
         Date startDate = new Date(System.currentTimeMillis() + 100000);
@@ -126,4 +125,7 @@ public class RecruitmentServiceTest {
         assertEquals(ErrorCode.INVALID_RECRUITMENT_DATE.getStatus(), response.getStatus()); // 에러 코드 검증
         assertEquals(ErrorCode.INVALID_RECRUITMENT_DATE.getMessage(), response.getMessage()); // 에러 메시지 검증
     }
+
+    @Test
+    @DisplayName("채용공고 실패 테스트 - 시작일이 마감일보다 이후인 경우")
 }
