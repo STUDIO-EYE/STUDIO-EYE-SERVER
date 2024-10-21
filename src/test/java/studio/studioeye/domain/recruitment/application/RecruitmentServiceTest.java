@@ -226,6 +226,7 @@ public class RecruitmentServiceTest {
         assertNotNull(response);
         assertEquals(ErrorCode.INVALID_RECRUITMENT_PAGE.getStatus(), response.getStatus()); // 에러 코드 검증
         assertEquals(ErrorCode.INVALID_RECRUITMENT_PAGE.getMessage(), response.getMessage()); // 에러 메시지 검증
+        Mockito.verify(recruitmentRepository, Mockito.never()).findAllRecruitments(any());
     }
 
     @Test
@@ -242,6 +243,7 @@ public class RecruitmentServiceTest {
         assertNotNull(response);
         assertEquals(ErrorCode.INVALID_RECRUITMENT_SIZE.getStatus(), response.getStatus()); // 에러 코드 검증
         assertEquals(ErrorCode.INVALID_RECRUITMENT_SIZE.getMessage(), response.getMessage()); // 에러 메시지 검증
+        Mockito.verify(recruitmentRepository, Mockito.never()).findAllRecruitments(any());
     }
 
 
