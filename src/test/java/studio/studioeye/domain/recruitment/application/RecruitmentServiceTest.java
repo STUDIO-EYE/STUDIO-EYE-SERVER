@@ -423,4 +423,22 @@ public class RecruitmentServiceTest {
         Mockito.verify(recruitmentRepository, times(1)).findById(id);
         Mockito.verify(recruitmentRepository, times(1)).delete(savedRecruitment);
     }
+
+    @Test
+    @DisplayName("채용공고 삭제 실패 테스트")
+    public void deleteRecruitmentFail() {
+        // given
+        Long id = 1L;
+        // stub
+        when(recruitmentRepository.findById(id)).thenReturn(Optional.empty());
+
+        // when
+        ApiResponse<String> response = recruitmentService.deleteRecruitment(id);
+
+        // then
+        Assertions.assertThat(response.getStatus()).isEqualTo(ErrorCode.INVALID_RECRUITMENT_ID.getStatus());
+        // method call verify
+        Mockito.verify(recruitmentRepository, times(1)).findById(id);
+        Mockito.verify(recruitmentRepository, Mockito.never()).delete(any());
+    }
 }
