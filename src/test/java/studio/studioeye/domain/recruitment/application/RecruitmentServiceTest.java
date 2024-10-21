@@ -266,4 +266,24 @@ public class RecruitmentServiceTest {
         Assertions.assertThat(findRecruitment.getStatus()).isEqualTo(savedRecruitment.getStatus());
         Mockito.verify(recruitmentRepository, times(1)).findById(id);
     }
+
+    @Test
+    @DisplayName("단일 채용공고 조회 실패 테스트")
+    public void retrieveRecruitmentByIdFail() {
+        // given
+        Long id = 2L;
+        Recruitment savedRecruitment = new Recruitment("Test Title1", new Date(System.currentTimeMillis() - 100000), new Date(System.currentTimeMillis() + 100000), "Test URL1", new Date(), Status.OPEN);
+        // stub
+        when(recruitmentRepository.findById(id)).thenReturn(Optional.empty());
+
+        // when
+        ApiResponse<Recruitment> response = recruitmentService.retrieveRecruitmentById(id);
+        Recruitment findRecruitment = response.getData();
+
+        // then
+        assertNotNull(response);
+        Assertions.assertThat(findRecruitment).isNotEqualTo(savedRecruitment);
+        assertEquals(ErrorCode.INVALID_RECRUITMENT_ID.getStatus(), response.getStatus()); // 에러 코드 검증
+        assertEquals(ErrorCode.INVALID_RECRUITMENT_ID.getMessage(), response.getMessage()); // 에러 메시지 검증
+    }
 }
