@@ -405,4 +405,22 @@ public class RecruitmentServiceTest {
         Assertions.assertThat(findRecruitment).isNotEqualTo(savedRecruitment);
         Mockito.verify(recruitmentRepository, times(1)).findById(invalidId);  // repository 메소드 호출 검증
     }
+
+    @Test
+    @DisplayName("채용공고 삭제 성공 테스트")
+    public void deleteRecruitmentSuccess() {
+        // given
+        Long id = 1L;
+        Recruitment savedRecruitment = new Recruitment("Test Title1", new Date(System.currentTimeMillis() - 100000), new Date(System.currentTimeMillis() + 100000), "Test URL1", new Date(), Status.OPEN);
+        // stub
+        when(recruitmentRepository.findById(id)).thenReturn(Optional.of(savedRecruitment));
+
+        // when
+        ApiResponse<String> response = recruitmentService.deleteRecruitment(id);
+
+        // then
+        Assertions.assertThat(response.getMessage()).isEqualTo("채용공고를 성공적으로 삭제하였습니다.");
+        Mockito.verify(recruitmentRepository, times(1)).findById(id);
+        Mockito.verify(recruitmentRepository, times(1)).delete(savedRecruitment);
+    }
 }
