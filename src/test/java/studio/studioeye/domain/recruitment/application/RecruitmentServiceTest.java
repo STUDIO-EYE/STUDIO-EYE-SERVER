@@ -19,6 +19,7 @@ import studio.studioeye.domain.recruitment.dao.RecruitmentTitle;
 import studio.studioeye.domain.recruitment.domain.Recruitment;
 import studio.studioeye.domain.recruitment.domain.Status;
 import studio.studioeye.domain.recruitment.dto.request.CreateRecruitmentServiceRequestDto;
+import studio.studioeye.domain.recruitment.dto.request.UpdateRecruitmentServiceRequestDto;
 import studio.studioeye.global.common.response.ApiResponse;
 import studio.studioeye.global.exception.error.ErrorCode;
 
@@ -328,5 +329,44 @@ public class RecruitmentServiceTest {
         assertNotNull(response);
         Assertions.assertThat(findRecruitment).isNotEqualTo(savedRecruitment);
         assertEquals(ErrorCode.RECRUITMENT_IS_EMPTY.getMessage(), response.getMessage()); // 에러 메시지 검증
+    }
+
+    @Test
+    @DisplayName("채용공고 수정 성공 테스트")
+    public void updateRecruitmentSuccess() {
+        // given
+        String startDateString = "2024-10-02 23:39:40.281000";
+        String deadLineString = "2024-10-31 13:39:40.281000";
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS");
+        LocalDateTime localStartDateTime = LocalDateTime.parse(startDateString, formatter);
+        LocalDateTime localDeadLineTime = LocalDateTime.parse(deadLineString, formatter);
+
+        Recruitment savedRecruitment = new Recruitment("Test Title1", new Date(System.currentTimeMillis() - 100000), new Date(System.currentTimeMillis() + 100000), "Test URL1", new Date(), Status.OPEN);
+
+        UpdateRecruitmentServiceRequestDto requestDto = new UpdateRecruitmentServiceRequestDto(
+                1L,
+                "title",
+                Date.from(localStartDateTime.atZone(ZoneId.systemDefault()).toInstant()),
+                Date.from(localDeadLineTime.atZone(ZoneId.systemDefault()).toInstant()),
+                "https://www.naver.com/"
+        );
+
+        // stub
+        when(recruitmentRepository.findById(requestDto.id())).thenReturn(Optional.of(savedRecruitment));
+
+        // when
+        ApiResponse<Recruitment> response = recruitmentService.updateRecruitment(requestDto);
+
+        // then
+        Assertions.assertThat(response.getMessage()).isEqualTo("채용공고 게시물을 성공적으로 수정했습니다.");
+        Assertions.assertThat(requestDto.title()).isEqualTo(savedRecruitment.getTitle());
+        Assertions.assertThat(requestDto.title()).isEqualTo(savedRecruitment.getTitle());
+        Assertions.assertThat(requestDto.startDate()).isEqualTo(savedRecruitment.getStartDate());
+        Assertions.assertThat(requestDto.deadline()).isEqualTo(savedRecruitment.getDeadline());
+        Assertions.assertThat(requestDto.link()).isEqualTo(savedRecruitment.getLink());
+
+        Mockito.verify(recruitmentRepository, times(1)).findById(requestDto.id());
+        Mockito.verify(recruitmentRepository, times(1)).save(any(Recruitment.class));
     }
 }
