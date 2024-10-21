@@ -99,7 +99,6 @@ public class ViewsController {
 
     @Operation(summary = "이번 월 조회수 1 상승 API (해당 월이 존재하지 않을 경우에는 생성)")
     @PutMapping("/views/increase")
-//    public ApiResponse<Views> updateThisMonthViews(@CookieValue(name = "viewed_cookie", required = false) String cookieValue,
     public ApiResponse<Views> updateThisMonthViews(@CookieValue(name = "main_viewed_cookie", required = false) String mainViewedCookie,
                                                    @CookieValue(name = "about_viewed_cookie", required = false) String aboutViewedCookie,
                                                    @CookieValue(name = "faq_viewed_cookie", required = false) String faqViewedCookie,

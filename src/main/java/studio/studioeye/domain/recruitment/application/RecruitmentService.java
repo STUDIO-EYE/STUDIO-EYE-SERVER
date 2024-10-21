@@ -29,6 +29,16 @@ public class RecruitmentService {
     private final RecruitmentRepository recruitmentRepository;
     public ApiResponse<Recruitment> createRecruitment(CreateRecruitmentServiceRequestDto dto) {
         TimeZone.setDefault(TimeZone.getTimeZone("Asia/Seoul"));
+
+        // 유효성 검사 추가
+        if(dto.title().trim().isEmpty()) {
+            return ApiResponse.withError(ErrorCode.RECRUITMENT_TITLE_IS_EMPTY);
+        }
+
+        if(dto.startDate().after(dto.deadline())) {
+            return ApiResponse.withError(ErrorCode.INVALID_RECRUITMENT_DATE);
+        }
+
         Recruitment recruitment = dto.toEntity(new Date(), calculateStatus(dto.startDate(), dto.deadline()));
 
         Recruitment savedRecruitment = recruitmentRepository.save(recruitment);
@@ -37,6 +47,12 @@ public class RecruitmentService {
     }
 
     public ApiResponse<Page<RecruitmentTitle>> retrieveRecruitmentList(int page, int size) {
+        if(page < 0) {
+            return ApiResponse.withError(ErrorCode.INVALID_RECRUITMENT_PAGE);
+        }
+        if(size < 1) {
+            return ApiResponse.withError(ErrorCode.INVALID_RECRUITMENT_SIZE);
+        }
         Pageable pageable = PageRequest.of(page, size);
         Page<RecruitmentTitle> recruitmentTitleList = recruitmentRepository.findAllRecruitments(pageable);
         return ApiResponse.ok("채용공고 목록을 성공적으로 조회했습니다.", recruitmentTitleList);
