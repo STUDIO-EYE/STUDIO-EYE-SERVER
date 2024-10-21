@@ -94,6 +94,7 @@ public class RecruitmentServiceTest {
         assertNotNull(response);
         assertEquals(ErrorCode.RECRUITMENT_TITLE_IS_EMPTY.getStatus(), response.getStatus()); // 에러 코드 검증
         assertEquals(ErrorCode.RECRUITMENT_TITLE_IS_EMPTY.getMessage(), response.getMessage()); // 에러 메시지 검증
+        Mockito.verify(recruitmentRepository, Mockito.never()).save(any());
     }
 
     @Test
@@ -116,6 +117,7 @@ public class RecruitmentServiceTest {
         assertNotNull(response);
         assertEquals(ErrorCode.INVALID_RECRUITMENT_DATE.getStatus(), response.getStatus()); // 에러 코드 검증
         assertEquals(ErrorCode.INVALID_RECRUITMENT_DATE.getMessage(), response.getMessage()); // 에러 메시지 검증
+        Mockito.verify(recruitmentRepository, Mockito.never()).save(any());
     }
 
     @Test
