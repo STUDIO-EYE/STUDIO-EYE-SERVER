@@ -175,4 +175,27 @@ public class BenefitServiceTest {
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatus());
         assertEquals(ErrorCode.INVALID_BENEFIT_ID.getMessage(), response.getMessage());
     }
+
+    @Test
+    @DisplayName("Benefit 텍스트 수정 성공 테스트")
+    void updateBenefitTextSuccess() {
+        // given
+        Long id = 1L;
+        UpdateBenefitServiceRequestDto requestDto = new UpdateBenefitServiceRequestDto(id, "Updated_Title", "Updated_Content");
+        Benefit savedBenefit = new Benefit("Test ImageUrl", "Test ImageFileName", "Test Title", "Test Content");
+
+        // stub
+        when(benefitRepository.findById(requestDto.id())).thenReturn(Optional.of(savedBenefit));
+        when(benefitRepository.save(any(Benefit.class))).thenReturn(savedBenefit);
+
+        // when
+        ApiResponse<Benefit> response = benefitService.updateBenefitText(requestDto);
+
+        // then
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatus());
+        assertEquals("혜택 텍스트 정보를 성공적으로 수정했습니다.", response.getMessage());
+        assertEquals("Updated_Title", savedBenefit.getTitle());
+        assertEquals("Updated_Content", savedBenefit.getContent());
+    }
 }
