@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import studio.studioeye.domain.news.domain.News;
@@ -13,6 +14,7 @@ import studio.studioeye.domain.recruitment.dao.RecruitmentRepository;
 import studio.studioeye.domain.recruitment.domain.Recruitment;
 import studio.studioeye.domain.recruitment.dto.request.CreateRecruitmentServiceRequestDto;
 import studio.studioeye.global.common.response.ApiResponse;
+import studio.studioeye.global.exception.error.ErrorCode;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -21,8 +23,10 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class RecruitmentServiceTest {
@@ -57,5 +61,48 @@ public class RecruitmentServiceTest {
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatus());
         assertEquals("채용공고 게시물을 성공적으로 등록하였습니다.", response.getMessage());
+        Mockito.verify(recruitmentRepository, times(1)).save(any(Recruitment.class));
+    }
+
+    @Test
+    @DisplayName("채용공고 실패 테스트 - 제목이 비어 있는 경우")
+    public void createRecruitmentFail() {
+        // given
+        Date startDate = new Date(System.currentTimeMillis() + 100000);
+        Date deadline = new Date(System.currentTimeMillis());
+        CreateRecruitmentServiceRequestDto requestDto = new CreateRecruitmentServiceRequestDto(
+                "",
+                startDate,
+                deadline,
+                "https://www.naver.com"
+        );
+
+        // when & then
+        ApiResponse<Recruitment> response = recruitmentService.createRecruitment(requestDto);
+
+        assertNotNull(response);
+        assertEquals(ErrorCode.RECRUITMENT_TITLE_IS_EMPTY.getStatus(), response.getStatus()); // 에러 코드 검증
+        assertEquals(ErrorCode.RECRUITMENT_TITLE_IS_EMPTY.getMessage(), response.getMessage()); // 에러 메시지 검증
+    }
+
+    @Test
+    @DisplayName("채용공고 실패 테스트 - 제목이 비어 있는 경우")
+    public void createRecruitmentFail_emptyTitle() {
+        // given
+        Date startDate = new Date(System.currentTimeMillis() + 100000);
+        Date deadline = new Date(System.currentTimeMillis());
+        CreateRecruitmentServiceRequestDto requestDto = new CreateRecruitmentServiceRequestDto(
+                "",
+                startDate,
+                deadline,
+                "https://www.naver.com"
+        );
+
+        // when & then
+        ApiResponse<Recruitment> response = recruitmentService.createRecruitment(requestDto);
+
+        assertNotNull(response);
+        assertEquals(ErrorCode.RECRUITMENT_TITLE_IS_EMPTY.getStatus(), response.getStatus()); // 에러 코드 검증
+        assertEquals(ErrorCode.RECRUITMENT_TITLE_IS_EMPTY.getMessage(), response.getMessage()); // 에러 메시지 검증
     }
 }
