@@ -89,4 +89,27 @@ public class BenefitServiceTest {
         assertEquals(ErrorCode.ERROR_S3_UPDATE_OBJECT.getStatus(), response.getStatus());
         assertEquals(ErrorCode.ERROR_S3_UPDATE_OBJECT.getMessage(), response.getMessage());
     }
+
+    @Test
+    @DisplayName("Benefit 전체 조회 성공 테스트")
+    void retrieveBenefitSuccess() {
+        // given
+        List<Benefit> benefitList = new ArrayList<>();
+        benefitList.add(new Benefit("Test ImageUrl1", "Test ImageFileName1", "Test Title1", "Test Content1"));
+        benefitList.add(new Benefit("Test ImageUrl2", "Test ImageFileName2", "Test Title2", "Test Content2"));
+        benefitList.add(new Benefit("Test ImageUrl3", "Test ImageFileName3", "Test Title3", "Test Content3"));
+
+        List<Benefit> savedBenefit = benefitList;
+
+        // stub
+        when(benefitRepository.findAll()).thenReturn(savedBenefit);
+
+        // when
+        ApiResponse<List<Benefit>> response = benefitService.retrieveBenefit();
+        List<Benefit> findBenefit = response.getData();
+
+        // then
+        Assertions.assertThat(findBenefit).isEqualTo(savedBenefit);
+        Assertions.assertThat(findBenefit.size()).isEqualTo(3);
+    }
 }
