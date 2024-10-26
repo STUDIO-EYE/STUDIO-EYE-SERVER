@@ -44,7 +44,7 @@ public class CeoServiceTest {
     );
 
     @Test
-    @DisplayName("Ceo 생성 성공 테스트")
+    @DisplayName("Ceo 정보 생성 성공 테스트")
     public void createCeoInformationSuccess() throws IOException {
         // given
         String name = "mingi";
@@ -61,7 +61,7 @@ public class CeoServiceTest {
         assertEquals("CEO 정보를 성공적으로 등록하였습니다.", response.getMessage());
     }
     @Test
-    @DisplayName("Ceo 생성 실패 - 이미지 업로드 실패")
+    @DisplayName("Ceo 정보 생성 실패 - 이미지 업로드 실패")
     public void createCeoFailDueToImageUpload() throws IOException {
         //given
         CreateCeoServiceRequestDto requestDto = new CreateCeoServiceRequestDto(
@@ -79,10 +79,11 @@ public class CeoServiceTest {
         assertEquals(ErrorCode.ERROR_S3_UPDATE_OBJECT.getMessage(), response.getMessage());
     }
     @Test
-    @DisplayName("Ceo 전체 정보 조회 성공")
+    @DisplayName("Ceo 전체 정보 조회 성공 테스트")
     void retrieveCeoInformationSuccess() {
         // given
         Ceo ceo = new Ceo("http://example.com/testImage.jpg", "testImage.jpg", "mingi", "CEO Introduction");
+        // stub
         when(ceoRepository.findAll()).thenReturn(List.of(ceo));
         // when
         ApiResponse<Ceo> response = ceoService.retrieveCeoInformation();
@@ -94,7 +95,7 @@ public class CeoServiceTest {
     @Test
     @DisplayName("Ceo 전체 정보 조회 실패 - 데이터 없음")
     void retrieveCeoInformationFail_NoData() {
-        // given
+        // stub
         when(ceoRepository.findAll()).thenReturn(new ArrayList<>());
         // when
         ApiResponse<Ceo> response = ceoService.retrieveCeoInformation();
@@ -105,11 +106,12 @@ public class CeoServiceTest {
         assertNull(response.getData());
     }
     @Test
-    @DisplayName("Ceo 전체 정보 수정 성공")
+    @DisplayName("Ceo 전체 정보 수정 성공 테스트")
     void updateCeoInformationSuccess() throws IOException {
         // given
         UpdateCeoServiceRequestDto dto = new UpdateCeoServiceRequestDto("Updated Name", "Updated Introduction");
         Ceo ceo = new Ceo("http://example.com/testImage.jpg", "testImage.jpg", "mingi", "CEO Introduction");
+        // stub
         when(ceoRepository.findAll()).thenReturn(List.of(ceo));
         when(s3Adapter.uploadFile(mockFile)).thenReturn(ApiResponse.ok("S3 업로드 성공", "http://example.com/updatedImage.jpg"));
         // when
@@ -122,12 +124,14 @@ public class CeoServiceTest {
     @Test
     @DisplayName("CEO 텍스트(이미지 제외) 정보 수정 성공 테스트")
     void updateCeoTextInformationSuccess() {
+        // given
         UpdateCeoServiceRequestDto dto = new UpdateCeoServiceRequestDto("Updated Name", "Updated Introduction");
         Ceo ceo = new Ceo("http://example.com/testImage.jpg", "testImage.jpg", "mingi", "CEO Introduction");
+        // stub
         when(ceoRepository.findAll()).thenReturn(List.of(ceo));
-
+        // when
         ApiResponse<Ceo> response = ceoService.updateCeoTextInformation(dto);
-
+        // then
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatus());
         assertEquals("CEO 텍스트 정보를 성공적으로 수정했습니다.", response.getMessage());
@@ -135,13 +139,15 @@ public class CeoServiceTest {
         assertEquals("Updated Introduction", ceo.getIntroduction());
     }
     @Test
-    @DisplayName("CEO 텍스트(이미지 제외) 정보 수정 실패 테스트 - 데이터 없음")
+    @DisplayName("CEO 텍스트(이미지 제외) 정보 수정 실패 - 데이터 없음")
     void updateCeoTextInformationFail_NoData() {
+        // given
         UpdateCeoServiceRequestDto dto = new UpdateCeoServiceRequestDto("Updated Name", "Updated Introduction");
+        // stub
         when(ceoRepository.findAll()).thenReturn(new ArrayList<>());
-
+        // when
         ApiResponse<Ceo> response = ceoService.updateCeoTextInformation(dto);
-
+        // then
         assertNotNull(response);
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatus());
         assertEquals(ErrorCode.CEO_IS_EMPTY.getMessage(), response.getMessage());
@@ -149,15 +155,32 @@ public class CeoServiceTest {
     @Test
     @DisplayName("CEO 이미지 정보 수정 성공 테스트")
     void updateCeoImageInformationSuccess() throws IOException {
+        // given
         Ceo ceo = new Ceo("http://example.com/testImage.jpg", "testImage.jpg", "mingi", "CEO Introduction");
+        // stub
         when(ceoRepository.findAll()).thenReturn(List.of(ceo));
         when(s3Adapter.uploadFile(mockFile)).thenReturn(ApiResponse.ok("S3에 이미지 업로드 성공", "http://example.com/updatedImage.jpg"));
-
+        // when
         ApiResponse<Ceo> response = ceoService.updateCeoImageInformation(mockFile);
-
+        // then
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatus());
         assertEquals("CEO 이미지 정보를 성공적으로 수정했습니다.", response.getMessage());
         assertEquals("http://example.com/updatedImage.jpg", ceo.getImageUrl());
+    }
+    @Test
+    @DisplayName("CEO 이미지 정보 수정 실패 - 이미지 업로드 실패")
+    void updateCeoImageInformationFail_ImageUploadError() throws IOException {
+        // given
+        Ceo ceo = new Ceo("http://example.com/testImage.jpg", "testImage.jpg", "mingi", "CEO Introduction");
+        // stub
+        when(ceoRepository.findAll()).thenReturn(List.of(ceo));
+        when(s3Adapter.uploadFile(mockFile)).thenReturn(ApiResponse.withError(ErrorCode.ERROR_S3_UPDATE_OBJECT));
+        // when
+        ApiResponse<Ceo> response = ceoService.updateCeoImageInformation(mockFile);
+        // then
+        assertNotNull(response);
+        assertEquals(ErrorCode.ERROR_S3_UPDATE_OBJECT.getStatus(), response.getStatus());
+        assertEquals(ErrorCode.ERROR_S3_UPDATE_OBJECT.getMessage(), response.getMessage());
     }
 }
