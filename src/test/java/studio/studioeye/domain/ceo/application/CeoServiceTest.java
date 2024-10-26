@@ -198,4 +198,17 @@ public class CeoServiceTest {
         assertEquals("CEO 정보를 성공적으로 삭제했습니다.", response.getMessage());
         verify(ceoRepository).delete(ceo);
     }
+    @Test
+    @DisplayName("CEO 전체 정보 삭제 실패 - 데이터 없음")
+    void deleteCeoInformationFail_NoData() {
+        // stub
+        when(ceoRepository.findAll()).thenReturn(new ArrayList<>());
+        // when
+        ApiResponse<String> response = ceoService.deleteCeoInformation();
+        // then
+        assertNotNull(response);
+        assertEquals(ErrorCode.CEO_IS_EMPTY.getStatus(), response.getStatus());
+        assertEquals(ErrorCode.CEO_IS_EMPTY.getMessage(), response.getMessage());
+        verify(ceoRepository, never()).delete(any(Ceo.class));
+    }
 }
