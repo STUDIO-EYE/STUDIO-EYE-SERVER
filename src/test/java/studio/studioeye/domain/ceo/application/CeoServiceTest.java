@@ -134,4 +134,16 @@ public class CeoServiceTest {
         assertEquals("Updated Name", ceo.getName());
         assertEquals("Updated Introduction", ceo.getIntroduction());
     }
+    @Test
+    @DisplayName("CEO 텍스트(이미지 제외) 정보 수정 실패 테스트 - 데이터 없음")
+    void updateCeoTextInformationFail_NoData() {
+        UpdateCeoServiceRequestDto dto = new UpdateCeoServiceRequestDto("Updated Name", "Updated Introduction");
+        when(ceoRepository.findAll()).thenReturn(new ArrayList<>());
+
+        ApiResponse<Ceo> response = ceoService.updateCeoTextInformation(dto);
+
+        assertNotNull(response);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatus());
+        assertEquals(ErrorCode.CEO_IS_EMPTY.getMessage(), response.getMessage());
+    }
 }
