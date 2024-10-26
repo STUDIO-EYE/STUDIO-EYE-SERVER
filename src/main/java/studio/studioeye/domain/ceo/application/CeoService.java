@@ -111,11 +111,10 @@ public class CeoService {
         return ApiResponse.ok("CEO 이미지 정보를 성공적으로 수정했습니다.", savedCeo);
     }
 
-
     public ApiResponse<String> deleteCeoInformation() {
         List<Ceo> ceoList = ceoRepository.findAll();
         if(ceoList.isEmpty()) {
-            ApiResponse.withError(ErrorCode.CEO_IS_EMPTY);
+            return ApiResponse.withError(ErrorCode.CEO_IS_EMPTY);
         }
         Ceo ceo = ceoList.get(0);
         ceoRepository.delete(ceo);
