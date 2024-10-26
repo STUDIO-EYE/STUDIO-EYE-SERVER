@@ -17,6 +17,7 @@ import studio.studioeye.global.exception.error.ErrorCode;
 import studio.studioeye.infrastructure.s3.S3Adapter;
 
 import java.io.IOException;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -76,4 +77,20 @@ public class CeoServiceTest {
         assertEquals(ErrorCode.ERROR_S3_UPDATE_OBJECT.getStatus(), response.getStatus());
         assertEquals(ErrorCode.ERROR_S3_UPDATE_OBJECT.getMessage(), response.getMessage());
     }
+    @Test
+    @DisplayName("Ceo 전체 정보 조회 성공")
+    void retrieveCeoInformationSuccess() {
+        // given
+        Ceo ceo = new Ceo("http://example.com/testImage.jpg", "testImage.jpg", "mingi", "CEO Introduction");
+        when(ceoRepository.findAll()).thenReturn(List.of(ceo));
+
+        // when
+        ApiResponse<Ceo> response = ceoService.retrieveCeoInformation();
+
+        // then
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatus());
+        assertEquals("CEO 정보를 성공적으로 조회했습니다.", response.getMessage());
+    }
+
 }
