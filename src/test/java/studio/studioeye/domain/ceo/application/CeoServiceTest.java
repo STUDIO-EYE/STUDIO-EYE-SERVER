@@ -183,4 +183,19 @@ public class CeoServiceTest {
         assertEquals(ErrorCode.ERROR_S3_UPDATE_OBJECT.getStatus(), response.getStatus());
         assertEquals(ErrorCode.ERROR_S3_UPDATE_OBJECT.getMessage(), response.getMessage());
     }
+    @Test
+    @DisplayName("CEO 전체 정보 삭제 성공 테스트")
+    void deleteCeoInformationSuccess() {
+        // given
+        Ceo ceo = new Ceo("http://example.com/testImage.jpg", "testImage.jpg", "mingi", "CEO Introduction");
+        // stub
+        when(ceoRepository.findAll()).thenReturn(List.of(ceo));
+        // when
+        ApiResponse<String> response = ceoService.deleteCeoInformation();
+        // then
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatus());
+        assertEquals("CEO 정보를 성공적으로 삭제했습니다.", response.getMessage());
+        verify(ceoRepository).delete(ceo);
+    }
 }
