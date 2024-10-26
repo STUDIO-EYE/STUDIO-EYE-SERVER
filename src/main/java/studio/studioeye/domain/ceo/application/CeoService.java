@@ -12,6 +12,7 @@ import studio.studioeye.infrastructure.s3.S3Adapter;
 import studio.studioeye.global.common.response.ApiResponse;
 import studio.studioeye.global.exception.error.ErrorCode;
 
+import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -21,14 +22,14 @@ public class CeoService {
     private final CeoRepository ceoRepository;
     private final S3Adapter s3Adapter;
 
-    public ApiResponse<Ceo> createCeoInformation(CreateCeoServiceRequestDto dto, MultipartFile file) {
+    public ApiResponse<Ceo> createCeoInformation(CreateCeoServiceRequestDto dto, MultipartFile file) throws IOException {
         List<Ceo> ceoList = ceoRepository.findAll();
         if(!ceoList.isEmpty()) {
             return updateCeoInformation(dto.toUpdateServiceRequest(), file);
         }
         String imageUrl = null;
         if (file != null) {
-            ApiResponse<String> updateFileResponse = s3Adapter.uploadImage(file);
+            ApiResponse<String> updateFileResponse = s3Adapter.uploadFile(file);
             if (updateFileResponse.getStatus().is5xxServerError()) {
                 return ApiResponse.withError(ErrorCode.ERROR_S3_UPDATE_OBJECT);
             }
