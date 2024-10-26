@@ -37,7 +37,7 @@ public class CeoController {
     @Operation(summary = "CEO 전체 정보 수정 API")
     @PutMapping("/ceo")
     public ApiResponse<Ceo> updateCeoInformation(@Valid @RequestPart("request") UpdateCeoRequestDto dto,
-                                            @RequestPart(value = "file", required = false) MultipartFile file) {
+                                            @RequestPart(value = "file", required = false) MultipartFile file) throws IOException {
         return ceoService.updateCeoInformation(dto.toServiceRequest(), file);
     }
 

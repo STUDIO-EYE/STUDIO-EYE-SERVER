@@ -1,6 +1,7 @@
 package studio.studioeye.domain.ceo.application;
 
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -50,7 +51,7 @@ public class CeoService {
         return ApiResponse.ok("CEO 정보를 성공적으로 조회했습니다.", ceo);
     }
 
-    public ApiResponse<Ceo> updateCeoInformation(UpdateCeoServiceRequestDto dto, MultipartFile file) {
+    public ApiResponse<Ceo> updateCeoInformation(UpdateCeoServiceRequestDto dto, MultipartFile file) throws IOException {
         String imageUrl = null;
         String fileName = null;
         List<Ceo> ceoList = ceoRepository.findAll();
@@ -59,7 +60,7 @@ public class CeoService {
             if(ceoImageFileName != null) s3Adapter.deleteFile(ceoImageFileName);
         }
         if(file != null) {
-            ApiResponse<String> updateFileResponse = s3Adapter.uploadImage(file);
+            ApiResponse<String> updateFileResponse = s3Adapter.uploadFile(file);
             if (updateFileResponse.getStatus().is5xxServerError()) {
                 return ApiResponse.withError(ErrorCode.ERROR_S3_UPDATE_OBJECT);
             }
@@ -85,6 +86,7 @@ public class CeoService {
         return ApiResponse.ok("CEO 텍스트 정보를 성공적으로 수정했습니다.", savedCeo);
     }
 
+    @SneakyThrows
     public ApiResponse<Ceo> updateCeoImageInformation(MultipartFile file) {
         String imageUrl = null;
         String fileName = null;
@@ -94,7 +96,7 @@ public class CeoService {
             if(ceoImageFileName != null) s3Adapter.deleteFile(ceoImageFileName);
         }
         if(file != null) {
-            ApiResponse<String> updateFileResponse = s3Adapter.uploadImage(file);
+            ApiResponse<String> updateFileResponse = s3Adapter.uploadFile(file);
             if (updateFileResponse.getStatus().is5xxServerError()) {
                 return ApiResponse.withError(ErrorCode.ERROR_S3_UPDATE_OBJECT);
             }
