@@ -146,4 +146,18 @@ public class CeoServiceTest {
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatus());
         assertEquals(ErrorCode.CEO_IS_EMPTY.getMessage(), response.getMessage());
     }
+    @Test
+    @DisplayName("CEO 이미지 정보 수정 성공 테스트")
+    void updateCeoImageInformationSuccess() throws IOException {
+        Ceo ceo = new Ceo("http://example.com/testImage.jpg", "testImage.jpg", "mingi", "CEO Introduction");
+        when(ceoRepository.findAll()).thenReturn(List.of(ceo));
+        when(s3Adapter.uploadFile(mockFile)).thenReturn(ApiResponse.ok("S3에 이미지 업로드 성공", "http://example.com/updatedImage.jpg"));
+
+        ApiResponse<Ceo> response = ceoService.updateCeoImageInformation(mockFile);
+
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatus());
+        assertEquals("CEO 이미지 정보를 성공적으로 수정했습니다.", response.getMessage());
+        assertEquals("http://example.com/updatedImage.jpg", ceo.getImageUrl());
+    }
 }
