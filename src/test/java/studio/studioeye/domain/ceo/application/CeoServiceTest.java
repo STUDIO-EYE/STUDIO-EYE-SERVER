@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 import studio.studioeye.domain.ceo.dao.CeoRepository;
 import studio.studioeye.domain.ceo.domain.Ceo;
 import studio.studioeye.domain.ceo.dto.request.CreateCeoServiceRequestDto;
+import studio.studioeye.domain.ceo.dto.request.UpdateCeoServiceRequestDto;
 import studio.studioeye.global.common.response.ApiResponse;
 import studio.studioeye.global.exception.error.ErrorCode;
 import studio.studioeye.infrastructure.s3.S3Adapter;
@@ -83,10 +84,8 @@ public class CeoServiceTest {
         // given
         Ceo ceo = new Ceo("http://example.com/testImage.jpg", "testImage.jpg", "mingi", "CEO Introduction");
         when(ceoRepository.findAll()).thenReturn(List.of(ceo));
-
         // when
         ApiResponse<Ceo> response = ceoService.retrieveCeoInformation();
-
         // then
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatus());
@@ -97,14 +96,27 @@ public class CeoServiceTest {
     void retrieveCeoInformationFail_NoData() {
         // given
         when(ceoRepository.findAll()).thenReturn(new ArrayList<>());
-
         // when
         ApiResponse<Ceo> response = ceoService.retrieveCeoInformation();
-
         // then
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatus());
         assertEquals("CEO 정보가 존재하지 않습니다.", response.getMessage());
         assertNull(response.getData());
+    }
+    @Test
+    @DisplayName("Ceo 전체 정보 수정 성공")
+    void updateCeoInformationSuccess() throws IOException {
+        // given
+        UpdateCeoServiceRequestDto dto = new UpdateCeoServiceRequestDto("Updated Name", "Updated Introduction");
+        Ceo ceo = new Ceo("http://example.com/testImage.jpg", "testImage.jpg", "mingi", "CEO Introduction");
+        when(ceoRepository.findAll()).thenReturn(List.of(ceo));
+        when(s3Adapter.uploadFile(mockFile)).thenReturn(ApiResponse.ok("S3 업로드 성공", "http://example.com/updatedImage.jpg"));
+        // when
+        ApiResponse<Ceo> response = ceoService.updateCeoInformation(dto, mockFile);
+        // then
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatus());
+        assertEquals("CEO 정보를 성공적으로 수정했습니다.", response.getMessage());
     }
 }
