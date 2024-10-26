@@ -17,10 +17,10 @@ import studio.studioeye.global.exception.error.ErrorCode;
 import studio.studioeye.infrastructure.s3.S3Adapter;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 
@@ -92,5 +92,19 @@ public class CeoServiceTest {
         assertEquals(HttpStatus.OK, response.getStatus());
         assertEquals("CEO 정보를 성공적으로 조회했습니다.", response.getMessage());
     }
+    @Test
+    @DisplayName("Ceo 전체 정보 조회 실패 - 데이터 없음")
+    void retrieveCeoInformationFail_NoData() {
+        // given
+        when(ceoRepository.findAll()).thenReturn(new ArrayList<>());
 
+        // when
+        ApiResponse<Ceo> response = ceoService.retrieveCeoInformation();
+
+        // then
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatus());
+        assertEquals("CEO 정보가 존재하지 않습니다.", response.getMessage());
+        assertNull(response.getData());
+    }
 }
