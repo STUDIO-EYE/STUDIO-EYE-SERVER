@@ -119,4 +119,21 @@ public class CeoServiceTest {
         assertEquals(HttpStatus.OK, response.getStatus());
         assertEquals("CEO 정보를 성공적으로 수정했습니다.", response.getMessage());
     }
+    @Test
+    @DisplayName("CEO 텍스트(이미지 제외) 정보 수정 성공 테스트")
+        UpdateCeoServiceRequestDto dto = new UpdateCeoServiceRequestDto("Updated Name", "Updated Introduction");
+        Ceo ceo = new Ceo("http://example.com/originalImage.jpg", "originalImage.jpg", "mingi", "Original Introduction");
+        List<Ceo> ceoList = List.of(ceo);
+        // Mock 설정
+        when(ceoRepository.findAll()).thenReturn(ceoList);
+        when(s3Adapter.uploadFile(any(MockMultipartFile.class)))
+                .thenReturn(ApiResponse.withError(ErrorCode.ERROR_S3_UPDATE_OBJECT));
+        // when
+        ApiResponse<Ceo> response = ceoService.updateCeoInformation(dto, mockFile);
+        // then
+        assertNotNull(response);
+        assertEquals(ErrorCode.ERROR_S3_UPDATE_OBJECT.getStatus(), response.getStatus());
+        assertEquals(ErrorCode.ERROR_S3_UPDATE_OBJECT.getMessage(), response.getMessage());
+    }
+
 }
