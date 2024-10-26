@@ -58,4 +58,22 @@ public class CeoServiceTest {
         assertEquals(HttpStatus.OK, response.getStatus());
         assertEquals("CEO 정보를 성공적으로 등록하였습니다.", response.getMessage());
     }
+    @Test
+    @DisplayName("Ceo 생성 실패 - 이미지 업로드 실패")
+    public void createCeoFailDueToImageUpload() throws IOException {
+        //given
+        CreateCeoServiceRequestDto requestDto = new CreateCeoServiceRequestDto(
+                "Test_Title",
+                "Test_Content"
+        );
+        //stub
+        when(s3Adapter.uploadFile(any(MultipartFile.class)))
+                .thenReturn(ApiResponse.withError(ErrorCode.ERROR_S3_UPDATE_OBJECT));
+        //when
+        ApiResponse<Ceo> response = ceoService.createCeoInformation(requestDto, mockFile);
+        //then
+        assertNotNull(response);
+        assertEquals(ErrorCode.ERROR_S3_UPDATE_OBJECT.getStatus(), response.getStatus());
+        assertEquals(ErrorCode.ERROR_S3_UPDATE_OBJECT.getMessage(), response.getMessage());
+    }
 }
