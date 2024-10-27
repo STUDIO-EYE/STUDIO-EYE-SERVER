@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import studio.studioeye.domain.faq.dao.FaqRepository;
 import studio.studioeye.domain.faq.domain.Faq;
 import studio.studioeye.domain.faq.dto.request.CreateFaqServiceRequestDto;
+import studio.studioeye.domain.recruitment.domain.Recruitment;
 import studio.studioeye.global.common.response.ApiResponse;
 import studio.studioeye.global.exception.error.ErrorCode;
 
@@ -143,6 +144,28 @@ public class FaqServiceTest {
         assertEquals(findFaq.getQuestion(), savedFaq.getQuestion());
         assertEquals(findFaq.getAnswer(), savedFaq.getAnswer());
         assertEquals(findFaq.getVisibility(), savedFaq.getVisibility());
+        Mockito.verify(faqRepository, times(1)).findById(id);
+    }
+
+    @Test
+    @DisplayName("FAQ 단일 조회 실패")
+    public void retrieveFaqByIdFail() {
+        // given
+        Long id = 2L;
+        Faq savedFaq = new Faq("Test Question1", "Test Answer1", true);
+
+        // stub
+        when(faqRepository.findById(id)).thenReturn(Optional.empty());
+
+        // when
+        ApiResponse<Faq> response = faqService.retrieveFaqById(id);
+        Faq findFaq = response.getData();
+
+        // then
+        assertNotNull(response);
+        assertNotEquals(findFaq, savedFaq);
+        assertEquals(ErrorCode.INVALID_FAQ_ID.getStatus(), response.getStatus());
+        assertEquals(ErrorCode.INVALID_FAQ_ID.getMessage(), response.getMessage());
         Mockito.verify(faqRepository, times(1)).findById(id);
     }
 }
