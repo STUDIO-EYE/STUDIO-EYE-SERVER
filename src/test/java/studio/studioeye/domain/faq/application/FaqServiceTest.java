@@ -1,5 +1,6 @@
 package studio.studioeye.domain.faq.application;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,6 +17,7 @@ import studio.studioeye.global.exception.error.ErrorCode;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -117,5 +119,30 @@ public class FaqServiceTest {
         assertEquals(HttpStatus.OK, response.getStatus());
         assertEquals("FAQ가 존재하지 않습니다.", response.getMessage());
         Mockito.verify(faqRepository, times(1)).findAll();
+    }
+
+    @Test
+    @DisplayName("FAQ 단일 조회 성공")
+    public void retrieveFaqByIdSuccess() {
+        // given
+        Long id = 1L;
+        Faq savedFaq = new Faq("Test Question1", "Test Answer1", true);
+
+        // stub
+        when(faqRepository.findById(id)).thenReturn(Optional.of(savedFaq));
+
+        // when
+        ApiResponse<Faq> response = faqService.retrieveFaqById(id);
+        Faq findFaq = response.getData();
+
+        // then
+        assertNotNull(findFaq);
+        assertEquals(HttpStatus.OK, response.getStatus());
+        assertEquals("FAQ를 성공적으로 조회했습니다.", response.getMessage());
+        assertEquals(findFaq, savedFaq);
+        assertEquals(findFaq.getQuestion(), savedFaq.getQuestion());
+        assertEquals(findFaq.getAnswer(), savedFaq.getAnswer());
+        assertEquals(findFaq.getVisibility(), savedFaq.getVisibility());
+        Mockito.verify(faqRepository, times(1)).findById(id);
     }
 }
