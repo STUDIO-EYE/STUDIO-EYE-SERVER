@@ -262,4 +262,23 @@ public class FaqServiceTest {
         Mockito.verify(faqRepository, times(1)).findById(id);
         Mockito.verify(faqRepository, times(1)).delete(savedFaq);
     }
+
+    @Test
+    @DisplayName("FAQ 삭제 실패")
+    public void deleteFaqFail() {
+        // given
+        Long invalidId = 999L;
+
+        // stub
+        when(faqRepository.findById(invalidId)).thenReturn(Optional.empty());
+
+        // when
+        ApiResponse<String> response = faqService.deleteFaq(invalidId);
+
+        // then
+        assertEquals(ErrorCode.INVALID_FAQ_ID.getStatus(), response.getStatus());
+        assertEquals(ErrorCode.INVALID_FAQ_ID.getMessage(), response.getMessage());
+        Mockito.verify(faqRepository, times(1)).findById(invalidId);
+        Mockito.verify(faqRepository, never()).delete(any());
+    }
 }
