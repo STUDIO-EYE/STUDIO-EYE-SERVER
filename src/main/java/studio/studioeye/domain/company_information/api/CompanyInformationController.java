@@ -1,11 +1,5 @@
 package studio.studioeye.domain.company_information.api;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import studio.studioeye.domain.company_information.application.CompanyInformationService;
 import studio.studioeye.domain.company_information.dao.CompanyBasicInformation;
 import studio.studioeye.domain.company_information.dao.CompanyIntroductionInformation;
@@ -13,6 +7,12 @@ import studio.studioeye.domain.company_information.domain.CompanyInformation;
 import studio.studioeye.domain.company_information.domain.CompanyInformationDetailInformation;
 import studio.studioeye.domain.company_information.dto.request.*;
 import studio.studioeye.global.common.response.ApiResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
@@ -28,9 +28,10 @@ public class CompanyInformationController {
     @Operation(summary = "회사 정보 등록 API")
     @PostMapping("/company/information")
     public ApiResponse<CompanyInformation> createCompanyInformation(@Valid @RequestPart("request") CreateCompanyInformationRequestDto dto,
-                                                                    @RequestPart(value = "logoImageUrl", required = false) MultipartFile logoImageUrl,
-                                                                    @RequestPart(value = "sloganImageUrl", required = false) MultipartFile sloganImageUrl) throws IOException {
-        return companyInformationService.createCompanyInformation(dto.toServiceRequest(), logoImageUrl, sloganImageUrl);
+                                                    @RequestPart(value = "lightLogoImage", required = false) MultipartFile lightLogoImage,
+                                                    @RequestPart(value = "darkLogoImage", required = false) MultipartFile darkLogoImage,
+                                                    @RequestPart(value = "sloganImage", required = false) MultipartFile sloganImage) throws IOException {
+        return companyInformationService.createCompanyInformation(dto.toServiceRequest(), lightLogoImage, darkLogoImage, sloganImage);
     }
 
     @Operation(summary = "회사 전체 정보 조회 API")
@@ -40,9 +41,9 @@ public class CompanyInformationController {
     }
 
     @Operation(summary = "회사 로고 이미지 조회 API")
-    @GetMapping("/company/logo")
-    public ApiResponse<String> retrieveCampanyLogoImage() {
-        return companyInformationService.retrieveCampanyLogoImage();
+    @GetMapping("/company/logo/{isLight}")
+    public ApiResponse<String> retrieveCampanyLogoImage(@PathVariable Boolean isLight) {
+        return companyInformationService.retrieveCampanyLogoImage(isLight);
     }
 
     @Operation(summary = "회사 기본 정보(주소, 영문주소, 유선번호, 팩스번호) 조회 API")
@@ -66,9 +67,10 @@ public class CompanyInformationController {
     @Operation(summary = "회사 전체 정보 수정 API")
     @PutMapping("/company/information")
     public ApiResponse<CompanyInformation> updateAllCompanyInformation(@Valid @RequestPart("request") UpdateAllCompanyInformationRequestDto dto,
-                                                   @RequestPart(value = "logoImageUrl", required = false) MultipartFile logoImageUrl,
+                                                   @RequestPart(value = "lightLogoImage", required = false) MultipartFile lightLogoImage,
+                                                   @RequestPart(value = "darkLogoImage", required = false) MultipartFile darkLogoImage,
                                                    @RequestPart(value = "sloganImageUrl", required = false) MultipartFile sloganImageUrl) throws IOException {
-        return companyInformationService.updateAllCompanyInformation(dto.toServiceRequest(), logoImageUrl, sloganImageUrl);
+        return companyInformationService.updateAllCompanyInformation(dto.toServiceRequest(), lightLogoImage, darkLogoImage, sloganImageUrl);
     }
     @Operation(summary = "회사 전체 텍스트 정보(이미지 제외) 수정 API")
     @PutMapping("/company/information/modify")
@@ -78,8 +80,9 @@ public class CompanyInformationController {
 
     @Operation(summary = "회사 로고 이미지 수정 API")
     @PutMapping("/company/logo")
-    public ApiResponse<CompanyInformation> updateCompanyLogoImage(@RequestPart(value = "logoImageUrl", required = false) MultipartFile logoImageUrl) throws IOException {
-        return companyInformationService.updateCompanyLogoImage(logoImageUrl);
+    public ApiResponse<CompanyInformation> updateCompanyLogoImage(@RequestPart(value = "lightLogoImage", required = false) MultipartFile lightLogoImage,
+                                                                  @RequestPart(value = "darkLogoImage", required = false) MultipartFile darkLogoImage) throws IOException {
+        return companyInformationService.updateCompanyLogoImage(lightLogoImage, darkLogoImage);
     }
 
     @Operation(summary = "회사 슬로건 이미지 수정 API")
@@ -90,9 +93,10 @@ public class CompanyInformationController {
 
     @Operation(summary = "회사 로고, 슬로건 이미지 수정 API")
     @PutMapping("/company/logo&slogan")
-    public ApiResponse<CompanyInformation> updateCompanyLogoImage(@RequestPart(value = "logoImageUrl", required = false) MultipartFile logoImageUrl,
-                                              @RequestPart(value = "sloganImageUrl", required = false) MultipartFile sloganImageUrl) throws IOException {
-        return companyInformationService.updateCompanyLogoAndSlogan(logoImageUrl, sloganImageUrl);
+    public ApiResponse<CompanyInformation> updateCompanyLogoImage(@RequestPart(value = "lightLogoImage", required = false) MultipartFile lightLogoImage,
+                                                                  @RequestPart(value = "darkLogoImage", required = false) MultipartFile darkLogoImage,
+                                                                  @RequestPart(value = "sloganImageUrl", required = false) MultipartFile sloganImageUrl) throws IOException {
+        return companyInformationService.updateCompanyLogoAndSlogan(lightLogoImage, darkLogoImage, sloganImageUrl);
     }
 
     @Operation(summary = "회사 기본 정보(주소, 유선번호, 팩스번호) 수정 API")
