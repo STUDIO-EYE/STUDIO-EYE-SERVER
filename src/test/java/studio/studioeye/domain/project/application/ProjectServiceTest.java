@@ -165,4 +165,31 @@ public class ProjectServiceTest {
     }
 
 
+    @Test
+    @DisplayName("프로젝트 게시 상태 수정 성공")
+    void UpdatePostingStatusSuccess() {
+        Long projectId = 1L;
+        UpdatePostingStatusDto dto = new UpdatePostingStatusDto(projectId, true);
+        Project project = new Project("Test Department", "Entertainment", "Test Name", "Test Client",
+                "2024-01-01", "Test Link", "Test Overview", mockFile.getName(), null, 0, 0, "main", true);
+
+        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
+
+        ApiResponse<Project> response = projectService.updatePostingStatus(dto);
+
+        assertEquals("프로젝트 게시 여부를 성공적으로 변경하였습니다.", response.getMessage());
+        assertTrue(project.getIsPosted()); // 게시 상태가 true로 변경되었는지 확인
+    }
+
+    @Test
+    @DisplayName("프로젝트 게시 상태 수정 실패 - 유효하지 않은 ID")
+    void UpdatePostingStatusFail() {
+        UpdatePostingStatusDto dto = new UpdatePostingStatusDto(999L, true); // 유효하지 않은 ID
+
+        when(projectRepository.findById(dto.projectId())).thenReturn(Optional.empty());
+
+        ApiResponse<Project> response = projectService.updatePostingStatus(dto);
+
+        assertEquals(ErrorCode.INVALID_PROJECT_ID.getStatus(), response.getStatus());
+    }
 }
