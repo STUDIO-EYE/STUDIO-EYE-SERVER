@@ -250,4 +250,29 @@ public class ProjectServiceTest {
         assertEquals(ErrorCode.INVALID_PROJECT_ID.getStatus(), response.getStatus());
     }
 
+    @Test
+    @DisplayName("프로젝트 전체 조회 성공")
+    void RetrieveAllArtworkProjectSuccess() {
+        List<Project> projects = new ArrayList<>();
+        projects.add(new Project("Test Department", "Entertainment", "Test Name", "Test Client",
+                "2024-01-01", "Test Link", "Test Overview", mockFile.getName(), null, 0, 0, "main", true));
+
+        when(projectRepository.findAllWithImagesAndOrderBySequenceAsc()).thenReturn(projects);
+
+        ApiResponse<List<Project>> response = projectService.retrieveAllArtworkProject();
+
+        assertEquals("프로젝트 목록을 성공적으로 조회했습니다.", response.getMessage());
+        assertEquals(projects, response.getData()); // 프로젝트 목록이 반환되었는지 확인
+    }
+
+    @Test
+    @DisplayName("프로젝트 전체 조회 실패 - 프로젝트가 없는 경우")
+    void RetrieveAllArtworkProjectFail() {
+        when(projectRepository.findAllWithImagesAndOrderBySequenceAsc()).thenReturn(new ArrayList<>());
+
+        ApiResponse<List<Project>> response = projectService.retrieveAllArtworkProject();
+
+        assertEquals("프로젝트가 존재하지 않습니다.", response.getMessage());
+    }
+
 }
