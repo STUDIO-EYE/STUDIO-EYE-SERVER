@@ -1,5 +1,6 @@
 package studio.studioeye.domain.faq.application;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -240,5 +241,25 @@ public class FaqServiceTest {
         assertNull(findFaq);
         Mockito.verify(faqRepository, times(1)).findById(invalidId);  // repository 메소드 호출 검증
         Mockito.verify(faqRepository, Mockito.never()).save(any());
+    }
+
+    @Test
+    @DisplayName("FAQ 삭제 성공")
+    public void deleteFaq() {
+        // given
+        Long id = 1L;
+        Faq savedFaq = new Faq("Test Question1", "Test Answer1", true);
+
+        // stub
+        when(faqRepository.findById(id)).thenReturn(Optional.of(savedFaq));
+
+        // when
+        ApiResponse<String> response = faqService.deleteFaq(id);
+
+        // then
+        assertEquals(HttpStatus.OK, response.getStatus());
+        assertEquals("FAQ를 성공적으로 삭제했습니다.", response.getMessage());
+        Mockito.verify(faqRepository, times(1)).findById(id);
+        Mockito.verify(faqRepository, times(1)).delete(savedFaq);
     }
 }
