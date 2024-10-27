@@ -222,4 +222,32 @@ public class ProjectServiceTest {
 
         assertEquals(ErrorCode.INVALID_PROJECT_ID.getStatus(), response.getStatus());
     }
+
+    @Test
+    @DisplayName("프로젝트 삭제 성공")
+    void DeleteProjectSuccess() {
+        Long projectId = 1L;
+        Project project = new Project("Test Department", "Entertainment", "Test Name", "Test Client",
+                "2024-01-01", "Test Link", "Test Overview", mockFile.getName(), null, 0, 0, "main", true);
+
+        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
+
+        ApiResponse<String> response = projectService.deleteProject(projectId);
+
+        assertEquals("프로젝트를 성공적으로 삭제했습니다.", response.getMessage());
+        verify(projectRepository).delete(project);
+    }
+
+    @Test
+    @DisplayName("프로젝트 삭제 실패 - 유효하지 않은 ID")
+    void DeleteProjectFail() {
+        Long projectId = 999L; // 유효하지 않은 ID
+
+        when(projectRepository.findById(projectId)).thenReturn(Optional.empty());
+
+        ApiResponse<String> response = projectService.deleteProject(projectId);
+
+        assertEquals(ErrorCode.INVALID_PROJECT_ID.getStatus(), response.getStatus());
+    }
+
 }
