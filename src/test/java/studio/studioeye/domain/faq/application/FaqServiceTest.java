@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import studio.studioeye.domain.faq.dao.FaqRepository;
 import studio.studioeye.domain.faq.domain.Faq;
 import studio.studioeye.domain.faq.dto.request.CreateFaqServiceRequestDto;
+import studio.studioeye.domain.faq.dto.request.UpdateFaqServiceRequestDto;
 import studio.studioeye.domain.recruitment.domain.Recruitment;
 import studio.studioeye.global.common.response.ApiResponse;
 import studio.studioeye.global.exception.error.ErrorCode;
@@ -167,5 +168,48 @@ public class FaqServiceTest {
         assertEquals(ErrorCode.INVALID_FAQ_ID.getStatus(), response.getStatus());
         assertEquals(ErrorCode.INVALID_FAQ_ID.getMessage(), response.getMessage());
         Mockito.verify(faqRepository, times(1)).findById(id);
+    }
+
+    @Test
+    @DisplayName("FAQ 수정 성공")
+    public void updateFaqSuccess() {
+        // given
+        Faq savedFaq = new Faq("Test Question1", "Test Answer1", true);
+
+        String question = "Test Question2";
+        String answer = "Test Answer2";
+        Boolean visibility = false;
+
+        UpdateFaqServiceRequestDto requestDto = new UpdateFaqServiceRequestDto(
+                1L, question, answer, visibility
+        );
+
+        // stub
+        when(faqRepository.findById(requestDto.id())).thenReturn(Optional.of(savedFaq));
+        when(faqRepository.save(any(Faq.class))).thenAnswer(invocation -> {
+            Faq argumentFaq = invocation.getArgument(0);
+            argumentFaq.updateTitle(question);
+            argumentFaq.updateContent(answer);
+            argumentFaq.updateVisibility(visibility);
+            return new Faq(argumentFaq.getQuestion(), argumentFaq.getAnswer(), argumentFaq.getVisibility());
+        });
+
+        // when
+        ApiResponse<Faq> response = faqService.updateFaq(requestDto);
+        Faq findFaq = response.getData();
+
+        // then
+        assertNotNull(findFaq);
+        assertEquals(HttpStatus.OK, response.getStatus());
+        assertEquals("FAQ를 성공적으로 수정하였습니다.", response.getMessage());
+        assertNotEquals(findFaq, savedFaq);
+        assertEquals(findFaq.getQuestion(), savedFaq.getQuestion());
+        assertEquals(findFaq.getAnswer(), savedFaq.getAnswer());
+        assertEquals(findFaq.getVisibility(), savedFaq.getVisibility());
+        assertEquals(findFaq.getQuestion(), requestDto.question());
+        assertEquals(findFaq.getAnswer(), requestDto.answer());
+        assertEquals(findFaq.getVisibility(), requestDto.visibility());
+        Mockito.verify(faqRepository, times(1)).findById(requestDto.id());
+        Mockito.verify(faqRepository, times(1)).save(any(Faq.class));
     }
 }
