@@ -17,8 +17,7 @@ import studio.studioeye.global.exception.error.ErrorCode;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -96,6 +95,27 @@ public class FaqServiceTest {
         assertEquals(findFaq.size(), savedFaqList.size());
         assertEquals(HttpStatus.OK, response.getStatus());
         assertEquals("FAQ 목록을 성공적으로 조회했습니다.", response.getMessage());
+        Mockito.verify(faqRepository, times(1)).findAll();
+    }
+
+    @Test
+    @DisplayName("FAQ 전체 조회 실패")
+    public void retrieveAllFaqFail() {
+        // given
+        List<Faq> savedFaqList = new ArrayList<>();
+
+        // stub
+        when(faqRepository.findAll()).thenReturn(savedFaqList);
+
+        // when
+        ApiResponse<List<Faq>> response = faqService.retrieveAllFaq();
+        List<Faq> findFaq = response.getData();
+
+        // then
+        assertNotNull(response);
+        assertNull(findFaq);
+        assertEquals(HttpStatus.OK, response.getStatus());
+        assertEquals("FAQ가 존재하지 않습니다.", response.getMessage());
         Mockito.verify(faqRepository, times(1)).findAll();
     }
 }
