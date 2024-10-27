@@ -11,15 +11,16 @@ import org.springframework.http.HttpStatus;
 import studio.studioeye.domain.faq.dao.FaqRepository;
 import studio.studioeye.domain.faq.domain.Faq;
 import studio.studioeye.domain.faq.dto.request.CreateFaqServiceRequestDto;
-import studio.studioeye.domain.recruitment.domain.Recruitment;
 import studio.studioeye.global.common.response.ApiResponse;
 import studio.studioeye.global.exception.error.ErrorCode;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class FaqServiceTest {
@@ -69,5 +70,32 @@ public class FaqServiceTest {
         assertEquals(ErrorCode.FAQ_IS_EMPTY.getStatus(), response.getStatus());
         assertEquals(ErrorCode.FAQ_IS_EMPTY.getMessage(), response.getMessage());
         Mockito.verify(faqRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("FAQ 전체 조회 성공")
+    public void retrieveAllFaqSuccess() {
+        // given
+        List<Faq> faqList = new ArrayList<>();
+        faqList.add(new Faq("Test Question1", "Test Answer1", true));
+        faqList.add(new Faq("Test Question2", "Test Answer2", true));
+        faqList.add(new Faq("Test Question3", "Test Answer3", true));
+
+        List<Faq> savedFaqList = faqList;
+
+        // stub
+        when(faqRepository.findAll()).thenReturn(savedFaqList);
+
+        // when
+        ApiResponse<List<Faq>> response = faqService.retrieveAllFaq();
+        List<Faq> findFaq = response.getData();
+
+        // then
+        assertNotNull(response);
+        assertEquals(findFaq, savedFaqList);
+        assertEquals(findFaq.size(), savedFaqList.size());
+        assertEquals(HttpStatus.OK, response.getStatus());
+        assertEquals("FAQ 목록을 성공적으로 조회했습니다.", response.getMessage());
+        Mockito.verify(faqRepository, times(1)).findAll();
     }
 }
