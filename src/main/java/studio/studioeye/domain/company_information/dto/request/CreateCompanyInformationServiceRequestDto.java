@@ -16,7 +16,8 @@ public record CreateCompanyInformationServiceRequestDto(
         String introduction,
         List<DetailInformationDTO> detailInformation
 ) {
-    public CompanyInformation toEntity(String logoImageFileName, String logoImageUrl,
+    public CompanyInformation toEntity(String lightLogoImageFileName, String lightLogoImageUrl,
+                                       String darkLogoImageFileName, String darkLogoImageUrl,
                                        String sloganImageFileName, String sloganImageUrl) {
         CompanyInformation companyInformation = CompanyInformation.builder()
                 .mainOverview(mainOverview)
@@ -26,8 +27,10 @@ public record CreateCompanyInformationServiceRequestDto(
                 .phone(phone)
                 .fax(fax)
                 .introduction(introduction)
-                .logoImageFileName(logoImageFileName)
-                .logoImageUrl(logoImageUrl)
+                .lightLogoImageFileName(lightLogoImageFileName)
+                .lightLogoImageUrl(lightLogoImageUrl)
+                .darkLogoImageFileName(darkLogoImageFileName)
+                .darkLogoImageUrl(darkLogoImageUrl)
                 .sloganImageFileName(sloganImageFileName)
                 .sloganImageUrl(sloganImageUrl)
                 .build();
