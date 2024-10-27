@@ -13,10 +13,12 @@ import studio.studioeye.domain.faq.domain.Faq;
 import studio.studioeye.domain.faq.dto.request.CreateFaqServiceRequestDto;
 import studio.studioeye.domain.recruitment.domain.Recruitment;
 import studio.studioeye.global.common.response.ApiResponse;
+import studio.studioeye.global.exception.error.ErrorCode;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 
 @ExtendWith(MockitoExtension.class)
@@ -46,5 +48,26 @@ public class FaqServiceTest {
         assertEquals(HttpStatus.OK, response.getStatus());
         assertEquals("FAQ를 성공적으로 등록하였습니다.", response.getMessage());
         Mockito.verify(faqRepository, times(1)).save(any(Faq.class));
+    }
+
+    @Test
+    @DisplayName("FAQ 생성 실패 - question이 비어 있는 경우")
+    public void createFaqFail() {
+        // given
+        String question = "";
+        String answer = "test answer";
+        Boolean visibility = true;
+        CreateFaqServiceRequestDto requestDto = new CreateFaqServiceRequestDto(
+                question, answer, visibility
+        );
+
+        // when
+        ApiResponse<Faq> response = faqService.createFaq(requestDto);
+
+        // then
+        assertNotNull(response);
+        assertEquals(ErrorCode.FAQ_IS_EMPTY.getStatus(), response.getStatus());
+        assertEquals(ErrorCode.FAQ_IS_EMPTY.getMessage(), response.getMessage());
+        Mockito.verify(faqRepository, never()).save(any());
     }
 }
