@@ -60,7 +60,7 @@ public class FaqService {
     public ApiResponse<Faq> retrieveFaqById(Long id) {
         Optional<Faq> optionalFaq = faqRepository.findById(id);
         if(optionalFaq.isEmpty()) {
-            return ApiResponse.ok("FAQ가 존재하지 않습니다.");
+            return ApiResponse.withError(ErrorCode.INVALID_FAQ_ID);
         }
         Faq faq = optionalFaq.get();
         return ApiResponse.ok("FAQ를 성공적으로 조회했습니다.", faq);
