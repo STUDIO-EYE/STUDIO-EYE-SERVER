@@ -112,4 +112,57 @@ public class ProjectServiceTest {
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatus()); // 적절한 상태 코드 수정
         assertEquals("이미지 업로드 중 오류가 발생했습니다.", response.getMessage()); // 예외 메시지 수정
     }
+
+    @Test
+    @DisplayName("Project 수정 성공 테스트")
+    void updateProjectSuccess() throws IOException {
+        // given
+        Long id = 1L;
+        UpdateProjectServiceRequestDto requestDto = new UpdateProjectServiceRequestDto(
+                id, "Updated Department", "Entertainment", "Updated Name", "Updated Client", "2024-01-02", "Updated Link", "Updated Overview", "main", true);
+
+        Project savedProject = new Project("Test Department", "Entertainment", "Test Name", "Test Client",
+                "2024-01-01", "Test Link", "Test Overview", mockFile.getName(), null, 0, 0, "main", true);
+
+        // Mock existing images as MultipartFile
+        List<MultipartFile> existingImages = List.of(mockFile);
+
+        // stub
+        when(projectRepository.findById(requestDto.projectId())).thenReturn(Optional.of(savedProject));
+        when(s3Adapter.deleteFile(savedProject.getMainImg())).thenReturn(ApiResponse.ok("S3에서 파일 삭제 성공"));
+        when(s3Adapter.uploadFile(any(MultipartFile.class)))
+                .thenReturn(ApiResponse.ok("S3에 이미지 업로드 성공", "Updated Test ImageUrl"));
+        when(projectRepository.save(any(Project.class))).thenReturn(savedProject);
+
+        // when
+        ApiResponse<Project> response = projectService.updateProject(requestDto, mockFile, existingImages);
+
+        // then
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatus());
+        assertEquals("프로젝트를 성공적으로 수정했습니다.", response.getMessage());
+        assertEquals("Updated Test ImageUrl", savedProject.getMainImg());
+    }
+
+    @Test
+    @DisplayName("Project 수정 실패 - 유효하지 않은 ID")
+    void updateProjectFail() throws IOException {
+        // given
+        Long id = 1L;
+        UpdateProjectServiceRequestDto requestDto = new UpdateProjectServiceRequestDto(
+                id, "Updated Department", "Entertainment", "Updated Name", "Updated Client", "2024-01-02", "Updated Link", "Updated Overview", "main", true);
+
+        // stub
+        when(projectRepository.findById(requestDto.projectId())).thenReturn(Optional.empty());
+
+        // when
+        ApiResponse<Project> response = projectService.updateProject(requestDto, mockFile, List.of(mockFile));
+
+        // then
+        assertNotNull(response);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatus());
+        assertEquals("유효하지 않은 project 식별자입니다.", response.getMessage());
+    }
+
+
 }
