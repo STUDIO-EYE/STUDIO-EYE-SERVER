@@ -1,6 +1,5 @@
 package studio.studioeye.domain.faq.application;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,7 +12,6 @@ import studio.studioeye.domain.faq.dao.FaqRepository;
 import studio.studioeye.domain.faq.domain.Faq;
 import studio.studioeye.domain.faq.dto.request.CreateFaqServiceRequestDto;
 import studio.studioeye.domain.faq.dto.request.UpdateFaqServiceRequestDto;
-import studio.studioeye.domain.recruitment.domain.Recruitment;
 import studio.studioeye.global.common.response.ApiResponse;
 import studio.studioeye.global.exception.error.ErrorCode;
 
@@ -211,5 +209,36 @@ public class FaqServiceTest {
         assertEquals(findFaq.getVisibility(), requestDto.visibility());
         Mockito.verify(faqRepository, times(1)).findById(requestDto.id());
         Mockito.verify(faqRepository, times(1)).save(any(Faq.class));
+    }
+
+    @Test
+    @DisplayName("FAQ 수정 실패")
+    public void updateFaqFail() {
+        // given
+        Faq savedFaq = new Faq("Test Question1", "Test Answer1", true);
+
+        Long invalidId = 999L;
+        String question = "Test Question2";
+        String answer = "Test Answer2";
+        Boolean visibility = false;
+
+        UpdateFaqServiceRequestDto requestDto = new UpdateFaqServiceRequestDto(
+                invalidId, question, answer, visibility
+        );
+
+        // stub
+        when(faqRepository.findById(requestDto.id())).thenReturn(Optional.empty());
+
+        // when
+        ApiResponse<Faq> response = faqService.updateFaq(requestDto);
+        Faq findFaq = response.getData();
+
+        // then
+        assertEquals(ErrorCode.INVALID_FAQ_ID.getStatus(), response.getStatus());
+        assertEquals(ErrorCode.INVALID_FAQ_ID.getMessage(), response.getMessage());
+        assertNotEquals(findFaq, savedFaq);
+        assertNull(findFaq);
+        Mockito.verify(faqRepository, times(1)).findById(invalidId);  // repository 메소드 호출 검증
+        Mockito.verify(faqRepository, Mockito.never()).save(any());
     }
 }
