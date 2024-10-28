@@ -98,18 +98,9 @@ jacocoTestReport {
 
     afterEvaluate {
         classDirectories.setFrom(
-                // 그 외의 매칭되는 클래스도 제외 대상
                 files(classDirectories.files.collect {
-                    fileTree(dir: it, excludes: [
-                            "**/*Application*",
-                            "**/*Config*",
-                            "**/*Interceptor*",
-                            "**/*Exception*",
-                            "**/global*",
-                            "**/dto*",
-                            "**/dao*",
-//                            "**/domain*",
-                            "**/api*"
+                    fileTree(dir: it, includes: [
+                            "studio/studioeye/domain/**/application/**"
                     ])
                 })
         )
