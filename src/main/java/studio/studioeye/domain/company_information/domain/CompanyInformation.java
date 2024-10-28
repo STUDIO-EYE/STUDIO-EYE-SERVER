@@ -1,5 +1,6 @@
 package studio.studioeye.domain.company_information.domain;
 
+import studio.studioeye.domain.company_information.dto.request.*;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -7,7 +8,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import studio.studioeye.domain.company_information.dto.request.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,10 +36,16 @@ public class CompanyInformation {
     private String addressEnglish;
 
     @NotNull
-    private String logoImageFileName;
+    private String lightLogoImageFileName;
 
     @NotNull
-    private String logoImageUrl;
+    private String lightLogoImageUrl;
+
+    @NotNull
+    private String darkLogoImageFileName;
+
+    @NotNull
+    private String darkLogoImageUrl;
 
     @NotNull
     private String phone;
@@ -65,7 +71,8 @@ public class CompanyInformation {
     public CompanyInformation(String mainOverview, String commitment,
                               String address,
                               String addressEnglish,
-                              String logoImageFileName, String logoImageUrl,
+                              String lightLogoImageFileName, String lightLogoImageUrl,
+                              String darkLogoImageFileName, String darkLogoImageUrl,
                               String phone,
                               String fax,
                               String introduction,
@@ -75,8 +82,10 @@ public class CompanyInformation {
         this.commitment = commitment;
         this.address = address;
         this.addressEnglish = addressEnglish;
-        this.logoImageFileName = logoImageFileName;
-        this.logoImageUrl = logoImageUrl;
+        this.darkLogoImageFileName = darkLogoImageFileName;
+        this.darkLogoImageUrl = darkLogoImageUrl;
+        this.lightLogoImageFileName = lightLogoImageFileName;
+        this.lightLogoImageUrl = lightLogoImageUrl;
         this.phone = phone;
         this.fax = fax;
         this.introduction = introduction;
@@ -89,8 +98,10 @@ public class CompanyInformation {
     }
 
     public void deleteLogoImage() {
-        this.logoImageFileName = null;
-        this.logoImageUrl = null;
+        this.lightLogoImageFileName = null;
+        this.lightLogoImageUrl = null;
+        this.darkLogoImageFileName = null;
+        this.darkLogoImageUrl = null;
     }
 
     public void deleteCompanyBasicInformation() {
@@ -112,9 +123,11 @@ public class CompanyInformation {
         this.sloganImageUrl = null;
     }
 
-    public void updateCompanyLogo(String logoImageFileName, String logoImageUrl) {
-        this.logoImageFileName = logoImageFileName;
-        this.logoImageUrl = logoImageUrl;
+    public void updateCompanyLogo(String lightLogoImageFileName, String lightLogoImageUrl, String darkLogoImageFileName, String darkLogoImageUrl) {
+        this.lightLogoImageFileName = lightLogoImageFileName;
+        this.lightLogoImageUrl = lightLogoImageUrl;
+        this.darkLogoImageFileName = darkLogoImageFileName;
+        this.darkLogoImageUrl = darkLogoImageUrl;
     }
 
     public void updateCompanySlogan(String sloganImageFileName, String sloganImageUrl) {
@@ -122,14 +135,18 @@ public class CompanyInformation {
         this.sloganImageUrl = sloganImageUrl;
     }
 
-    public void updateAllCompanyInformation(UpdateAllCompanyInformationServiceRequestDto dto, String logoImageFileName,
-                                            String logoImageUrl, String sloganImageFileName, String sloganImageUrl) {
+    public void updateAllCompanyInformation(UpdateAllCompanyInformationServiceRequestDto dto,
+                                            String lightLogoImageFileName, String lightLogoImageUrl,
+                                            String darkLogoImageFileName, String darkLogoImageUrl,
+                                            String sloganImageFileName, String sloganImageUrl) {
         this.mainOverview = dto.mainOverview();
         this.commitment = dto.commitment();
         this.address = dto.address();
         this.addressEnglish = dto.addressEnglish();
-        this.logoImageFileName = logoImageFileName;
-        this.logoImageUrl = logoImageUrl;
+        this.lightLogoImageFileName = lightLogoImageFileName;
+        this.lightLogoImageUrl = lightLogoImageUrl;
+        this.darkLogoImageFileName = darkLogoImageFileName;
+        this.darkLogoImageUrl = darkLogoImageUrl;
         this.phone = dto.phone();
         this.fax = dto.fax();
         this.introduction = dto.introduction();
@@ -166,9 +183,11 @@ public class CompanyInformation {
         this.introduction = dto.introduction();
     }
 
-    public void updateCompanyLogoAndSlogan(String logoImageFileName, String logoImageUrl, String sloganImageFileName, String sloganImageUrl) {
-        this.logoImageFileName = logoImageFileName;
-        this.logoImageUrl = logoImageUrl;
+    public void updateCompanyLogoAndSlogan(String lightLogoImageFileName, String lightLogoImageUrl, String darkLogoImageFileName, String darkLogoImageUrl, String sloganImageFileName, String sloganImageUrl) {
+        this.lightLogoImageFileName = lightLogoImageFileName;
+        this.lightLogoImageUrl = lightLogoImageUrl;
+        this.darkLogoImageFileName = darkLogoImageFileName;
+        this.darkLogoImageUrl = darkLogoImageUrl;
         this.sloganImageFileName = sloganImageFileName;
         this.sloganImageUrl = sloganImageUrl;
     }

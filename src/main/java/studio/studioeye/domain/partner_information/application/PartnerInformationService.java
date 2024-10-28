@@ -36,15 +36,14 @@ public class PartnerInformationService {
 		return ApiResponse.ok("협력사 정보를 성공적으로 등록하였습니다.", savedPartnerInformation);
 	}
 
-	private String getImgUrl(MultipartFile file) {
-		ApiResponse<String> updateFileResponse = s3Adapter.uploadImage(file);
-
-		if(updateFileResponse.getStatus().is5xxServerError()){
-
+	private String getImgUrl(MultipartFile logoImg) {
+		ApiResponse<String> updateFileResponse = s3Adapter.uploadImage(logoImg);
+		if (updateFileResponse == null || updateFileResponse.getStatus().is5xxServerError()) {
 			return "";
 		}
-        return updateFileResponse.getData();
+		return updateFileResponse.getData();
 	}
+
 
 	public ApiResponse<List<Map<String, Object>>> retrieveAllPartnerInfo() {
 		List<PartnerInformation> partnerInformationList = partnerInformationRepository.findAll();
