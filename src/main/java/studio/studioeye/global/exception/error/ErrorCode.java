@@ -61,7 +61,7 @@ public enum ErrorCode {
 	INVALID_SSE_ID(HttpStatus.BAD_REQUEST, "유효하지 않은 sse 식별자입니다."),
 
 	// FAQ
-	INVALID_FAQ_ID(HttpStatus.BAD_REQUEST, "유효하지 않은 views 식별자입니다."),
+	INVALID_FAQ_ID(HttpStatus.BAD_REQUEST, "유효하지 않은 faq 식별자입니다."),
 	FAQ_IS_EMPTY(HttpStatus.BAD_REQUEST, "입력된 내용이 없습니다"),
 
 	// CompanyInformation
