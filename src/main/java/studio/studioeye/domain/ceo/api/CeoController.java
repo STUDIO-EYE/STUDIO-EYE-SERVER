@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+
 @Tag(name = "CEO 정보 API", description = "CEO 정보 등록 / 수정 / 삭제 / 조회")
 @RestController
 @RequestMapping("/api")
@@ -22,7 +24,7 @@ public class CeoController {
     @Operation(summary = "CEO 정보 등록 API")
     @PostMapping("/ceo")
     public ApiResponse<Ceo> createCeoInformation(@Valid @RequestPart("request") CreateCeoRequestDto dto,
-                                                 @RequestPart(value = "file", required = false) MultipartFile file){
+                                                 @RequestPart(value = "file", required = false) MultipartFile file) throws IOException {
         return ceoService.createCeoInformation(dto.toServiceRequest(), file);
     }
 
@@ -35,7 +37,7 @@ public class CeoController {
     @Operation(summary = "CEO 전체 정보 수정 API")
     @PutMapping("/ceo")
     public ApiResponse<Ceo> updateCeoInformation(@Valid @RequestPart("request") UpdateCeoRequestDto dto,
-                                            @RequestPart(value = "file", required = false) MultipartFile file) {
+                                            @RequestPart(value = "file", required = false) MultipartFile file) throws IOException {
         return ceoService.updateCeoInformation(dto.toServiceRequest(), file);
     }
 
