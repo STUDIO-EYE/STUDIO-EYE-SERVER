@@ -1,12 +1,5 @@
 package studio.studioeye.domain.project.application;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 import studio.studioeye.domain.project.dao.ProjectRepository;
 import studio.studioeye.domain.project.domain.Project;
 import studio.studioeye.domain.project.domain.ProjectImage;
@@ -15,7 +8,15 @@ import studio.studioeye.domain.views.application.ViewsService;
 import studio.studioeye.infrastructure.s3.S3Adapter;
 import studio.studioeye.global.common.response.ApiResponse;
 import studio.studioeye.global.exception.error.ErrorCode;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -33,9 +34,23 @@ public class ProjectService {
 	private static final String MAIN_PROJECT_TYPE = "main";
 	private static final String OTHERS_PROJECT_TYPE = "others";
 
-	public ApiResponse<Project> createProject(CreateProjectServiceRequestDto dto, MultipartFile mainImgFile, List<MultipartFile> files) {
+	// CREATE
+	public ApiResponse<Project> createProject(CreateProjectServiceRequestDto dto,
+											  MultipartFile mainImgFile, MultipartFile responsiveMainImgFile,
+											  List<MultipartFile> files) throws IOException {
 		String mainImg = getImgUrl(mainImgFile);
 		if (mainImg.isEmpty()) return ApiResponse.withError(ErrorCode.ERROR_S3_UPDATE_OBJECT);
+		String mainImgFileName = mainImgFile.getOriginalFilename();
+
+		// TODO 임시 코드
+		String responsiveMainImg = null;
+		String responsiveMainImgFileName = null;
+
+		if(responsiveMainImgFile != null) {
+			responsiveMainImg = getImgUrl(responsiveMainImgFile);
+			if (responsiveMainImg.isEmpty()) return ApiResponse.withError(ErrorCode.ERROR_S3_UPDATE_OBJECT);
+			responsiveMainImgFileName = responsiveMainImgFile.getOriginalFilename();
+		}
 
 		List<ProjectImage> projectImages = new LinkedList<>();
 		if (files != null) {
@@ -88,7 +103,7 @@ public class ProjectService {
 				return ApiResponse.withError(ErrorCode.INVALID_PROJECT_TYPE);
 		}
 
-		Project project = dto.toEntity(mainImg, projectImages, projectCount, mainSequence);
+		Project project = dto.toEntity(mainImg, mainImgFileName, responsiveMainImg, responsiveMainImgFileName, projectImages, projectCount, mainSequence);
 
 		// ProjectImage의 project 필드 설정
 		for (ProjectImage projectImage : projectImages) {
@@ -99,7 +114,63 @@ public class ProjectService {
 		return ApiResponse.ok("프로젝트를 성공적으로 등록하였습니다.", savedProject);
 	}
 
-	public ApiResponse<Project> updateProject(UpdateProjectServiceRequestDto dto, MultipartFile mainImgFile, List<MultipartFile> files) {
+	// RETRIEVE
+	// for artwork page
+	public ApiResponse<List<Project>> retrieveAllArtworkProject() {
+		List<Project> projectList = projectRepository.findAllWithImagesAndOrderBySequenceAsc();
+		if (projectList.isEmpty()){
+			return ApiResponse.ok("프로젝트가 존재하지 않습니다.");
+		}
+
+		return ApiResponse.ok("프로젝트 목록을 성공적으로 조회했습니다.", projectList);
+	}
+
+	// for main page
+	public ApiResponse<List<Project>> retrieveAllMainProject() {
+		List<Project> projectList = projectRepository.findAllWithImagesAndOrderByMainSequenceAsc();
+		List<Project> responseProject = new ArrayList<>();
+		List<Project> topProject = projectRepository.findByProjectType(TOP_PROJECT_TYPE);
+		Project top;
+		if (!topProject.isEmpty()) {
+			top = topProject.get(0);
+			responseProject.add(top);
+		}
+		responseProject.addAll(projectList);
+
+		if (projectList.isEmpty()){
+			return ApiResponse.ok("프로젝트가 존재하지 않습니다.");
+		}
+
+		return ApiResponse.ok("프로젝트 목록을 성공적으로 조회했습니다.", responseProject);
+
+	}
+
+	public ApiResponse<Project> retrieveProject(Long projectId) {
+		Optional<Project> optionalProject = projectRepository.findById(projectId);
+		if(optionalProject.isEmpty()){
+			return ApiResponse.withError(ErrorCode.INVALID_PROJECT_ID);
+		}
+
+		Project project = optionalProject.get();
+		return ApiResponse.ok("프로젝트를 성공적으로 조회했습니다.", project);
+	}
+
+	public Page<Project> retrieveArtworkProjectPage(int page, int size) {
+		Pageable pageable = PageRequest.of(page, size);
+		return projectRepository.findAll(pageable);
+	}
+
+	// UPDATE
+	public ApiResponse<Project> updateProject(UpdateProjectServiceRequestDto dto,
+											  MultipartFile mainImgFile, MultipartFile responsiveMainImgFile,
+											  List<MultipartFile> files) throws IOException {
+		if(mainImgFile == null && mainImgFile.isEmpty()) {
+			return ApiResponse.withError(ErrorCode.NOT_EXIST_IMAGE_FILE);
+		}
+		// TODO 임시 코드
+//		if(responsiveMainImgFile == null && responsiveMainImgFile.isEmpty()) {
+//			return ApiResponse.withError(ErrorCode.NOT_EXIST_IMAGE_FILE);
+//		}
 		Optional<Project> optionalProject = projectRepository.findById(dto.projectId());
 		if(optionalProject.isEmpty()){
 			return ApiResponse.withError(ErrorCode.INVALID_PROJECT_ID);
@@ -118,7 +189,8 @@ public class ProjectService {
 				}
 				// 기존의 프로젝트 타입이 main이었을 경우, 다른 main 프로젝트들의 mainSequence 수정
 				if (project.getProjectType().equals(MAIN_PROJECT_TYPE)) {
-					List<Project> findByMainSequenceGreaterThan = projectRepository.findAllByMainSequenceGreaterThanAndMainSequenceNot(project.getMainSequence(), 999);
+					List<Project> findByMainSequenceGreaterThan
+							= projectRepository.findAllByMainSequenceGreaterThanAndMainSequenceNot(project.getMainSequence(), 999);
 					for (Project findMainProject : findByMainSequenceGreaterThan) {
 						findMainProject.updateMainSequence(findMainProject.getMainSequence() - 1);
 					}
@@ -142,7 +214,8 @@ public class ProjectService {
 			case OTHERS_PROJECT_TYPE:
 				// 기존의 프로젝트 타입이 main이었을 경우, 다른 main 프로젝트들의 mainSequence 수정
 				if (project.getProjectType().equals(MAIN_PROJECT_TYPE)) {
-					List<Project> findByMainSequenceGreaterThan = projectRepository.findAllByMainSequenceGreaterThanAndMainSequenceNot(project.getMainSequence(), 999);
+					List<Project> findByMainSequenceGreaterThan
+							= projectRepository.findAllByMainSequenceGreaterThanAndMainSequenceNot(project.getMainSequence(), 999);
 					for (Project findMainProject : findByMainSequenceGreaterThan) {
 						findMainProject.updateMainSequence(findMainProject.getMainSequence() - 1);
 					}
@@ -153,6 +226,14 @@ public class ProjectService {
 			default: // 유효하지 않은 값일 경우
 				return ApiResponse.withError(ErrorCode.INVALID_PROJECT_TYPE);
 		}
+
+		// 기존 메인 이미지 삭제
+		String mainImgFileName = project.getMainImgFileName();
+		if(mainImgFileName != null) s3Adapter.deleteFile(mainImgFileName);
+
+		// 기존 반응형 메인이미지 삭제
+		String responsiveMainImgFileName = project.getMainImgFileName();
+		if(responsiveMainImgFileName != null) s3Adapter.deleteFile(responsiveMainImgFileName);
 
 		// 기존 이미지들 전체 삭제
 		List<ProjectImage> existingImages = project.getProjectImages();
@@ -168,6 +249,16 @@ public class ProjectService {
 		String mainImg = getImgUrl(mainImgFile);
 		if (mainImg.isEmpty()) return ApiResponse.withError(ErrorCode.ERROR_S3_UPDATE_OBJECT);
 		project.setMainImg(mainImg);
+		project.setMainImgFileName(mainImgFile.getOriginalFilename());
+
+		// 새로운 반응형 메인이미지 저장
+		// TODO 임시 코드
+		if(responsiveMainImgFile != null) {
+			String responsiveMainImg = getImgUrl(responsiveMainImgFile);
+			if (responsiveMainImg.isEmpty()) return ApiResponse.withError(ErrorCode.ERROR_S3_UPDATE_OBJECT);
+			project.setResponsiveMainImg(responsiveMainImg);
+			project.setResponsiveMainImgFileName(responsiveMainImgFile.getOriginalFilename());
+		}
 
 		// 기존 이미지 + 새로운 이미지들 저장
 		List<ProjectImage> projectImages = new LinkedList<>();
@@ -222,81 +313,6 @@ public class ProjectService {
 		return ApiResponse.ok("메인 페이지에 보여질 프로젝트의 순서를 성공적으로 수정하였습니다.");
 	}
 
-	private String getImgUrl(MultipartFile file) {
-		ApiResponse<String> updateFileResponse = s3Adapter.uploadImage(file);
-
-		if(updateFileResponse.getStatus().is5xxServerError()){
-
-			return "";
-		}
-        return updateFileResponse.getData();
-	}
-
-	public ApiResponse<String> deleteProject(Long projectId) {
-		Optional<Project> optionalProject = projectRepository.findById(projectId);
-		if(optionalProject.isEmpty()){
-			return ApiResponse.withError(ErrorCode.INVALID_PROJECT_ID);
-		}
-
-		Project project = optionalProject.get();
-		Integer sequence = project.getSequence();
-		Integer mainSequence = project.getMainSequence();
-		projectRepository.delete(project);
-
-		List<Project> findBySequenceGreaterThan = projectRepository.findAllBySequenceGreaterThan(sequence);
-		List<Project> findByMainSequenceGreaterThan = projectRepository.findAllByMainSequenceGreaterThanAndMainSequenceNot(mainSequence, 999);
-		for (Project findArtworkProject : findBySequenceGreaterThan) {
-			findArtworkProject.updateSequence(findArtworkProject.getSequence() - 1);
-		}
-
-		if (project.getProjectType().equals(MAIN_PROJECT_TYPE)) {
-			for (Project findMainProject : findByMainSequenceGreaterThan) {
-				findMainProject.updateMainSequence(findMainProject.getMainSequence() - 1);
-			}
-		}
-		return ApiResponse.ok("프로젝트를 성공적으로 삭제했습니다.");
-	}
-
-	// for artwork page
-	public ApiResponse<List<Project>> retrieveAllArtworkProject() {
-		List<Project> projectList = projectRepository.findAllWithImagesAndOrderBySequenceAsc();
-		if (projectList.isEmpty()){
-			return ApiResponse.ok("프로젝트가 존재하지 않습니다.");
-		}
-
-		return ApiResponse.ok("프로젝트 목록을 성공적으로 조회했습니다.", projectList);
-	}
-
-	// for main page
-	public ApiResponse<List<Project>> retrieveAllMainProject() {
-		List<Project> projectList = projectRepository.findAllWithImagesAndOrderByMainSequenceAsc();
-		List<Project> responseProject = new ArrayList<>();
-		List<Project> topProject = projectRepository.findByProjectType(TOP_PROJECT_TYPE);
-		Project top;
-		if (!topProject.isEmpty()) {
-			top = topProject.get(0);
-			responseProject.add(top);
-		}
-        responseProject.addAll(projectList);
-
-		if (projectList.isEmpty()){
-			return ApiResponse.ok("프로젝트가 존재하지 않습니다.");
-		}
-
-		return ApiResponse.ok("프로젝트 목록을 성공적으로 조회했습니다.", responseProject);
-
-	}
-
-	public ApiResponse<Project> retrieveProject(Long projectId) {
-		Optional<Project> optionalProject = projectRepository.findById(projectId);
-		if(optionalProject.isEmpty()){
-			return ApiResponse.withError(ErrorCode.INVALID_PROJECT_ID);
-		}
-
-		Project project = optionalProject.get();
-		return ApiResponse.ok("프로젝트를 성공적으로 조회했습니다.", project);
-	}
-
 	public ApiResponse<Project> updatePostingStatus(UpdatePostingStatusDto dto) {
 		Optional<Project> optionalProject = projectRepository.findById(dto.projectId());
 		if(optionalProject.isEmpty()){
@@ -328,7 +344,8 @@ public class ProjectService {
 				}
 				// 기존의 프로젝트 타입이 main이었을 경우, 다른 main 프로젝트들의 mainSequence 수정
 				if (project.getProjectType().equals(MAIN_PROJECT_TYPE)) {
-					List<Project> findByMainSequenceGreaterThan = projectRepository.findAllByMainSequenceGreaterThanAndMainSequenceNot(project.getMainSequence(), 999);
+					List<Project> findByMainSequenceGreaterThan
+							= projectRepository.findAllByMainSequenceGreaterThanAndMainSequenceNot(project.getMainSequence(), 999);
 					for (Project findMainProject : findByMainSequenceGreaterThan) {
 						findMainProject.updateMainSequence(findMainProject.getMainSequence() - 1);
 					}
@@ -355,7 +372,8 @@ public class ProjectService {
 			case OTHERS_PROJECT_TYPE:
 				// 기존의 프로젝트 타입이 main이었을 경우, 다른 main 프로젝트들의 mainSequence 수정
 				if (project.getProjectType().equals(MAIN_PROJECT_TYPE)) {
-					List<Project> findByMainSequenceGreaterThan = projectRepository.findAllByMainSequenceGreaterThanAndMainSequenceNot(project.getMainSequence(), 999);
+					List<Project> findByMainSequenceGreaterThan
+							= projectRepository.findAllByMainSequenceGreaterThanAndMainSequenceNot(project.getMainSequence(), 999);
 					for (Project findMainProject : findByMainSequenceGreaterThan) {
 						findMainProject.updateMainSequence(findMainProject.getMainSequence() - 1);
 					}
@@ -368,8 +386,60 @@ public class ProjectService {
 		}
 	}
 
-	public Page<Project> retrieveArtworkProjectPage(int page, int size) {
-		Pageable pageable = PageRequest.of(page, size);
-		return projectRepository.findAll(pageable);
+	// DELETE
+	public ApiResponse<String> deleteProject(Long projectId) {
+		Optional<Project> optionalProject = projectRepository.findById(projectId);
+		if(optionalProject.isEmpty()){
+			return ApiResponse.withError(ErrorCode.INVALID_PROJECT_ID);
+		}
+
+		Project project = optionalProject.get();
+		Integer sequence = project.getSequence();
+		Integer mainSequence = project.getMainSequence();
+
+		// 메인 이미지 삭제
+		String mainImgFileName = project.getMainImgFileName();
+		if(mainImgFileName != null) s3Adapter.deleteFile(mainImgFileName);
+
+		// 반응형 메인이미지 삭제
+		String responsiveMainImgFileName = project.getMainImgFileName();
+		if(responsiveMainImgFileName != null) s3Adapter.deleteFile(responsiveMainImgFileName);
+
+		// 이미지들 전체 삭제
+		List<ProjectImage> existingImages = project.getProjectImages();
+		// S3에서 이미지들 삭제
+		for (ProjectImage image : existingImages) {
+			String fileName = image.getFileName();
+			// S3Adapter의 deleteFile 메소드를 호출하여 이미지를 삭제
+			if(fileName != null) s3Adapter.deleteFile(fileName);
+		}
+		project.getProjectImages().clear();
+
+		projectRepository.delete(project);
+
+		List<Project> findBySequenceGreaterThan = projectRepository.findAllBySequenceGreaterThan(sequence);
+		List<Project> findByMainSequenceGreaterThan
+				= projectRepository.findAllByMainSequenceGreaterThanAndMainSequenceNot(mainSequence, 999);
+		for (Project findArtworkProject : findBySequenceGreaterThan) {
+			findArtworkProject.updateSequence(findArtworkProject.getSequence() - 1);
+		}
+
+		if (project.getProjectType().equals(MAIN_PROJECT_TYPE)) {
+			for (Project findMainProject : findByMainSequenceGreaterThan) {
+				findMainProject.updateMainSequence(findMainProject.getMainSequence() - 1);
+			}
+		}
+		return ApiResponse.ok("프로젝트를 성공적으로 삭제했습니다.");
+	}
+
+	// UTILITY
+	private String getImgUrl(MultipartFile file) throws IOException {
+		ApiResponse<String> updateFileResponse = s3Adapter.uploadFile(file);
+
+		if(updateFileResponse.getStatus().is5xxServerError()){
+
+			return "";
+		}
+		return updateFileResponse.getData();
 	}
 }

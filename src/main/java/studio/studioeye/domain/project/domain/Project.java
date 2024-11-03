@@ -1,9 +1,9 @@
 package studio.studioeye.domain.project.domain;
 
+import studio.studioeye.domain.project.dto.request.UpdateProjectServiceRequestDto;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
-import studio.studioeye.domain.project.dto.request.UpdateProjectServiceRequestDto;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -39,6 +39,12 @@ public class Project {
 
 	private String mainImg;
 
+	private String mainImgFileName;
+
+	private String responsiveMainImg;
+
+	private String responsiveMainImgFileName;
+
 	private Integer sequence;
 
 	private Integer mainSequence;
@@ -48,9 +54,9 @@ public class Project {
 	private List<ProjectImage> projectImages = new LinkedList<>();
 
 	@Builder
-	public Project(String department, String category, String name, String client, String date, String link,
-				   String overView, String mainImg, List<ProjectImage> projectImages, Integer sequence,
-				   Integer mainSequence, String projectType, Boolean isPosted) {
+	public Project(String department, String category, String name, String client, String date, String link, String overView,
+				   String mainImg, String mainImgFileName, String responsiveMainImg, String responsiveMainImgFileName,
+				   List<ProjectImage> projectImages, Integer sequence, Integer mainSequence, String projectType, Boolean isPosted) {
 		this.department = department;
 		this.category = category;
 		this.name = name;
@@ -59,6 +65,9 @@ public class Project {
 		this.link = link;
 		this.overView = overView;
 		this.mainImg = mainImg;
+		this.mainImgFileName = mainImgFileName;
+		this.responsiveMainImg = responsiveMainImg;
+		this.responsiveMainImgFileName = responsiveMainImgFileName;
 		this.projectImages = projectImages;
 		this.isPosted = isPosted;
 		this.projectType = projectType;
@@ -66,7 +75,7 @@ public class Project {
 		this.mainSequence = mainSequence;
 	}
 
-	public Project update(UpdateProjectServiceRequestDto dto) {
+	public void update(UpdateProjectServiceRequestDto dto) {
 		this.department = dto.department();
 		this.category = dto.category();
 		this.name = dto.name();
@@ -76,7 +85,6 @@ public class Project {
 		this.overView = dto.overView();
 		this.projectType = dto.projectType();
 		this.isPosted = dto.isPosted();
-		return this;
 	}
 
 	public void updateSequence(Integer sequence) {

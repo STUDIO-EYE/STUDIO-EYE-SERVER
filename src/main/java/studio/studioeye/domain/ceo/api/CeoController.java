@@ -49,7 +49,7 @@ public class CeoController {
 
     @Operation(summary = "CEO 이미지 정보 수정 API")
     @PutMapping("/ceo/image")
-    public ApiResponse<Ceo> updateCeoImageInformation(@RequestPart(value = "file", required = false) MultipartFile file) {
+    public ApiResponse<Ceo> updateCeoImageInformation(@RequestPart(value = "file", required = false) MultipartFile file) throws IOException {
         return ceoService.updateCeoImageInformation(file);
     }
 

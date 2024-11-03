@@ -11,7 +11,13 @@ import java.util.Optional;
 
 public interface RecruitmentRepository extends JpaRepository<Recruitment, Long> {
 
-    @Query("SELECT r.id AS id, r.title AS title, r.status AS status FROM Recruitment r  ORDER BY r.deadline ASC")
+    @Query("SELECT r.id AS id, r.title AS title, r.status AS status FROM Recruitment r " +
+            "ORDER BY CASE " +
+            "WHEN r.status = 'OPEN' THEN 1 " +
+            "WHEN r.status = 'PREPARING' THEN 2 " +
+            "WHEN r.status = 'CLOSE' THEN 3 " +
+            "ELSE 4 END, " +
+            "r.deadline ASC")
     Page<RecruitmentTitle> findAllRecruitments(Pageable pageable);
 
     Optional<Recruitment> findTopByOrderByCreatedAtDesc();

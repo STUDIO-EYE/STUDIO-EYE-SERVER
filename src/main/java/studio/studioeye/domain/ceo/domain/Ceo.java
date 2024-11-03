@@ -1,5 +1,6 @@
 package studio.studioeye.domain.ceo.domain;
 
+import studio.studioeye.domain.ceo.dto.request.UpdateCeoServiceRequestDto;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -9,7 +10,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import studio.studioeye.domain.ceo.dto.request.UpdateCeoServiceRequestDto;
 
 @Entity
 @Getter
