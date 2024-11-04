@@ -216,4 +216,25 @@ public class ViewsServiceTest {
         Mockito.verify(viewsRepository, times(1)).findById(any(Long.class));
     }
 
+    @Test
+    @DisplayName("단일 조회수 조회 실패 테스트")
+    public void retrieveViewsByIdFail() {
+        // given
+        Long id = 1L;
+
+        // stub
+        when(viewsRepository.findById(id)).thenReturn(Optional.empty());
+
+        // when
+        ApiResponse<Views> response = viewsService.retrieveViewsById(id);
+        Views findViews = response.getData();
+
+        // then
+        assertNotNull(response);
+        assertNull(findViews);
+        assertEquals(ErrorCode.INVALID_VIEWS_ID.getStatus(), response.getStatus());
+        assertEquals(ErrorCode.INVALID_VIEWS_ID.getMessage(), response.getMessage());
+        Mockito.verify(viewsRepository, times(1)).findById(any(Long.class));
+    }
+
 }
