@@ -231,4 +231,51 @@ public class ClientServiceTest {
         // then
         assertTrue(result.isEmpty());
     }
+
+    @Test
+    @DisplayName("Client 수정 성공")
+    void updateClientSuccess() throws IOException {
+        // given
+        Long clientId = 1L;
+        UpdateClientServiceRequestDto requestDto = new UpdateClientServiceRequestDto(clientId, "Updated_Client", false);
+        Client savedClient = new Client("Client", "http://example.com/logo.jpg", true);
+        savedClient.setId(clientId);
+
+        when(clientRepository.findById(clientId)).thenReturn(Optional.of(savedClient));
+
+        MockMultipartFile mockFile = new MockMultipartFile("logo", "logo.png", "image/png", "test image content".getBytes());
+
+        when(s3Adapter.uploadImage(any(MultipartFile.class)))
+                .thenReturn(ApiResponse.ok("S3에 이미지 업로드 성공", "Updated Test Logo Url"));
+
+        when(clientRepository.save(any(Client.class))).thenReturn(savedClient);
+
+        // when
+        ApiResponse<Client> response = clientService.updateClient(requestDto, mockFile);
+
+        // then
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatus());
+        assertEquals("클라이언트를 성공적으로 수정했습니다.", response.getMessage());
+        assertEquals("Updated Test Logo Url", response.getData().getLogoImg()); // 로고 URL 확인 추가
+    }
+
+    @Test
+    @DisplayName("Client 수정 실패 - 유효하지 않은 ID")
+    void updateClientFail_InvalidId() throws IOException {
+        // given
+        Long clientId = 1L;
+        UpdateClientServiceRequestDto requestDto = new UpdateClientServiceRequestDto(clientId, "Updated_Client", false);
+
+        when(clientRepository.findById(clientId)).thenReturn(Optional.empty());
+
+        // when
+        ApiResponse<Client> response = clientService.updateClient(requestDto, mockFile);
+
+        // then
+        assertNotNull(response);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatus());
+        assertEquals(ErrorCode.INVALID_CLIENT_ID.getMessage(), response.getMessage());
+    }
+
 }
