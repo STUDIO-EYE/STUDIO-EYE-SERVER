@@ -88,4 +88,39 @@ public class ClientServiceTest {
         assertEquals(ErrorCode.ERROR_S3_UPDATE_OBJECT.getStatus(), response.getStatus());
         assertEquals(ErrorCode.ERROR_S3_UPDATE_OBJECT.getMessage(), response.getMessage());
     }
+    @Test
+    @DisplayName("Client 전체 조회 성공")
+    void retrieveAllClientSuccess() {
+        // given
+        List<Client> clientList = List.of(
+                new Client("Client1", "http://example.com/logo1.jpg", true),
+                new Client("Client2", "http://example.com/logo2.jpg", false)
+        );
+        clientList.get(0).setId(1L);
+        clientList.get(1).setId(2L);
+        when(clientRepository.findAll()).thenReturn(clientList);
+
+        // when
+        ApiResponse<List<Map<String, Object>>> response = clientService.retrieveAllClient();
+        List<Map<String, Object>> retrievedClients = response.getData();
+
+        // then
+        assertNotNull(retrievedClients);
+        assertEquals(2, retrievedClients.size());
+        assertEquals("클라이언트 목록을 성공적으로 조회했습니다.", response.getMessage());
+    }
+
+    @Test
+    @DisplayName("Client 전체 조회 실패 - 데이터 없음")
+    void retrieveAllClientFail_NoData() {
+        // given
+        when(clientRepository.findAll()).thenReturn(Collections.emptyList());
+
+        // when
+        ApiResponse<List<Map<String, Object>>> response = clientService.retrieveAllClient();
+
+        // then
+        assertNull(response.getData());
+        assertEquals("클라이언트가 존재하지 않습니다.", response.getMessage());
+    }
 }
