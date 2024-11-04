@@ -26,8 +26,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -151,6 +150,27 @@ public class ViewsServiceTest {
         assertEquals(savedViewsList.size(), findViews.size());
         assertEquals(HttpStatus.OK, response.getStatus());
         assertEquals("조회수 목록을 성공적으로 조회했습니다.", response.getMessage());
+        Mockito.verify(viewsRepository, times(1)).findAll();
+    }
+
+    @Test
+    @DisplayName("조회수 전체 조회 실패 테스트")
+    public void retrieveAllViewsFail() {
+        // given
+        List<Views> savedViewsList = new ArrayList<>();
+
+        // stub
+        when(viewsRepository.findAll()).thenReturn(savedViewsList);
+
+        // when
+        ApiResponse<List<Views>> response = viewsService.retrieveAllViews();
+        List<Views> findViews = response.getData();
+
+        // then
+        assertNotNull(response);
+        assertNull(findViews);
+        assertEquals(HttpStatus.OK, response.getStatus());
+        assertEquals("조회수가 존재하지 않습니다.", response.getMessage());
         Mockito.verify(viewsRepository, times(1)).findAll();
     }
 }
