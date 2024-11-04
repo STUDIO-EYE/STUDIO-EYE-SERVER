@@ -103,6 +103,7 @@ public class ViewsServiceTest {
                 .views(views)
                 .menu(menu)
                 .category(category)
+                .createdAt(new Date())
                 .build();
 
         CreateViewsServiceRequestDto requestDto = new CreateViewsServiceRequestDto(
