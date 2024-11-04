@@ -1,10 +1,10 @@
 package studio.studioeye.domain.project.dao;
 
+import studio.studioeye.domain.project.domain.Project;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import studio.studioeye.domain.project.domain.Project;
 
 import java.util.List;
 

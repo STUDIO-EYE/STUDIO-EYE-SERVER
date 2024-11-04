@@ -16,21 +16,24 @@ public record CreateProjectServiceRequestDto(
 	String projectType,
 	Boolean isPosted
 ) {
-	public Project toEntity(String mainImg, List<ProjectImage> projectImages, long projectCount, Integer mainSequence) {
+	public Project toEntity(String mainImg, String mainImgFileName, String responsiveMainImg, String responsiveMainImgFileName, List<ProjectImage> projectImages, long projectCount, Integer mainSequence) {
 		return Project.builder()
-			.department(department)
-			.category(category)
-			.name(name)
-			.client(client)
-			.date(date)
-			.link(link)
-			.overView(overView)
-			.mainImg(mainImg)
-			.projectImages(projectImages)
-			.sequence((int) (projectCount + 1))
-			.mainSequence(mainSequence)
-			.projectType(projectType)
-			.isPosted(isPosted)
-			.build();
+				.department(department)
+				.category(category)
+				.name(name)
+				.client(client)
+				.date(date)
+				.link(link)
+				.overView(overView)
+				.mainImg(mainImg)
+				.mainImgFileName(mainImgFileName)
+				.responsiveMainImg(responsiveMainImg)
+				.responsiveMainImgFileName(responsiveMainImgFileName)
+				.projectImages(projectImages)
+				.sequence((int) (projectCount + 1))
+				.mainSequence(mainSequence)
+				.projectType(projectType)
+				.isPosted(isPosted)
+				.build();
 	}
 }

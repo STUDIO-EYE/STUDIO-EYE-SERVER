@@ -1,10 +1,5 @@
 package studio.studioeye.domain.ceo.application;
 
-import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 import studio.studioeye.domain.ceo.dao.CeoRepository;
 import studio.studioeye.domain.ceo.domain.Ceo;
 import studio.studioeye.domain.ceo.dto.request.CreateCeoServiceRequestDto;
@@ -12,6 +7,10 @@ import studio.studioeye.domain.ceo.dto.request.UpdateCeoServiceRequestDto;
 import studio.studioeye.infrastructure.s3.S3Adapter;
 import studio.studioeye.global.common.response.ApiResponse;
 import studio.studioeye.global.exception.error.ErrorCode;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
@@ -87,8 +86,7 @@ public class CeoService {
         return ApiResponse.ok("CEO 텍스트 정보를 성공적으로 수정했습니다.", savedCeo);
     }
 
-    @SneakyThrows
-    public ApiResponse<Ceo> updateCeoImageInformation(MultipartFile file) {
+    public ApiResponse<Ceo> updateCeoImageInformation(MultipartFile file) throws IOException {
         String imageUrl = null;
         String fileName = null;
         List<Ceo> ceoList = ceoRepository.findAll();
@@ -117,6 +115,9 @@ public class CeoService {
             return ApiResponse.withError(ErrorCode.CEO_IS_EMPTY);
         }
         Ceo ceo = ceoList.get(0);
+        String ceoImageFileName = ceoList.get(0).getImageFileName();
+        if(ceoImageFileName != null) s3Adapter.deleteFile(ceoImageFileName);
+
         ceoRepository.delete(ceo);
         return ApiResponse.ok("CEO 정보를 성공적으로 삭제했습니다.");
     }
