@@ -362,4 +362,44 @@ public class ClientServiceTest {
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatus());
         assertEquals(ErrorCode.INVALID_CLIENT_ID.getMessage(), response.getMessage());
     }
+
+    @Test
+    @DisplayName("Client 삭제 성공")
+    void deleteClientSuccess() {
+        // given
+        Long clientId = 1L;
+        Client clientToDelete = new Client("Client", "http://example.com/logo.jpg", true);
+
+        when(clientRepository.findById(clientId)).thenReturn(Optional.of(clientToDelete));
+//        when(s3Adapter.deleteFile(clientToDelete.getLogoImg())).thenReturn(ApiResponse.ok("S3에서 파일 삭제 성공"));
+
+        // when
+        ApiResponse<String> response = clientService.deleteClient(clientId);
+
+        // then
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatus());
+        assertEquals("클라이언트를 성공적으로 삭제했습니다.", response.getMessage());
+
+        verify(clientRepository).delete(clientToDelete);
+    }
+
+    @Test
+    @DisplayName("Client 삭제 실패 - 유효하지 않은 ID")
+    void deleteClientFail() {
+        // given
+        Long clientId = 1L;
+
+        when(clientRepository.findById(clientId)).thenReturn(Optional.empty());
+
+        // when
+        ApiResponse<String> response = clientService.deleteClient(clientId);
+
+        // then
+        assertNotNull(response);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatus());
+        assertEquals(ErrorCode.INVALID_CLIENT_ID.getMessage(), response.getMessage());
+
+        verify(clientRepository, never()).delete(any(Client.class));
+    }
 }
