@@ -462,4 +462,27 @@ public class ViewsServiceTest {
         assertEquals(ErrorCode.INVALID_VIEWS_MONTH.getMessage(), response.getMessage());
         Mockito.verify(viewsRepository, never()).findByYearAndMonthBetweenAndMenuAndCategory(any(Integer.class), any(Integer.class), any(Integer.class), any(Integer.class), any(MenuTitle.class), any(ArtworkCategory.class));
     }
+
+    @Test
+    @DisplayName("기간(시작점(연도,월), 종료점(연도,월))으로 카테고리별, 메뉴별 전체 조회수 조회 실패 테스트 - 종료점이 시작점보다 앞에 있는 경우")
+    public void retrieveAllMenuCategoryViewsByPeriodFail_invalidPeriod() {
+        // given
+        Integer startYear = 2024;
+        Integer startMonth = 11;
+        Integer endYear = 2024;
+        Integer endMonth = 9;
+        MenuTitle menu = MenuTitle.ABOUT;
+        ArtworkCategory category = ArtworkCategory.ALL;
+
+        // when
+        ApiResponse<List<ViewsSummary>> response = viewsService.retrieveAllMenuCategoryViewsByPeriod(startYear, startMonth, endYear, endMonth, menu, category);
+        List<ViewsSummary> findViews = response.getData();
+
+        // then
+        assertNotNull(response);
+        assertNull(findViews);
+        assertEquals(ErrorCode.INVALID_PERIOD_FORMAT.getStatus(), response.getStatus());
+        assertEquals(ErrorCode.INVALID_PERIOD_FORMAT.getMessage(), response.getMessage());
+        Mockito.verify(viewsRepository, never()).findByYearAndMonthBetweenAndMenuAndCategory(any(Integer.class), any(Integer.class), any(Integer.class), any(Integer.class), any(MenuTitle.class), any(ArtworkCategory.class));
+    }
 }
