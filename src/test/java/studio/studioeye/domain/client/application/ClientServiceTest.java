@@ -192,4 +192,43 @@ public class ClientServiceTest {
         assertNull(response.getData());
         assertEquals("클라이언트가 존재하지 않습니다.", response.getMessage());
     }
+
+    @Test
+    @DisplayName("Client 페이지네이션 조회 성공")
+    void retrieveClientPageSuccess() {
+        // given
+        List<Client> clientList = List.of(
+                new Client("Client1", "http://example.com/logo1.jpg", true),
+                new Client("Client2", "http://example.com/logo2.jpg", false)
+        );
+
+        Page<Client> page = new PageImpl<>(clientList);
+        Pageable pageable = PageRequest.of(0, 2);
+
+        when(clientRepository.findAll(pageable)).thenReturn(page);
+
+        // when
+        Page<Client> result = clientService.retrieveClientPage(0, 2);
+
+        // then
+        assertNotNull(result);
+        assertEquals(2, result.getContent().size());
+        assertEquals(clientList, result.getContent());
+    }
+
+    @Test
+    @DisplayName("Client 페이지네이션 조회 실패 - 페이지 데이터 없음")
+    void retrieveClientPageFail_NoData() {
+        // given
+        Pageable pageable = PageRequest.of(0, 2);
+        Page<Client> emptyPage = new PageImpl<>(Collections.emptyList());
+
+        when(clientRepository.findAll(pageable)).thenReturn(emptyPage);
+
+        // when
+        Page<Client> result = clientService.retrieveClientPage(0, 2);
+
+        // then
+        assertTrue(result.isEmpty());
+    }
 }
