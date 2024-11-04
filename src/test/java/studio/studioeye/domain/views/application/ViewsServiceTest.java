@@ -273,4 +273,26 @@ public class ViewsServiceTest {
         Mockito.verify(viewsRepository, times(1)).findByYear(any(Integer.class));
     }
 
+    @Test
+    @DisplayName("해당 연도 조회수 전체 조회 실패 테스트")
+    public void retrieveViewsByYearFail() {
+        // given
+        Integer year = 2024;
+
+        List<Views> savedViewsList = new ArrayList<>();
+
+        // stub
+        when(viewsRepository.findByYear(year)).thenReturn(savedViewsList);
+
+        // when
+        ApiResponse<List<Views>> response = viewsService.retrieveViewsByYear(year);
+        List<Views> findViews = response.getData();
+
+        // then
+        assertNotNull(response);
+        assertNull(findViews);
+        assertEquals(HttpStatus.OK, response.getStatus());
+        assertEquals("조회수가 존재하지 않습니다.", response.getMessage());
+        Mockito.verify(viewsRepository, times(1)).findByYear(any(Integer.class));
+    }
 }
