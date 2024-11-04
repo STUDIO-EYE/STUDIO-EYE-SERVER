@@ -16,6 +16,7 @@ import studio.studioeye.domain.recruitment.domain.Recruitment;
 import studio.studioeye.domain.recruitment.domain.Status;
 import studio.studioeye.domain.recruitment.dto.request.CreateRecruitmentServiceRequestDto;
 import studio.studioeye.domain.views.dao.ViewsRepository;
+import studio.studioeye.domain.views.dao.ViewsSummary;
 import studio.studioeye.domain.views.domain.Views;
 import studio.studioeye.domain.views.dto.request.CreateViewsServiceRequestDto;
 import studio.studioeye.global.common.response.ApiResponse;
@@ -359,5 +360,83 @@ public class ViewsServiceTest {
         assertEquals(HttpStatus.OK, response.getStatus());
         assertEquals("조회수가 존재하지 않습니다.", response.getMessage());
         Mockito.verify(viewsRepository, times(1)).findByYearAndMonth(any(Integer.class), any(Integer.class));
+    }
+
+    @Test
+    @DisplayName("기간(시작점(연도,월), 종료점(연도,월))으로 카테고리별, 메뉴별 전체 조회수 조회 성공 테스트")
+    public void retrieveAllMenuCategoryViewsByPeriodSuccess() {
+        // given
+        Integer startYear = 2024;
+        Integer startMonth = 9;
+        Integer endYear = 2024;
+        Integer endMonth = 11;
+        MenuTitle menu = MenuTitle.ABOUT;
+        ArtworkCategory category = ArtworkCategory.ALL;
+
+        List<ViewsSummary> savedViewsList = new ArrayList<>();
+        savedViewsList.add(new ViewsSummary() {
+            @Override
+            public Integer getYear() {
+                return 2024;
+            }
+
+            @Override
+            public Integer getMonth() {
+                return 9;
+            }
+
+            @Override
+            public Long getViews() {
+                return 2L;
+            }
+        });
+        savedViewsList.add(new ViewsSummary() {
+            @Override
+            public Integer getYear() {
+                return 2024;
+            }
+
+            @Override
+            public Integer getMonth() {
+                return 10;
+            }
+
+            @Override
+            public Long getViews() {
+                return 8L;
+            }
+        });
+        savedViewsList.add(new ViewsSummary() {
+            @Override
+            public Integer getYear() {
+                return 2024;
+            }
+
+            @Override
+            public Integer getMonth() {
+                return 11;
+            }
+
+            @Override
+            public Long getViews() {
+                return 24L;
+            }
+        });
+
+        // stub
+        when(viewsRepository.findByYearAndMonthBetweenAndMenuAndCategory(startYear, startMonth, endYear, endMonth, menu, category)).thenReturn(savedViewsList);
+
+        // when
+        ApiResponse<List<ViewsSummary>> response = viewsService.retrieveAllMenuCategoryViewsByPeriod(startYear, startMonth, endYear, endMonth, menu, category);
+        List<ViewsSummary> findViews = response.getData();
+
+        // then
+        assertNotNull(response);
+        assertNotNull(findViews);
+        assertEquals(savedViewsList, findViews);
+        assertEquals(savedViewsList.size(), findViews.size());
+        assertEquals(HttpStatus.OK, response.getStatus());
+        assertEquals("조회수 목록을 성공적으로 조회했습니다.", response.getMessage());
+        Mockito.verify(viewsRepository, times(1)).findByYearAndMonthBetweenAndMenuAndCategory(any(Integer.class), any(Integer.class), any(Integer.class), any(Integer.class), any(MenuTitle.class), any(ArtworkCategory.class));
     }
 }
