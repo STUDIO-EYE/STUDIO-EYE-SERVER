@@ -40,7 +40,7 @@ public class ViewsServiceTest {
     @Test
     @DisplayName("조회수 생성 성공 테스트")
     public void createViewsSuccess() {
-        //given
+        // given
         Integer year = 2024;
         Integer month = 11;
         Long views = 1L;
@@ -52,10 +52,10 @@ public class ViewsServiceTest {
                 year, month, views, menu, category
         );
 
-        //when
+        // when
         ApiResponse<Views> response = viewsService.createViews(requestDto);
 
-        //then
+        // then
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatus());
         assertEquals("조회 수 등록을 완료했습니다.", response.getMessage());
@@ -65,7 +65,7 @@ public class ViewsServiceTest {
     @Test
     @DisplayName("조회수 생성 실패 테스트 - 유효하지 않은 월 형식(1~12)인 경우")
     public void createViewsFail_invalidMonth() {
-        //given
+        // given
         Integer year = 2024;
         Integer month = 13;
         Long views = 1L;
@@ -77,10 +77,10 @@ public class ViewsServiceTest {
                 year, month, views, menu, category
         );
 
-        //when
+        // when
         ApiResponse<Views> response = viewsService.createViews(requestDto);
 
-        //then
+        // then
         assertNotNull(response);
         assertEquals(ErrorCode.INVALID_VIEWS_MONTH.getStatus(), response.getStatus());
         assertEquals(ErrorCode.INVALID_VIEWS_MONTH.getMessage(), response.getMessage());
@@ -90,7 +90,7 @@ public class ViewsServiceTest {
     @Test
     @DisplayName("조회수 생성 실패 테스트 - 이미 해당 연월의 조회수가 존재하는 경우")
     public void createViewsFail_alreadyExisted() {
-        //given
+        // given
         Integer year = 2024;
         Integer month = 11;
         Long views = 1L;
@@ -112,10 +112,10 @@ public class ViewsServiceTest {
         // stub
         when(viewsRepository.findByYearAndMonth(year, month)).thenReturn(Optional.of(savedViews));
 
-        //when
+        // when
         ApiResponse<Views> response = viewsService.createViews(requestDto);
 
-        //then
+        // then
         assertNotNull(response);
         assertEquals(ErrorCode.ALREADY_EXISTED_DATA.getStatus(), response.getStatus());
         assertEquals(ErrorCode.ALREADY_EXISTED_DATA.getMessage(), response.getMessage());
