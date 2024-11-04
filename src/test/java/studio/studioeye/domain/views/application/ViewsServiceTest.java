@@ -295,4 +295,46 @@ public class ViewsServiceTest {
         assertEquals("조회수가 존재하지 않습니다.", response.getMessage());
         Mockito.verify(viewsRepository, times(1)).findByYear(any(Integer.class));
     }
+
+    @Test
+    @DisplayName("연도, 월로 조회수 상세 조회 성공 테스트")
+    public void retrieveViewsByYearMonthSuccess() {
+        // given
+        Long id = 1L;
+        Integer year = 2024;
+        Integer month = 11;
+        Long views = 1L;
+        MenuTitle menu = MenuTitle.ABOUT;
+        ArtworkCategory category = ArtworkCategory.ALL;
+
+        Views savedViews = Views.builder()
+                .year(year)
+                .month(month)
+                .views(views)
+                .menu(menu)
+                .category(category)
+                .createdAt(new Date())
+                .build();
+
+        // stub
+        when(viewsRepository.findByYearAndMonth(year, month)).thenReturn(Optional.of(savedViews));
+
+        // when
+        ApiResponse<Views> response = viewsService.retrieveViewsByYearMonth(year, month);
+        Views findViews = response.getData();
+
+        // then
+        assertNotNull(response);
+        assertNotNull(findViews);
+        assertEquals(savedViews, findViews);
+        assertEquals(savedViews.getYear(), findViews.getYear());
+        assertEquals(savedViews.getMonth(), findViews.getMonth());
+        assertEquals(savedViews.getViews(), findViews.getViews());
+        assertEquals(savedViews.getMenu(), findViews.getMenu());
+        assertEquals(savedViews.getCategory(), findViews.getCategory());
+        assertEquals(savedViews.getCreatedAt(), findViews.getCreatedAt());
+        assertEquals(HttpStatus.OK, response.getStatus());
+        assertEquals("조회수를 성공적으로 조회했습니다.", response.getMessage());
+        Mockito.verify(viewsRepository, times(1)).findByYearAndMonth(any(Integer.class), any(Integer.class));
+    }
 }
