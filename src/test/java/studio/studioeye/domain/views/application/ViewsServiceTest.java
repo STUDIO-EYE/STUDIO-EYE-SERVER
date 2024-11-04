@@ -21,7 +21,9 @@ import studio.studioeye.domain.views.dto.request.CreateViewsServiceRequestDto;
 import studio.studioeye.global.common.response.ApiResponse;
 import studio.studioeye.global.exception.error.ErrorCode;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -121,5 +123,34 @@ public class ViewsServiceTest {
         assertEquals(ErrorCode.ALREADY_EXISTED_DATA.getStatus(), response.getStatus());
         assertEquals(ErrorCode.ALREADY_EXISTED_DATA.getMessage(), response.getMessage());
         Mockito.verify(viewsRepository, never()).save(any(Views.class));
+    }
+
+    @Test
+    @DisplayName("조회수 전체 조회 성공 테스트")
+    public void retrieveAllViewsSuccess() {
+        // given
+        List<Views> savedViewsList = new ArrayList<>();
+        savedViewsList.add(new Views(2024, 6, 1L, MenuTitle.ABOUT, ArtworkCategory.ALL, new Date()));
+        savedViewsList.add(new Views(2024, 7, 1L, MenuTitle.ABOUT, ArtworkCategory.ALL, new Date()));
+        savedViewsList.add(new Views(2024, 8, 1L, MenuTitle.ABOUT, ArtworkCategory.ALL, new Date()));
+        savedViewsList.add(new Views(2024, 9, 1L, MenuTitle.ABOUT, ArtworkCategory.ALL, new Date()));
+        savedViewsList.add(new Views(2024, 10, 1L, MenuTitle.ABOUT, ArtworkCategory.ALL, new Date()));
+        savedViewsList.add(new Views(2024, 11, 1L, MenuTitle.ABOUT, ArtworkCategory.ALL, new Date()));
+
+        // stub
+        when(viewsRepository.findAll()).thenReturn(savedViewsList);
+
+        // when
+        ApiResponse<List<Views>> response = viewsService.retrieveAllViews();
+        List<Views> findViews = response.getData();
+
+        // then
+        assertNotNull(response);
+        assertNotNull(findViews);
+        assertEquals(savedViewsList, findViews);
+        assertEquals(savedViewsList.size(), findViews.size());
+        assertEquals(HttpStatus.OK, response.getStatus());
+        assertEquals("조회수 목록을 성공적으로 조회했습니다.", response.getMessage());
+        Mockito.verify(viewsRepository, times(1)).findAll();
     }
 }
