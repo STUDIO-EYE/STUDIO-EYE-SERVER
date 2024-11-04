@@ -52,7 +52,7 @@ public class FaqService {
     public ApiResponse<List<FaqQuestions>> retrieveAllFaqTitle() {
         List<FaqQuestions> faqQuestions = faqRepository.findAllQuestions();
         if(faqQuestions.isEmpty()) {
-            return ApiResponse.ok("FAQ가 존재하지 않습니다.");
+            return ApiResponse.withError(ErrorCode.INVALID_FAQ_ID);
         }
         return ApiResponse.ok("FAQ 목록을 성공적으로 조회했습니다.", faqQuestions);
     }
