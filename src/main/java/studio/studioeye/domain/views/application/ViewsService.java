@@ -335,7 +335,7 @@ public class ViewsService {
     public ApiResponse<Views> retrieveViewsById(Long viewsId) {
         Optional<Views> optionalViews = viewsRepository.findById(viewsId);
         if(optionalViews.isEmpty()){
-            return ApiResponse.ok("조회수가 존재하지 않습니다.");
+            return ApiResponse.withError(ErrorCode.INVALID_VIEWS_ID);
         }
         Views views = optionalViews.get();
         return ApiResponse.ok("조회수를 성공적으로 조회했습니다.", views);
