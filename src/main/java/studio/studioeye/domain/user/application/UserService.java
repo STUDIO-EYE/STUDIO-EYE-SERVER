@@ -13,8 +13,6 @@ import java.util.Optional;
 
 public interface UserService{
 
-    Optional<User> findOne(String email);
-
     JWTAuthResponse login(RequestLogin requestLogin);
 
     String register(RequestUser requestUser);
