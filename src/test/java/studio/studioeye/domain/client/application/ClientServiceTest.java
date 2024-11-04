@@ -278,4 +278,44 @@ public class ClientServiceTest {
         assertEquals(ErrorCode.INVALID_CLIENT_ID.getMessage(), response.getMessage());
     }
 
+    @Test
+    @DisplayName("클라이언트 정보 수정 성공")
+    void updateClientTextSuccess() {
+        // given
+        Long clientId = 1L;
+        UpdateClientServiceRequestDto requestDto = new UpdateClientServiceRequestDto(clientId, "Updated_Client", false);
+        Client existingClient = new Client("Client", "http://example.com/logo.jpg", true);
+        existingClient.setId(clientId);
+
+        when(clientRepository.findById(clientId)).thenReturn(Optional.of(existingClient));
+
+        when(clientRepository.save(any(Client.class))).thenReturn(existingClient);
+
+        // when
+        ApiResponse<Client> response = clientService.updateClientText(requestDto);
+
+        // then
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatus());
+        assertEquals("클라이언트를 성공적으로 수정했습니다.", response.getMessage());
+        assertEquals("Updated_Client", response.getData().getName());
+    }
+
+    @Test
+    @DisplayName("클라이언트 정보 수정 실패 - 클라이언트가 존재하지 않음")
+    void updateClientTextClientNotFound() {
+        // given
+        Long clientId = 1L;
+        UpdateClientServiceRequestDto requestDto = new UpdateClientServiceRequestDto(clientId, "Updated_Client", false);
+
+        when(clientRepository.findById(clientId)).thenReturn(Optional.empty());
+
+        // when
+        ApiResponse<Client> response = clientService.updateClientText(requestDto);
+
+        // then
+        assertNotNull(response);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatus());
+        assertEquals(ErrorCode.INVALID_CLIENT_ID.getMessage(), response.getMessage());
+    }
 }
