@@ -60,11 +60,6 @@ public class UserServiceImpl implements UserService {
     private static final String AUTH_CODE_PREFIX = "AuthCode ";
 
     @Override
-    public Optional<User> findOne(String email) {
-        return userRepository.findByEmail(email);
-    }
-
-    @Override
     public JWTAuthResponse login(RequestLogin requestLogin) {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                 requestLogin.getEmail(), requestLogin.getPwd()));
@@ -142,12 +137,6 @@ public class UserServiceImpl implements UserService {
 //            return tokenDto;
 //        } else throw new BusinessLogicException(ExceptionCode.TOKEN_IS_NOT_SAME);
 //    }
-
-    private void verifiedRefreshToken(String refreshToken) {
-        if (refreshToken == null) {
-            throw new BusinessLogicException(ExceptionCode.HEADER_REFRESH_TOKEN_NOT_EXISTS);
-        }
-    }
 
     //이메일 인증번호 관련 메소드
     public void sendCodeToEmail(String toEmail) {
