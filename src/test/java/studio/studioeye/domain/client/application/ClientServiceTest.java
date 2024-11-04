@@ -157,4 +157,39 @@ public class ClientServiceTest {
         assertEquals(ErrorCode.INVALID_CLIENT_ID.getMessage(), response.getMessage());
         assertEquals(ErrorCode.INVALID_CLIENT_ID.getStatus(), response.getStatus());
     }
+
+    @Test
+    @DisplayName("Client 로고 이미지 리스트 조회 성공")
+    void retrieveAllClientLogoImgListSuccess() {
+        // given
+        List<Client> clientList = List.of(
+                new Client("Client1", "http://example.com/logo1.jpg", true),
+                new Client("Client2", "http://example.com/logo2.jpg", false)
+        );
+
+        when(clientRepository.findAll()).thenReturn(clientList);
+
+        // when
+        ApiResponse<List<String>> response = clientService.retrieveAllClientLogoImgList();
+        List<String> logoImgList = response.getData();
+
+        // then
+        assertNotNull(logoImgList);
+        assertEquals(2, logoImgList.size());
+        assertEquals("클라이언트 로고 이미지 리스트를 성공적으로 조회했습니다.", response.getMessage());
+    }
+
+    @Test
+    @DisplayName("Client 로고 이미지 리스트 조회 실패 - 데이터 없음")
+    void retrieveAllClientLogoImgListFail_NoData() {
+        // given
+        when(clientRepository.findAll()).thenReturn(Collections.emptyList());
+
+        // when
+        ApiResponse<List<String>> response = clientService.retrieveAllClientLogoImgList();
+
+        // then
+        assertNull(response.getData());
+        assertEquals("클라이언트가 존재하지 않습니다.", response.getMessage());
+    }
 }
