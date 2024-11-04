@@ -237,4 +237,40 @@ public class ViewsServiceTest {
         Mockito.verify(viewsRepository, times(1)).findById(any(Long.class));
     }
 
+    @Test
+    @DisplayName("해당 연도 조회수 전체 조회 성공 테스트")
+    public void retrieveViewsByYearSuccess() {
+        // given
+        Integer year = 2024;
+
+        List<Views> savedViewsList = new ArrayList<>();
+        savedViewsList.add(new Views(year, 1, 1L, MenuTitle.ABOUT, ArtworkCategory.ALL, new Date()));
+        savedViewsList.add(new Views(year, 2, 1L, MenuTitle.ABOUT, ArtworkCategory.ALL, new Date()));
+        savedViewsList.add(new Views(year, 3, 1L, MenuTitle.ABOUT, ArtworkCategory.ALL, new Date()));
+        savedViewsList.add(new Views(year, 4, 1L, MenuTitle.ABOUT, ArtworkCategory.ALL, new Date()));
+        savedViewsList.add(new Views(year, 5, 1L, MenuTitle.ABOUT, ArtworkCategory.ALL, new Date()));
+        savedViewsList.add(new Views(year, 6, 1L, MenuTitle.ABOUT, ArtworkCategory.ALL, new Date()));
+        savedViewsList.add(new Views(year, 7, 1L, MenuTitle.ABOUT, ArtworkCategory.ALL, new Date()));
+        savedViewsList.add(new Views(year, 8, 1L, MenuTitle.ABOUT, ArtworkCategory.ALL, new Date()));
+        savedViewsList.add(new Views(year, 9, 1L, MenuTitle.ABOUT, ArtworkCategory.ALL, new Date()));
+        savedViewsList.add(new Views(year, 10, 1L, MenuTitle.ABOUT, ArtworkCategory.ALL, new Date()));
+        savedViewsList.add(new Views(year, 11, 1L, MenuTitle.ABOUT, ArtworkCategory.ALL, new Date()));
+
+        // stub
+        when(viewsRepository.findByYear(year)).thenReturn(savedViewsList);
+
+        // when
+        ApiResponse<List<Views>> response = viewsService.retrieveViewsByYear(year);
+        List<Views> findViews = response.getData();
+
+        // then
+        assertNotNull(response);
+        assertNotNull(findViews);
+        assertEquals(savedViewsList, findViews);
+        assertEquals(savedViewsList.size(), findViews.size());
+        assertEquals(HttpStatus.OK, response.getStatus());
+        assertEquals("조회수 목록을 성공적으로 조회했습니다.", response.getMessage());
+        Mockito.verify(viewsRepository, times(1)).findByYear(any(Integer.class));
+    }
+
 }
