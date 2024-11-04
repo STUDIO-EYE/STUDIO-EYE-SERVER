@@ -318,4 +318,48 @@ public class ClientServiceTest {
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatus());
         assertEquals(ErrorCode.INVALID_CLIENT_ID.getMessage(), response.getMessage());
     }
+
+    @Test
+    @DisplayName("클라이언트 로고 이미지 수정 성공")
+    void updateClientLogoImgSuccess() throws IOException {
+        // given
+        Long clientId = 1L;
+        MultipartFile mockFile = new MockMultipartFile("logo", "logo.png", "image/png", "test image content".getBytes());
+        Client existingClient = new Client("Client", "http://example.com/logo.jpg", true);
+        existingClient.setId(clientId);
+
+        when(clientRepository.findById(clientId)).thenReturn(Optional.of(existingClient));
+
+        when(s3Adapter.uploadImage(any(MultipartFile.class)))
+                .thenReturn(ApiResponse.ok("S3에 이미지 업로드 성공", "http://example.com/updated_logo.jpg"));
+
+        when(clientRepository.save(any(Client.class))).thenReturn(existingClient);
+
+        // when
+        ApiResponse<Client> response = clientService.updateClientLogoImg(clientId, mockFile);
+
+        // then
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatus());
+        assertEquals("클라이언트 로고 이미지를 성공적으로 수정했습니다.", response.getMessage());
+        assertEquals("http://example.com/updated_logo.jpg", response.getData().getLogoImg()); // 로고 URL 확인
+    }
+
+    @Test
+    @DisplayName("클라이언트 로고 이미지 수정 실패 - 클라이언트가 존재하지 않음")
+    void updateClientLogoImgClientNotFound() throws IOException {
+        // given
+        Long clientId = 1L;
+        MultipartFile mockFile = new MockMultipartFile("logo", "logo.png", "image/png", "test image content".getBytes());
+
+        when(clientRepository.findById(clientId)).thenReturn(Optional.empty());
+
+        // when
+        ApiResponse<Client> response = clientService.updateClientLogoImg(clientId, mockFile);
+
+        // then
+        assertNotNull(response);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatus());
+        assertEquals(ErrorCode.INVALID_CLIENT_ID.getMessage(), response.getMessage());
+    }
 }
