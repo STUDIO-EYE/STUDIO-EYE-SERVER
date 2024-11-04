@@ -123,4 +123,38 @@ public class ClientServiceTest {
         assertNull(response.getData());
         assertEquals("클라이언트가 존재하지 않습니다.", response.getMessage());
     }
+
+    @Test
+    @DisplayName("Client 단일 조회 성공")
+    void retrieveClientSuccess() {
+        // given
+        Long clientId = 1L;
+        Client client = new Client("Client1", "http://example.com/logo1.jpg", true);
+        client.setId(1L);
+        when(clientRepository.findById(clientId)).thenReturn(Optional.of(client));
+
+        // when
+        ApiResponse<Map<String, Object>> response = clientService.retrieveClient(clientId);
+        Map<String, Object> retrievedClient = response.getData();
+
+        // then
+        assertNotNull(retrievedClient);
+        assertEquals("클라이언트를 성공적으로 조회했습니다.", response.getMessage());
+    }
+
+    @Test
+    @DisplayName("Client 단일 조회 실패 - 유효하지 않은 ID")
+    void retrieveClientFail_InvalidId() {
+        // given
+        Long clientId = 1L;
+        when(clientRepository.findById(clientId)).thenReturn(Optional.empty());
+
+        // when
+        ApiResponse<Map<String, Object>> response = clientService.retrieveClient(clientId);
+
+        // then
+        assertNull(response.getData());
+        assertEquals(ErrorCode.INVALID_CLIENT_ID.getMessage(), response.getMessage());
+        assertEquals(ErrorCode.INVALID_CLIENT_ID.getStatus(), response.getStatus());
+    }
 }
