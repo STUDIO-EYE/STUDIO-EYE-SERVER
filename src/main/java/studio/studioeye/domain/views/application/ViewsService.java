@@ -364,14 +364,6 @@ public class ViewsService {
         return ApiResponse.ok("조회수를 성공적으로 수정했습니다.", updatedViews);
     }
 
-    public ApiResponse<Views> updateThisMonthViews(String mainViewedCookie, String aboutViewedCookie,
-                                                   String faqViewedCookie, String contactViewedCookie,
-                                                   String newsViewedCookie, String recruitmentViewedCookie,
-                                                   String artworkEntertainmentViewedCookie, String artworkDramaViewedCookie,
-                                                   String artworkDocumentaryViewedCookie, String artworkChannelOperatingViewedCookie,
-                                                   String artworkBrandedViewedCookie, String artworkMotionGraphicViewedCookie,
-                                                   String artworkAnimationViewedCookie, String artworkLiveCommerceViewedCookie,
-                                                   UpdateViewsServiceRequestDto dto) {
     public ApiResponse<Views> updateThisMonthViews(UpdateViewsServiceRequestDto dto) {
 
         }
