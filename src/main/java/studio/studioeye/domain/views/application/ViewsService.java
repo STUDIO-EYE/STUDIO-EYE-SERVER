@@ -372,17 +372,11 @@ public class ViewsService {
                                                    String artworkBrandedViewedCookie, String artworkMotionGraphicViewedCookie,
                                                    String artworkAnimationViewedCookie, String artworkLiveCommerceViewedCookie,
                                                    UpdateViewsServiceRequestDto dto) {
+    public ApiResponse<Views> updateThisMonthViews(UpdateViewsServiceRequestDto dto) {
+
+        }
 
         TimeZone.setDefault(TimeZone.getTimeZone("Asia/Seoul"));
-
-        if(mainViewedCookie != null || aboutViewedCookie != null || faqViewedCookie != null
-                || contactViewedCookie != null || newsViewedCookie != null || recruitmentViewedCookie != null
-                || artworkEntertainmentViewedCookie != null || artworkDramaViewedCookie != null
-                || artworkDocumentaryViewedCookie != null ||artworkChannelOperatingViewedCookie != null
-                || artworkBrandedViewedCookie != null || artworkMotionGraphicViewedCookie != null
-                || artworkAnimationViewedCookie != null || artworkLiveCommerceViewedCookie != null) {
-            return ApiResponse.ok("이미 방문한 사용자입니다.");
-        }
 
         return this.updateViewsByYearMonth(
                 Integer.parseInt(new SimpleDateFormat("yyyy").format(new Date().getTime())),
