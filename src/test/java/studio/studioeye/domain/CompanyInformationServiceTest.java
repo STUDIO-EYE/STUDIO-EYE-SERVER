@@ -17,6 +17,7 @@ import studio.studioeye.domain.company_information.domain.CompanyInformationDeta
 import studio.studioeye.domain.company_information.dto.request.CreateCompanyInformationServiceRequestDto;
 import studio.studioeye.domain.company_information.dto.request.DetailInformationDTO;
 import studio.studioeye.domain.company_information.dto.request.UpdateAllCompanyInformationServiceRequestDto;
+import studio.studioeye.domain.company_information.dto.request.UpdateCompanyBasicInformationServiceRequestDto;
 import studio.studioeye.domain.recruitment.domain.Recruitment;
 import studio.studioeye.global.common.response.ApiResponse;
 import studio.studioeye.global.exception.error.ErrorCode;
@@ -755,5 +756,59 @@ public class CompanyInformationServiceTest {
         assertEquals(ErrorCode.COMPANYINFORMATION_IS_EMPTY.getMessage(), response.getMessage());
         Mockito.verify(companyInformationRepository, times(1)).findAll();
         Mockito.verify(companyInformationRepository, never()).save(any(CompanyInformation.class));
+    }
+
+    @Test
+    @DisplayName("회사 기본 정보(주소, 유선번호, 팩스번호) 수정 성공 테스트")
+    public void updateCompanyBasicInformationSuccess() {
+        // given
+        String address = "Test address";
+        String addressEnglish = "Test addressEnglish";
+        String phone = "Test phone";
+        String fax = "Test fax";
+
+        UpdateCompanyBasicInformationServiceRequestDto requestDto = new UpdateCompanyBasicInformationServiceRequestDto(
+                address, addressEnglish, phone, fax
+        );
+
+        List<CompanyInformation> savedCompanyInformationList = new ArrayList<>();
+
+        CompanyInformation savedCompanyInformation = CompanyInformation.builder()
+                .mainOverview("Test")
+                .commitment("Test")
+                .address("Test")
+                .addressEnglish("Test")
+                .phone("Test")
+                .fax("Test")
+                .introduction("Test")
+                .lightLogoImageFileName("Test")
+                .lightLogoImageUrl("Test")
+                .darkLogoImageFileName("Test")
+                .darkLogoImageUrl("Test")
+                .sloganImageFileName("Test")
+                .sloganImageUrl("Test")
+                .build();
+
+        List<CompanyInformationDetailInformation> savedDetailInformation = new ArrayList<>();
+
+        savedDetailInformation.add(new CompanyInformationDetailInformation(savedCompanyInformation, "Test Key1", "Test Value1"));
+        savedDetailInformation.add(new CompanyInformationDetailInformation(savedCompanyInformation, "Test Key2", "Test Value2"));
+        savedDetailInformation.add(new CompanyInformationDetailInformation(savedCompanyInformation, "Test Key3", "Test Value3"));
+
+        savedCompanyInformation.initDetailInformation(savedDetailInformation);
+
+        savedCompanyInformationList.add(savedCompanyInformation);
+
+        // stub
+        when(companyInformationRepository.findAll()).thenReturn(savedCompanyInformationList);
+
+        // when
+        ApiResponse<CompanyInformation> response = companyInformationService.updateCompanyBasicInformation(requestDto);
+
+        // then
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatus());
+        assertEquals("회사 기본 정보를 성공적으로 수정했습니다.", response.getMessage());
+        Mockito.verify(companyInformationRepository, times(1)).save(any(CompanyInformation.class));
     }
 }
