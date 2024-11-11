@@ -316,4 +316,36 @@ public class CompanyInformationServiceTest {
 //        assertEquals(HttpStatus.BAD_REQUEST, response.getStatus());
 //        assertEquals(ErrorCode.COMPANYINFORMATION_IS_EMPTY.getMessage(), response.getMessage());
 //    }
+    @Test
+    @DisplayName("회사 소개 정보 삭제 성공")
+    void deleteCompanyIntroductionInformationSuccess() {
+        // given
+        CompanyInformation companyInformation = CompanyInformation.builder()
+                .sloganImageFileName("slogan.png")
+                .build();
+
+        when(companyInformationRepository.findAll()).thenReturn(List.of(companyInformation));
+
+        // when
+        ApiResponse<CompanyInformation> response = companyInformationService.deleteCompanyIntroductionInformation();
+
+        // then
+        assertEquals("회사 소개 정보를 성공적으로 삭제했습니다.", response.getMessage());
+        verify(s3Adaptor, times(1)).deleteFile(anyString()); // S3 파일 삭제 호출 확인
+        verify(companyInformationRepository, times(1)).save(any(CompanyInformation.class)); // 저장 호출 확인
+    }
+//    @Test
+//    @DisplayName("회사 소개 정보 삭제 실패 - 회사 정보 없음")
+//    void deleteCompanyIntroductionInformation_emptyCompany_returnsErrorResponse() {
+//        // given
+//        when(companyInformationRepository.findAll()).thenReturn(Collections.emptyList());
+//
+//        // when
+//        ApiResponse<CompanyInformation> response = companyInformationService.deleteCompanyIntroductionInformation();
+//
+//        // then
+//        assertEquals(HttpStatus.BAD_REQUEST, response.getStatus());
+//        assertEquals(ErrorCode.COMPANYINFORMATION_IS_EMPTY.getMessage(), response.getMessage());
+//    }
+//    }
 }
