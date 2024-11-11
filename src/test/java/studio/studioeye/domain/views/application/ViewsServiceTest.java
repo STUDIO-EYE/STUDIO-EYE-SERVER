@@ -511,4 +511,25 @@ public class ViewsServiceTest {
         );
         Mockito.verify(viewsRepository, times(1)).save(any(Views.class));
     }
+
+    @Test
+    @DisplayName("이번 월 조회수 1 상승 실패 테스트")
+    public void updateThisMonthViewsFail() {
+        // given
+        MenuTitle menu = MenuTitle.ABOUT;
+        ArtworkCategory category = ArtworkCategory.ENTERTAINMENT;
+
+        UpdateViewsServiceRequestDto requestDto = new UpdateViewsServiceRequestDto(menu, category);
+
+        // when
+        ApiResponse<Views> response = viewsService.updateThisMonthViews(requestDto);
+        Views findViews = response.getData();
+
+        // then
+        assertNotNull(response);
+        assertNull(findViews);
+        assertEquals(ErrorCode.INVALID_VIEWS_CATEGORY.getStatus(), response.getStatus());
+        assertEquals(ErrorCode.INVALID_VIEWS_CATEGORY.getMessage(), response.getMessage());
+        Mockito.verify(viewsRepository, never()).save(any(Views.class));
+    }
 }
