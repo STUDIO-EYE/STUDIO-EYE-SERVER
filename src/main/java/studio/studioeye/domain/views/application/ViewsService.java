@@ -365,9 +365,11 @@ public class ViewsService {
     }
 
     public ApiResponse<Views> updateThisMonthViews(UpdateViewsServiceRequestDto dto) {
+
         if(!dto.menu().equals(MenuTitle.ARTWORK) && !dto.category().equals(ArtworkCategory.ALL)) {
             return ApiResponse.withError(ErrorCode.INVALID_VIEWS_CATEGORY);
         }
+
         TimeZone.setDefault(TimeZone.getTimeZone("Asia/Seoul"));
 
         return this.updateViewsByYearMonth(
