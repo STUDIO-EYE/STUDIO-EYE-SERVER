@@ -99,28 +99,8 @@ public class ViewsController {
 
     @Operation(summary = "이번 월 조회수 1 상승 API (해당 월이 존재하지 않을 경우에는 생성)")
     @PutMapping("/views/increase")
-    public ApiResponse<Views> updateThisMonthViews(@CookieValue(name = "main_viewed_cookie", required = false) String mainViewedCookie,
-                                                   @CookieValue(name = "about_viewed_cookie", required = false) String aboutViewedCookie,
-                                                   @CookieValue(name = "faq_viewed_cookie", required = false) String faqViewedCookie,
-                                                   @CookieValue(name = "contact_viewed_cookie", required = false) String contactViewedCookie,
-                                                   @CookieValue(name = "news_viewed_cookie", required = false) String newsViewedCookie,
-                                                   @CookieValue(name = "recruitment_viewed_cookie", required = false) String recruitmentViewedCookie,
-                                                   @CookieValue(name = "artwork_entertainment_viewed_cookie", required = false) String artworkEntertainmentViewedCookie,
-                                                   @CookieValue(name = "artwork_drama_viewed_cookie", required = false) String artworkDramaViewedCookie,
-                                                   @CookieValue(name = "artwork_documentary_viewed_cookie", required = false) String artworkDocumentaryViewedCookie,
-                                                   @CookieValue(name = "artwork_channel_operating_viewed_cookie", required = false) String artworkChannelOperatingViewedCookie,
-                                                   @CookieValue(name = "artwork_branded_viewed_cookie", required = false) String artworkBrandedViewedCookie,
-                                                   @CookieValue(name = "artwork_motion_graphic_viewed_cookie", required = false) String artworkMotionGraphicViewedCookie,
-                                                   @CookieValue(name = "artwork_animation_viewed_cookie", required = false) String artworkAnimationViewedCookie,
-                                                   @CookieValue(name = "artwork_live_commerce_viewed_cookie", required = false) String artworkLiveCommerceViewedCookie,
-                                                   @RequestBody UpdateViewsRequestDto dto) {
+    public ApiResponse<Views> updateThisMonthViews(@RequestBody UpdateViewsRequestDto dto) {
 
-        return viewsService.updateThisMonthViews(mainViewedCookie, aboutViewedCookie, faqViewedCookie,
-                                                contactViewedCookie, newsViewedCookie, recruitmentViewedCookie,
-                                                artworkEntertainmentViewedCookie, artworkDramaViewedCookie,
-                                                artworkDocumentaryViewedCookie, artworkChannelOperatingViewedCookie,
-                                                artworkBrandedViewedCookie, artworkMotionGraphicViewedCookie,
-                                                artworkAnimationViewedCookie, artworkLiveCommerceViewedCookie,
-                                                dto.toServiceRequest());
+        return viewsService.updateThisMonthViews(dto.toServiceRequest());
     }
 }
