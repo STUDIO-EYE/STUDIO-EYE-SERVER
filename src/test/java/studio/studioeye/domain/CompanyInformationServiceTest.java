@@ -73,4 +73,37 @@ public class CompanyInformationServiceTest {
         assertNull(response.getData());
         assertEquals("회사 정보가 존재하지 않습니다.", response.getMessage());
     }
+
+    @Test
+    @DisplayName("회사 로고 이미지 조회 성공")
+    void retrieveCompanyLogoImage() {
+        // given
+        List<String> darkLogoImageUrls = List.of("darkLogoImageUrl1?v=123456789");
+        when(companyInformationRepository.findDarkLogoImageUrl()).thenReturn(darkLogoImageUrls);
+
+        // when
+        ApiResponse<String> response = companyInformationService.retrieveCampanyLogoImage(false);
+        String retrievedCompanyInformation = response.getData();
+
+        // then
+        assertNotNull(retrievedCompanyInformation);
+        assertEquals("회사 로고 이미지를 성공적으로 조회하였습니다.", response.getMessage());
+        assertTrue(retrievedCompanyInformation.startsWith("darkLogoImageUrl1"));
+    }
+
+    @Test
+    @DisplayName("회사 로고 이미지 조회 실패 - 로고 이미지 없음")
+    void retrieveCompanyLogoImageWhenLogoImageNotExists() {
+        // given
+        when(companyInformationRepository.findDarkLogoImageUrl()).thenReturn(Collections.emptyList());
+
+        // when
+        ApiResponse<String> response = companyInformationService.retrieveCampanyLogoImage(false);
+        String retrievedCompanyInformation = response.getData();
+
+        // then
+        assertNull(retrievedCompanyInformation);
+        assertEquals("회사 로고 이미지가 존재하지 않습니다.", response.getMessage());
+    }
+
 }
