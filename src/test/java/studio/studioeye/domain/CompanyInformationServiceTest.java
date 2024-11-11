@@ -347,5 +347,34 @@ public class CompanyInformationServiceTest {
 //        assertEquals(HttpStatus.BAD_REQUEST, response.getStatus());
 //        assertEquals(ErrorCode.COMPANYINFORMATION_IS_EMPTY.getMessage(), response.getMessage());
 //    }
+    @Test
+    @DisplayName("회사 상세 정보 삭제 성공")
+    void deleteCompanyDetailInformationSuccess() {
+        // given
+        CompanyInformation companyInformation = CompanyInformation.builder()
+                .detailInformation(new ArrayList<>()) // 예시 데이터
+                .build();
+
+        when(companyInformationRepository.findAll()).thenReturn(List.of(companyInformation));
+
+        // when
+        ApiResponse<CompanyInformation> response = companyInformationService.deleteCompanyDetailInformation();
+
+        // then
+        assertEquals("회사 5가지 상세 정보를 성공적으로 삭제했습니다.", response.getMessage());
+        verify(companyInformationRepository, times(1)).save(any(CompanyInformation.class)); // 저장 호출 확인
+    }
+//    @Test
+//    @DisplayName("회사 상세 정보 삭제 실패 - 회사 정보 없음")
+//    void deleteCompanyDetailInformation_emptyCompany_returnsErrorResponse() {
+//        // given
+//        when(companyInformationRepository.findAll()).thenReturn(Collections.emptyList());
+//
+//        // when
+//        ApiResponse<CompanyInformation> response = companyInformationService.deleteCompanyDetailInformation();
+//
+//        // then
+//        assertEquals(HttpStatus.BAD_REQUEST, response.getStatus());
+//        assertEquals(ErrorCode.COMPANYINFORMATION_IS_EMPTY.getMessage(), response.getMessage());
 //    }
 }
