@@ -84,7 +84,7 @@ public class CompanyInformationServiceTest {
         // stub
         // Mock S3 upload 동작 설정
         when(s3Adapter.uploadFile(any(MultipartFile.class)))
-                .thenReturn(ApiResponse.ok("프로젝트를 성공적으로 등록하였습니다.", "http://example.com/testImage.jpg"));
+                .thenReturn(ApiResponse.ok("S3 버킷에 이미지 업로드를 성공하였습니다.", "http://example.com/testImage.jpg"));
 
         // when
         ApiResponse<CompanyInformation> response = companyInformationService.createCompanyInformation(requestDto, mockFile, mockFile, mockFile);
