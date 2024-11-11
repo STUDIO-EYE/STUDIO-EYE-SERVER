@@ -167,4 +167,50 @@ public class CompanyInformationServiceTest {
         assertNull(response.getData());
         assertEquals("회사 소개 정보가 존재하지 않습니다.", response.getMessage());
     }
+    @Test
+    @DisplayName("회사 상세 정보 조회 성공")
+    void retrieveCompanyDetailInformationSuccess() {
+        // given
+        CompanyInformation companyInformation = CompanyInformation.builder()
+                .mainOverview("Main overview")
+                .commitment("Our commitment")
+                .detailInformation(new ArrayList<>())
+                .build();
+
+        companyInformation.getDetailInformation().add(CompanyInformationDetailInformation.builder()
+                .companyInformation(companyInformation)
+                .key("Detail Key 1")
+                .value("Detail Value 1")
+                .build());
+        companyInformation.getDetailInformation().add(CompanyInformationDetailInformation.builder()
+                .companyInformation(companyInformation)
+                .key("Detail Key 2")
+                .value("Detail Value 2")
+                .build());
+
+        List<CompanyInformation> companyInformations = List.of(companyInformation);
+        when(companyInformationRepository.findAll()).thenReturn(companyInformations);
+
+        // when
+        ApiResponse<List<CompanyInformationDetailInformation>> response = companyInformationService.retrieveCompanyDetailInformation();
+
+        // then
+        assertNotNull(response.getData());
+        assertEquals("회사 상세 정보를 성공적으로 조회하였습니다.", response.getMessage());
+        assertEquals(2, response.getData().size());
+    }
+
+    @Test
+    @DisplayName("회사 상세 정보 조회 실패 - 정보 없음")
+    void retrieveCompanyDetailInformationFailure_NoInformation() {
+        // given
+        when(companyInformationRepository.findAll()).thenReturn(Collections.emptyList());
+
+        // when
+        ApiResponse<List<CompanyInformationDetailInformation>> response = companyInformationService.retrieveCompanyDetailInformation();
+
+        // then
+        assertEquals("회사 정보가 존재하지 않습니다.", response.getMessage());
+        assertNull(response.getData());
+    }
 }
