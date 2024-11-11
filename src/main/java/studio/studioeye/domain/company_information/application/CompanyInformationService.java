@@ -217,7 +217,7 @@ public class CompanyInformationService {
         if (updateLightLogoFileResponse.getStatus().is5xxServerError()) {
             return ApiResponse.withError(ErrorCode.ERROR_S3_UPDATE_OBJECT);
         }
-        ApiResponse<String> updateDarkLogoFileResponse = s3Adapter.uploadFile(lightLogoImage);
+        ApiResponse<String> updateDarkLogoFileResponse = s3Adapter.uploadFile(darkLogoImage);
         if (updateDarkLogoFileResponse.getStatus().is5xxServerError()) {
             return ApiResponse.withError(ErrorCode.ERROR_S3_UPDATE_OBJECT);
         }

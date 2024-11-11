@@ -383,5 +383,4 @@ public class ViewsService {
         // 월 형식 검사
         return month < 1 || month > 12;
     }
-
 }
