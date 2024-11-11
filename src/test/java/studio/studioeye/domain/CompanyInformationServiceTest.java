@@ -14,10 +14,7 @@ import studio.studioeye.domain.company_information.application.CompanyInformatio
 import studio.studioeye.domain.company_information.dao.CompanyInformationRepository;
 import studio.studioeye.domain.company_information.domain.CompanyInformation;
 import studio.studioeye.domain.company_information.domain.CompanyInformationDetailInformation;
-import studio.studioeye.domain.company_information.dto.request.CreateCompanyInformationServiceRequestDto;
-import studio.studioeye.domain.company_information.dto.request.DetailInformationDTO;
-import studio.studioeye.domain.company_information.dto.request.UpdateAllCompanyInformationServiceRequestDto;
-import studio.studioeye.domain.company_information.dto.request.UpdateCompanyBasicInformationServiceRequestDto;
+import studio.studioeye.domain.company_information.dto.request.*;
 import studio.studioeye.domain.recruitment.domain.Recruitment;
 import studio.studioeye.global.common.response.ApiResponse;
 import studio.studioeye.global.exception.error.ErrorCode;
@@ -854,5 +851,75 @@ public class CompanyInformationServiceTest {
         assertEquals(ErrorCode.COMPANYINFORMATION_IS_EMPTY.getMessage(), response.getMessage());
         Mockito.verify(companyInformationRepository, times(1)).findAll();
         Mockito.verify(companyInformationRepository, never()).save(any(CompanyInformation.class));
+    }
+
+    @Test
+    @DisplayName("회사 소개 정보(mainOverview, commitment, introduction) 수정 성공 테스트")
+    public void updateCompanyIntroductionInformationSuccess() {
+        // given
+        String mainOverview = "Test mainOverview";
+        String commitment = "Test commitment";
+        String introduction = "Test introduction";
+
+        List<DetailInformationDTO> detailInformation = new ArrayList<>();
+
+        DetailInformationDTO dto1 = new DetailInformationDTO();
+        dto1.setKey("Test Key1");
+        dto1.setValue("Test Value1");
+        detailInformation.add(dto1);
+
+        DetailInformationDTO dto2 = new DetailInformationDTO();
+        dto2.setKey("Test Key2");
+        dto2.setValue("Test Value2");
+        detailInformation.add(dto2);
+
+        DetailInformationDTO dto3 = new DetailInformationDTO();
+        dto3.setKey("Test Key3");
+        dto3.setValue("Test Value3");
+        detailInformation.add(dto3);
+
+        UpdateCompanyIntroductionInformationServiceRequestDto requestDto = new UpdateCompanyIntroductionInformationServiceRequestDto(
+                mainOverview, commitment, introduction
+        );
+
+        List<CompanyInformation> savedCompanyInformationList = new ArrayList<>();
+
+        CompanyInformation savedCompanyInformation = CompanyInformation.builder()
+                .mainOverview("Test")
+                .commitment("Test")
+                .address("Test")
+                .addressEnglish("Test")
+                .phone("Test")
+                .fax("Test")
+                .introduction("Test")
+                .lightLogoImageFileName("Test")
+                .lightLogoImageUrl("Test")
+                .darkLogoImageFileName("Test")
+                .darkLogoImageUrl("Test")
+                .sloganImageFileName("Test")
+                .sloganImageUrl("Test")
+                .build();
+
+        List<CompanyInformationDetailInformation> savedDetailInformation = new ArrayList<>();
+
+        savedDetailInformation.add(new CompanyInformationDetailInformation(savedCompanyInformation, "Test Key1", "Test Value1"));
+        savedDetailInformation.add(new CompanyInformationDetailInformation(savedCompanyInformation, "Test Key2", "Test Value2"));
+        savedDetailInformation.add(new CompanyInformationDetailInformation(savedCompanyInformation, "Test Key3", "Test Value3"));
+
+        savedCompanyInformation.initDetailInformation(savedDetailInformation);
+
+        savedCompanyInformationList.add(savedCompanyInformation);
+
+        // stub
+        when(companyInformationRepository.findAll()).thenReturn(savedCompanyInformationList);
+
+        // when
+        ApiResponse<CompanyInformation> response = companyInformationService.updateCompanyIntroductionInformation(requestDto);
+
+        // then
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatus());
+        assertEquals("회사 소개 정보를 성공적으로 수정했습니다.", response.getMessage());
+        Mockito.verify(companyInformationRepository, times(1)).save(any(CompanyInformation.class));
     }
 }
