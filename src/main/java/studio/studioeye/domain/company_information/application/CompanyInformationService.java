@@ -34,6 +34,13 @@ public class CompanyInformationService {
         if(!companyInformations.isEmpty()) {
             return updateAllCompanyInformation(dto.toUpdateServiceRequest(), lightLogoImage, darkLogoImage, sloganImage);
         }
+
+        if(lightLogoImage == null || lightLogoImage.isEmpty()
+                || darkLogoImage == null || darkLogoImage.isEmpty()
+                || sloganImage == null || sloganImage.isEmpty()) {
+            return ApiResponse.withError(ErrorCode.NOT_EXIST_IMAGE_FILE);
+        }
+
         String lightLogoImageFileName = null;
         String lightLogoImageUrl = null;
         String darkLogoImageFileName = null;
