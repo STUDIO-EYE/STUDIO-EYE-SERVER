@@ -388,4 +388,54 @@ public class CompanyInformationServiceTest {
         Mockito.verify(companyInformationRepository, times(1)).findAll();
         Mockito.verify(companyInformationRepository, never()).save(any(CompanyInformation.class));
     }
+
+    @Test
+    @DisplayName("회사 로고 이미지 수정 성공 테스트")
+    public void updateCompanyLogoImageSuccess() throws IOException {
+        // given
+        List<CompanyInformation> savedCompanyInformationList = new ArrayList<>();
+
+        CompanyInformation savedCompanyInformation = CompanyInformation.builder()
+                .mainOverview("Test")
+                .commitment("Test")
+                .address("Test")
+                .addressEnglish("Test")
+                .phone("Test")
+                .fax("Test")
+                .introduction("Test")
+                .lightLogoImageFileName("Test")
+                .lightLogoImageUrl("Test")
+                .darkLogoImageFileName("Test")
+                .darkLogoImageUrl("Test")
+                .sloganImageFileName("Test")
+                .sloganImageUrl("Test")
+                .build();
+
+        List<CompanyInformationDetailInformation> savedDetailInformation = new ArrayList<>();
+
+        savedDetailInformation.add(new CompanyInformationDetailInformation(savedCompanyInformation, "Test Key1", "Test Value1"));
+        savedDetailInformation.add(new CompanyInformationDetailInformation(savedCompanyInformation, "Test Key2", "Test Value2"));
+        savedDetailInformation.add(new CompanyInformationDetailInformation(savedCompanyInformation, "Test Key3", "Test Value3"));
+
+        savedCompanyInformation.initDetailInformation(savedDetailInformation);
+
+        savedCompanyInformationList.add(savedCompanyInformation);
+
+        // stub
+        when(companyInformationRepository.findAll()).thenReturn(savedCompanyInformationList);
+        // Mock S3 upload 동작 설정
+        when(s3Adapter.uploadFile(any(MultipartFile.class)))
+                .thenReturn(ApiResponse.ok("S3 버킷에 이미지 업로드를 성공하였습니다.", "http://example.com/testImage.jpg"));
+
+        // when
+        ApiResponse<CompanyInformation> response = companyInformationService.updateCompanyLogoImage(mockFile, mockFile);
+
+        // then
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatus());
+        assertEquals("회사 로고 이미지를 성공적으로 수정했습니다.", response.getMessage());
+        Mockito.verify(companyInformationRepository, times(1)).save(any(CompanyInformation.class));
+    }
+
+
 }
