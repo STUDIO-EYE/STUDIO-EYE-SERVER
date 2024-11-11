@@ -19,9 +19,11 @@ import studio.studioeye.domain.views.dao.ViewsRepository;
 import studio.studioeye.domain.views.dao.ViewsSummary;
 import studio.studioeye.domain.views.domain.Views;
 import studio.studioeye.domain.views.dto.request.CreateViewsServiceRequestDto;
+import studio.studioeye.domain.views.dto.request.UpdateViewsServiceRequestDto;
 import studio.studioeye.global.common.response.ApiResponse;
 import studio.studioeye.global.exception.error.ErrorCode;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -484,5 +486,29 @@ public class ViewsServiceTest {
         assertEquals(ErrorCode.INVALID_PERIOD_FORMAT.getStatus(), response.getStatus());
         assertEquals(ErrorCode.INVALID_PERIOD_FORMAT.getMessage(), response.getMessage());
         Mockito.verify(viewsRepository, never()).findByYearAndMonthBetweenAndMenuAndCategory(any(Integer.class), any(Integer.class), any(Integer.class), any(Integer.class), any(MenuTitle.class), any(ArtworkCategory.class));
+    }
+
+    @Test
+    @DisplayName("이번 월 조회수 1 상승 성공 테스트")
+    public void updateThisMonthViewsSuccess() {
+        // given
+        MenuTitle menu = MenuTitle.ABOUT;
+        ArtworkCategory category = ArtworkCategory.ALL;
+
+        UpdateViewsServiceRequestDto requestDto = new UpdateViewsServiceRequestDto(menu, category);
+
+        // when
+        ApiResponse<Views> response = viewsService.updateThisMonthViews(requestDto);
+        Views findViews = response.getData();
+
+        // then
+        assertNotNull(response);
+        assertNull(findViews);
+        assertEquals(HttpStatus.OK, response.getStatus());
+        assertTrue(
+                response.getMessage().equals("조회수를 성공적으로 수정했습니다.") ||
+                        response.getMessage().equals("조회 수 등록을 완료했습니다.")
+        );
+        Mockito.verify(viewsRepository, times(1)).save(any(Views.class));
     }
 }
