@@ -243,10 +243,11 @@ public class CompanyInformationService {
             return ApiResponse.withError(ErrorCode.NOT_EXIST_IMAGE_FILE);
         }
         List<CompanyInformation> companyInformations = companyInformationRepository.findAll();
-        if (!companyInformations.isEmpty()) {
-            String fileName = companyInformations.get(0).getSloganImageFileName();
-            s3Adapter.deleteFile(fileName);
+        if (companyInformations.isEmpty()) {
+            return ApiResponse.withError(ErrorCode.COMPANYINFORMATION_IS_EMPTY);
         }
+        String fileName = companyInformations.get(0).getSloganImageFileName();
+        s3Adapter.deleteFile(fileName);
 
         ApiResponse<String> updateSloganFileResponse = s3Adapter.uploadFile(sloganImageUrl);
         if (updateSloganFileResponse.getStatus().is5xxServerError()) {
