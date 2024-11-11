@@ -13,8 +13,10 @@ import org.springframework.web.multipart.MultipartFile;
 import studio.studioeye.domain.company_information.application.CompanyInformationService;
 import studio.studioeye.domain.company_information.dao.CompanyInformationRepository;
 import studio.studioeye.domain.company_information.domain.CompanyInformation;
+import studio.studioeye.domain.company_information.domain.CompanyInformationDetailInformation;
 import studio.studioeye.domain.company_information.dto.request.CreateCompanyInformationServiceRequestDto;
 import studio.studioeye.domain.company_information.dto.request.DetailInformationDTO;
+import studio.studioeye.domain.company_information.dto.request.UpdateAllCompanyInformationServiceRequestDto;
 import studio.studioeye.domain.recruitment.domain.Recruitment;
 import studio.studioeye.global.common.response.ApiResponse;
 import studio.studioeye.global.exception.error.ErrorCode;
@@ -23,6 +25,7 @@ import studio.studioeye.infrastructure.s3.S3Adapter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -138,5 +141,83 @@ public class CompanyInformationServiceTest {
         assertEquals(ErrorCode.NOT_EXIST_IMAGE_FILE.getStatus(), response.getStatus());
         assertEquals(ErrorCode.NOT_EXIST_IMAGE_FILE.getMessage(), response.getMessage());
         Mockito.verify(companyInformationRepository, never()).save(any(CompanyInformation.class));
+    }
+
+    @Test
+    @DisplayName("회사 전체 정보 수정 성공 테스트")
+    public void updateAllCompanyInformationSuccess() throws IOException {
+        // given
+        String mainOverview = "Test mainOverview";
+        String commitment = "Test commitment";
+        String address = "Test address";
+        String addressEnglish = "Test addressEnglish";
+        String phone = "Test phone";
+        String fax = "Test fax";
+        String introduction = "Test introduction";
+
+        List<DetailInformationDTO> detailInformation = new ArrayList<>();
+
+        DetailInformationDTO dto1 = new DetailInformationDTO();
+        dto1.setKey("Test Key1");
+        dto1.setValue("Test Value1");
+        detailInformation.add(dto1);
+
+        DetailInformationDTO dto2 = new DetailInformationDTO();
+        dto2.setKey("Test Key2");
+        dto2.setValue("Test Value2");
+        detailInformation.add(dto2);
+
+        DetailInformationDTO dto3 = new DetailInformationDTO();
+        dto3.setKey("Test Key3");
+        dto3.setValue("Test Value3");
+        detailInformation.add(dto3);
+
+        UpdateAllCompanyInformationServiceRequestDto requestDto = new UpdateAllCompanyInformationServiceRequestDto(
+                mainOverview, commitment, address, addressEnglish, phone, fax, introduction, detailInformation
+        );
+
+        List<CompanyInformation> savedCompanyInformationList = new ArrayList<>();
+
+        CompanyInformation savedCompanyInformation = CompanyInformation.builder()
+                .mainOverview("Test")
+                .commitment("Test")
+                .address("Test")
+                .addressEnglish("Test")
+                .phone("Test")
+                .fax("Test")
+                .introduction("Test")
+                .lightLogoImageFileName("Test")
+                .lightLogoImageUrl("Test")
+                .darkLogoImageFileName("Test")
+                .darkLogoImageUrl("Test")
+                .sloganImageFileName("Test")
+                .sloganImageUrl("Test")
+                .build();
+
+        List<CompanyInformationDetailInformation> savedDetailInformation = new ArrayList<>();
+
+        savedDetailInformation.add(new CompanyInformationDetailInformation(savedCompanyInformation, "Test Key1", "Test Value1"));
+        savedDetailInformation.add(new CompanyInformationDetailInformation(savedCompanyInformation, "Test Key2", "Test Value2"));
+        savedDetailInformation.add(new CompanyInformationDetailInformation(savedCompanyInformation, "Test Key3", "Test Value3"));
+
+        savedCompanyInformation.initDetailInformation(savedDetailInformation);
+
+        savedCompanyInformationList.add(savedCompanyInformation);
+
+        // stub
+        when(companyInformationRepository.findAll()).thenReturn(savedCompanyInformationList);
+        // Mock S3 upload 동작 설정
+        when(s3Adapter.uploadFile(any(MultipartFile.class)))
+                .thenReturn(ApiResponse.ok("S3 버킷에 이미지 업로드를 성공하였습니다.", "http://example.com/testImage.jpg"));
+
+        // when
+        ApiResponse<CompanyInformation> response = companyInformationService.updateAllCompanyInformation(requestDto, mockFile, mockFile, mockFile);
+        CompanyInformation findCompanyInformation = response.getData();
+
+        // then
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatus());
+        assertEquals("전체 회사 정보를 성공적으로 수정했습니다.", response.getMessage());
+        Mockito.verify(companyInformationRepository, times(1)).save(any(CompanyInformation.class));
     }
 }
