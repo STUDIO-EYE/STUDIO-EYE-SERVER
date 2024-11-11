@@ -34,6 +34,13 @@ public class CompanyInformationService {
         if(!companyInformations.isEmpty()) {
             return updateAllCompanyInformation(dto.toUpdateServiceRequest(), lightLogoImage, darkLogoImage, sloganImage);
         }
+
+        if(lightLogoImage == null || lightLogoImage.isEmpty()
+                || darkLogoImage == null || darkLogoImage.isEmpty()
+                || sloganImage == null || sloganImage.isEmpty()) {
+            return ApiResponse.withError(ErrorCode.NOT_EXIST_IMAGE_FILE);
+        }
+
         String lightLogoImageFileName = null;
         String lightLogoImageUrl = null;
         String darkLogoImageFileName = null;
@@ -184,6 +191,9 @@ public class CompanyInformationService {
 
     public ApiResponse<CompanyInformation> updateAllCompanyTextInformation(UpdateAllCompanyInformationServiceRequestDto dto) {
         List<CompanyInformation> companyInformations = companyInformationRepository.findAll();
+        if (companyInformations.isEmpty()) {
+            return ApiResponse.withError(ErrorCode.COMPANYINFORMATION_IS_EMPTY);
+        }
         CompanyInformation companyInformation = companyInformations.get(0);
         companyInformation.updateAllCompanyTextInformation(dto);
         CompanyInformation savedCompanyInformation = companyInformationRepository.save(companyInformation);
@@ -193,7 +203,7 @@ public class CompanyInformationService {
     public ApiResponse<CompanyInformation> updateCompanyBasicInformation(UpdateCompanyBasicInformationServiceRequestDto dto) {
         List<CompanyInformation> companyInformations = companyInformationRepository.findAll();
         if (companyInformations.isEmpty()) {
-            ApiResponse.withError(ErrorCode.COMPANYINFORMATION_IS_EMPTY);
+            return ApiResponse.withError(ErrorCode.COMPANYINFORMATION_IS_EMPTY);
         }
         CompanyInformation companyInformation = companyInformations.get(0);
         companyInformation.updateCompanyBasicInformation(dto);
@@ -206,12 +216,13 @@ public class CompanyInformationService {
             return ApiResponse.withError(ErrorCode.NOT_EXIST_IMAGE_FILE);
         }
         List<CompanyInformation> companyInformations = companyInformationRepository.findAll();
-        if (!companyInformations.isEmpty()) {
-            String fileName = companyInformations.get(0).getLightLogoImageFileName();
-            s3Adapter.deleteFile(fileName);
-            fileName = companyInformations.get(0).getDarkLogoImageFileName();
-            s3Adapter.deleteFile(fileName);
+        if (companyInformations.isEmpty()) {
+            return ApiResponse.withError(ErrorCode.COMPANYINFORMATION_IS_EMPTY);
         }
+        String fileName = companyInformations.get(0).getLightLogoImageFileName();
+        s3Adapter.deleteFile(fileName);
+        fileName = companyInformations.get(0).getDarkLogoImageFileName();
+        s3Adapter.deleteFile(fileName);
 
         ApiResponse<String> updateLightLogoFileResponse = s3Adapter.uploadFile(lightLogoImage);
         if (updateLightLogoFileResponse.getStatus().is5xxServerError()) {
@@ -232,10 +243,11 @@ public class CompanyInformationService {
             return ApiResponse.withError(ErrorCode.NOT_EXIST_IMAGE_FILE);
         }
         List<CompanyInformation> companyInformations = companyInformationRepository.findAll();
-        if (!companyInformations.isEmpty()) {
-            String fileName = companyInformations.get(0).getSloganImageFileName();
-            s3Adapter.deleteFile(fileName);
+        if (companyInformations.isEmpty()) {
+            return ApiResponse.withError(ErrorCode.COMPANYINFORMATION_IS_EMPTY);
         }
+        String fileName = companyInformations.get(0).getSloganImageFileName();
+        s3Adapter.deleteFile(fileName);
 
         ApiResponse<String> updateSloganFileResponse = s3Adapter.uploadFile(sloganImageUrl);
         if (updateSloganFileResponse.getStatus().is5xxServerError()) {
@@ -299,6 +311,9 @@ public class CompanyInformationService {
 
     public ApiResponse<CompanyInformation> updateCompanyIntroductionInformation(UpdateCompanyIntroductionInformationServiceRequestDto dto) {
         List<CompanyInformation> companyInformations = companyInformationRepository.findAll();
+        if (companyInformations.isEmpty()) {
+            return ApiResponse.withError(ErrorCode.COMPANYINFORMATION_IS_EMPTY);
+        }
         CompanyInformation companyInformation = companyInformations.get(0);
         companyInformation.updateCompanyIntroductionInformation(dto);
         CompanyInformation savedCompanyInformation = companyInformationRepository.save(companyInformation);
@@ -308,7 +323,7 @@ public class CompanyInformationService {
     public ApiResponse<CompanyInformation> updateCompanyDetailInformation(UpdateCompanyDetailInformationServiceRequestDto dto) {
         List<CompanyInformation> companyInformations = companyInformationRepository.findAll();
         if (companyInformations.isEmpty()) {
-            ApiResponse.withError(ErrorCode.COMPANYINFORMATION_IS_EMPTY);
+            return ApiResponse.withError(ErrorCode.COMPANYINFORMATION_IS_EMPTY);
         }
         CompanyInformation companyInformation = companyInformations.get(0);
         companyInformation.updateCompanyDetailInformation(dto);
