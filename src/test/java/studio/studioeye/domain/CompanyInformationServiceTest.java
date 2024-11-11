@@ -710,4 +710,50 @@ public class CompanyInformationServiceTest {
         assertEquals("회사 로고 이미지와 슬로건 이미지를 성공적으로 수정했습니다.", response.getMessage());
         Mockito.verify(companyInformationRepository, times(1)).save(any(CompanyInformation.class));
     }
+
+    @Test
+    @DisplayName("회사 로고, 슬로건 이미지 수정 실패 테스트 - 회사 데이터가 없는 경우")
+    public void updateCompanyLogoAndSloganFail_notFound() throws IOException {
+        // given
+        List<CompanyInformation> savedCompanyInformationList = new ArrayList<>();
+
+        CompanyInformation savedCompanyInformation = CompanyInformation.builder()
+                .mainOverview("Test")
+                .commitment("Test")
+                .address("Test")
+                .addressEnglish("Test")
+                .phone("Test")
+                .fax("Test")
+                .introduction("Test")
+                .lightLogoImageFileName("Test")
+                .lightLogoImageUrl("Test")
+                .darkLogoImageFileName("Test")
+                .darkLogoImageUrl("Test")
+                .sloganImageFileName("Test")
+                .sloganImageUrl("Test")
+                .build();
+
+        List<CompanyInformationDetailInformation> savedDetailInformation = new ArrayList<>();
+
+        savedDetailInformation.add(new CompanyInformationDetailInformation(savedCompanyInformation, "Test Key1", "Test Value1"));
+        savedDetailInformation.add(new CompanyInformationDetailInformation(savedCompanyInformation, "Test Key2", "Test Value2"));
+        savedDetailInformation.add(new CompanyInformationDetailInformation(savedCompanyInformation, "Test Key3", "Test Value3"));
+
+        savedCompanyInformation.initDetailInformation(savedDetailInformation);
+
+        savedCompanyInformationList.add(savedCompanyInformation);
+
+        // stub
+        when(companyInformationRepository.findAll()).thenReturn(List.of());
+
+        // when
+        ApiResponse<CompanyInformation> response = companyInformationService.updateCompanyLogoAndSlogan(mockFile, mockFile, mockFile);
+
+        // then
+        assertNotNull(response);
+        assertEquals(ErrorCode.COMPANYINFORMATION_IS_EMPTY.getStatus(), response.getStatus());
+        assertEquals(ErrorCode.COMPANYINFORMATION_IS_EMPTY.getMessage(), response.getMessage());
+        Mockito.verify(companyInformationRepository, times(1)).findAll();
+        Mockito.verify(companyInformationRepository, never()).save(any(CompanyInformation.class));
+    }
 }
