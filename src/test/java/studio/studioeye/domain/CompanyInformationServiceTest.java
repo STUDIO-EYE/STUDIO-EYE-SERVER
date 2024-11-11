@@ -965,4 +965,70 @@ public class CompanyInformationServiceTest {
         Mockito.verify(companyInformationRepository, times(1)).findAll();
         Mockito.verify(companyInformationRepository, never()).save(any(CompanyInformation.class));
     }
+
+    @Test
+    @DisplayName("회사 5가지 상세 정보 수정 성공 테스트")
+    public void updateCompanyDetailInformationSuccess() {
+        // given
+        List<DetailInformationDTO> detailInformation = new ArrayList<>();
+
+        DetailInformationDTO dto1 = new DetailInformationDTO();
+        dto1.setKey("Test Key1");
+        dto1.setValue("Test Value1");
+        detailInformation.add(dto1);
+
+        DetailInformationDTO dto2 = new DetailInformationDTO();
+        dto2.setKey("Test Key2");
+        dto2.setValue("Test Value2");
+        detailInformation.add(dto2);
+
+        DetailInformationDTO dto3 = new DetailInformationDTO();
+        dto3.setKey("Test Key3");
+        dto3.setValue("Test Value3");
+        detailInformation.add(dto3);
+
+        UpdateCompanyDetailInformationServiceRequestDto requestDto = new UpdateCompanyDetailInformationServiceRequestDto(
+                detailInformation
+        );
+
+        List<CompanyInformation> savedCompanyInformationList = new ArrayList<>();
+
+        CompanyInformation savedCompanyInformation = CompanyInformation.builder()
+                .mainOverview("Test")
+                .commitment("Test")
+                .address("Test")
+                .addressEnglish("Test")
+                .phone("Test")
+                .fax("Test")
+                .introduction("Test")
+                .lightLogoImageFileName("Test")
+                .lightLogoImageUrl("Test")
+                .darkLogoImageFileName("Test")
+                .darkLogoImageUrl("Test")
+                .sloganImageFileName("Test")
+                .sloganImageUrl("Test")
+                .build();
+
+        List<CompanyInformationDetailInformation> savedDetailInformation = new ArrayList<>();
+
+        savedDetailInformation.add(new CompanyInformationDetailInformation(savedCompanyInformation, "Test Key1", "Test Value1"));
+        savedDetailInformation.add(new CompanyInformationDetailInformation(savedCompanyInformation, "Test Key2", "Test Value2"));
+        savedDetailInformation.add(new CompanyInformationDetailInformation(savedCompanyInformation, "Test Key3", "Test Value3"));
+
+        savedCompanyInformation.initDetailInformation(savedDetailInformation);
+
+        savedCompanyInformationList.add(savedCompanyInformation);
+
+        // stub
+        when(companyInformationRepository.findAll()).thenReturn(savedCompanyInformationList);
+
+        // when
+        ApiResponse<CompanyInformation> response = companyInformationService.updateCompanyDetailInformation(requestDto);
+
+        // then
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatus());
+        assertEquals("회사 5가지 상세 정보를 성공적으로 수정했습니다.", response.getMessage());
+        Mockito.verify(companyInformationRepository, times(1)).save(any(CompanyInformation.class));
+    }
 }
