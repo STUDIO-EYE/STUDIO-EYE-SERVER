@@ -213,4 +213,41 @@ public class CompanyInformationServiceTest {
         assertEquals("회사 정보가 존재하지 않습니다.", response.getMessage());
         assertNull(response.getData());
     }
+
+    @Test
+    @DisplayName("전체 회사 정보 삭제 성공")
+    void deleteAllCompanyInformationSuccess() {
+        // given
+        List<CompanyInformation> companyInformations = List.of(
+                CompanyInformation.builder().lightLogoImageFileName("light_logo.png")
+                        .darkLogoImageFileName("dark_logo.png")
+                        .sloganImageFileName("slogan.png").build()
+        );
+
+        when(companyInformationRepository.findAll()).thenReturn(companyInformations);
+
+        // when
+        ApiResponse<String> response = companyInformationService.deleteAllCompanyInformation();
+
+        // then
+        assertEquals("전체 회사 정보를 성공적으로 삭제했습니다.", response.getMessage());
+        verify(s3Adaptor, times(3)).deleteFile(anyString()); // S3 파일 삭제 호출 확인
+        verify(companyInformationRepository, times(1)).delete(any(CompanyInformation.class)); // 삭제 호출 확인
+    }
+
+    @Test
+    @DisplayName("전체 회사 정보 삭제 실패 - 정보 없음")
+    void deleteAllCompanyInformationFailure_NoCompanyInformation() {
+        // given
+        when(companyInformationRepository.findAll()).thenReturn(Collections.emptyList());
+
+        // when
+        ApiResponse<String> response = companyInformationService.deleteAllCompanyInformation();
+
+        // then
+        assertEquals("전체 회사 정보를 성공적으로 삭제했습니다.", response.getMessage()); // 수정된 메시지
+        verify(s3Adaptor, times(0)).deleteFile(anyString()); // S3 파일 삭제 호출이 없음을 확인
+        verify(companyInformationRepository, times(0)).delete(any(CompanyInformation.class)); // 삭제 호출이 없음을 확인
+    }
+
 }
