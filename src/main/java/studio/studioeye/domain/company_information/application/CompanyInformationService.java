@@ -191,6 +191,9 @@ public class CompanyInformationService {
 
     public ApiResponse<CompanyInformation> updateAllCompanyTextInformation(UpdateAllCompanyInformationServiceRequestDto dto) {
         List<CompanyInformation> companyInformations = companyInformationRepository.findAll();
+        if (companyInformations.isEmpty()) {
+            return ApiResponse.withError(ErrorCode.COMPANYINFORMATION_IS_EMPTY);
+        }
         CompanyInformation companyInformation = companyInformations.get(0);
         companyInformation.updateAllCompanyTextInformation(dto);
         CompanyInformation savedCompanyInformation = companyInformationRepository.save(companyInformation);
