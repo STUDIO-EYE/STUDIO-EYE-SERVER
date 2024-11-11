@@ -138,4 +138,33 @@ public class CompanyInformationServiceTest {
         assertEquals("회사 기본 정보가 존재하지 않습니다.", response.getMessage());
     }
 
+    @Test
+    @DisplayName("회사 소개 정보 조회 성공")
+    void retrieveCompanyIntroductionInformationSuccess() {
+        // given
+        CompanyIntroductionInformation companyIntroductionInformation = new CompanyIntroductionInformationImpl("introduction1", "sloganImageUrl1");
+        when(companyInformationRepository.findIntroductionAndSloganImageUrl()).thenReturn(List.of(companyIntroductionInformation));
+
+        // when
+        ApiResponse<CompanyIntroductionInformation> response = companyInformationService.retrieveCompanyIntroductionInformation();
+
+        // then
+        assertNotNull(response.getData());
+        assertEquals("회사 소개 정보를 성공적으로 조회하였습니다.", response.getMessage());
+        assertTrue(response.getData().getSloganImageUrl().startsWith("sloganImageUrl1"));
+    }
+
+    @Test
+    @DisplayName("회사 소개 정보 조회 실패 - 정보 없음")
+    void retrieveCompanyIntroductionInformationFailure() {
+        // given
+        when(companyInformationRepository.findIntroductionAndSloganImageUrl()).thenReturn(Collections.emptyList());
+
+        // when
+        ApiResponse<CompanyIntroductionInformation> response = companyInformationService.retrieveCompanyIntroductionInformation();
+
+        // then
+        assertNull(response.getData());
+        assertEquals("회사 소개 정보가 존재하지 않습니다.", response.getMessage());
+    }
 }
