@@ -573,4 +573,47 @@ public class CompanyInformationServiceTest {
         assertEquals("회사 슬로건 이미지를 성공적으로 수정했습니다.", response.getMessage());
         Mockito.verify(companyInformationRepository, times(1)).save(any(CompanyInformation.class));
     }
+
+    @Test
+    @DisplayName("회사 슬로건 이미지 수정 실패 테스트 - 슬로건 이미지가 없는 경우")
+    public void updateCompanySloganImageFail_invalidFile() throws IOException {
+        // given
+        List<CompanyInformation> savedCompanyInformationList = new ArrayList<>();
+
+        CompanyInformation savedCompanyInformation = CompanyInformation.builder()
+                .mainOverview("Test")
+                .commitment("Test")
+                .address("Test")
+                .addressEnglish("Test")
+                .phone("Test")
+                .fax("Test")
+                .introduction("Test")
+                .lightLogoImageFileName("Test")
+                .lightLogoImageUrl("Test")
+                .darkLogoImageFileName("Test")
+                .darkLogoImageUrl("Test")
+                .sloganImageFileName("Test")
+                .sloganImageUrl("Test")
+                .build();
+
+        List<CompanyInformationDetailInformation> savedDetailInformation = new ArrayList<>();
+
+        savedDetailInformation.add(new CompanyInformationDetailInformation(savedCompanyInformation, "Test Key1", "Test Value1"));
+        savedDetailInformation.add(new CompanyInformationDetailInformation(savedCompanyInformation, "Test Key2", "Test Value2"));
+        savedDetailInformation.add(new CompanyInformationDetailInformation(savedCompanyInformation, "Test Key3", "Test Value3"));
+
+        savedCompanyInformation.initDetailInformation(savedDetailInformation);
+
+        savedCompanyInformationList.add(savedCompanyInformation);
+
+        // when
+        ApiResponse<CompanyInformation> response = companyInformationService.updateCompanySloganImage(null);
+
+        // then
+        assertNotNull(response);
+        assertEquals(ErrorCode.NOT_EXIST_IMAGE_FILE.getStatus(), response.getStatus());
+        assertEquals(ErrorCode.NOT_EXIST_IMAGE_FILE.getMessage(), response.getMessage());
+        Mockito.verify(companyInformationRepository, never()).findAll();
+        Mockito.verify(companyInformationRepository, never()).save(any(CompanyInformation.class));
+    }
 }
