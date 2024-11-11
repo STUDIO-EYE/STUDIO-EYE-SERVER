@@ -106,4 +106,36 @@ public class CompanyInformationServiceTest {
         assertEquals("회사 로고 이미지가 존재하지 않습니다.", response.getMessage());
     }
 
+    @Test
+    @DisplayName("회사 기본 정보 조회 성공")
+    void retrieveCompanyBasicInformationSuccess() {
+        // given
+        CompanyBasicInformation companyBasicInformation = mock(CompanyBasicInformation.class);
+        when(companyBasicInformation.getAddress()).thenReturn("address1");
+        when(companyBasicInformation.getPhone()).thenReturn("phone1");
+        when(companyInformationRepository.findAddressAndPhoneAndFax()).thenReturn(List.of(companyBasicInformation));
+
+        // when
+        ApiResponse<CompanyBasicInformation> response = companyInformationService.retrieveCompanyBasicInformation();
+
+        // then
+        assertNotNull(response.getData());
+        assertEquals("회사 기본 정보를 성공적으로 조회하였습니다.", response.getMessage());
+        assertEquals("address1", response.getData().getAddress());
+        assertEquals("phone1", response.getData().getPhone());
+    }
+    @Test
+    @DisplayName("회사 기본 정보 조회 실패 - 정보 없음")
+    void retrieveCompanyBasicInformationFailure() {
+        // given
+        when(companyInformationRepository.findAddressAndPhoneAndFax()).thenReturn(Collections.emptyList());
+
+        // when
+        ApiResponse<CompanyBasicInformation> response = companyInformationService.retrieveCompanyBasicInformation();
+
+        // then
+        assertNull(response.getData());
+        assertEquals("회사 기본 정보가 존재하지 않습니다.", response.getMessage());
+    }
+
 }
