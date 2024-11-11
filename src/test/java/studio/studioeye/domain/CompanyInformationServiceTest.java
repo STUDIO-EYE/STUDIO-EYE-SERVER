@@ -811,4 +811,48 @@ public class CompanyInformationServiceTest {
         assertEquals("회사 기본 정보를 성공적으로 수정했습니다.", response.getMessage());
         Mockito.verify(companyInformationRepository, times(1)).save(any(CompanyInformation.class));
     }
+
+    @Test
+    @DisplayName("회사 기본 정보(주소, 유선번호, 팩스번호) 수정 실패 테스트")
+    public void updateCompanyBasicInformationFail() {
+        // given
+        String address = "Test address";
+        String addressEnglish = "Test addressEnglish";
+        String phone = "Test phone";
+        String fax = "Test fax";
+
+        List<DetailInformationDTO> detailInformation = new ArrayList<>();
+
+        DetailInformationDTO dto1 = new DetailInformationDTO();
+        dto1.setKey("Test Key1");
+        dto1.setValue("Test Value1");
+        detailInformation.add(dto1);
+
+        DetailInformationDTO dto2 = new DetailInformationDTO();
+        dto2.setKey("Test Key2");
+        dto2.setValue("Test Value2");
+        detailInformation.add(dto2);
+
+        DetailInformationDTO dto3 = new DetailInformationDTO();
+        dto3.setKey("Test Key3");
+        dto3.setValue("Test Value3");
+        detailInformation.add(dto3);
+
+        UpdateCompanyBasicInformationServiceRequestDto requestDto = new UpdateCompanyBasicInformationServiceRequestDto(
+                address, addressEnglish, phone, fax
+        );
+
+        // stub
+        when(companyInformationRepository.findAll()).thenReturn(List.of());
+
+        // when
+        ApiResponse<CompanyInformation> response = companyInformationService.updateCompanyBasicInformation(requestDto);
+
+        // then
+        assertNotNull(response);
+        assertEquals(ErrorCode.COMPANYINFORMATION_IS_EMPTY.getStatus(), response.getStatus());
+        assertEquals(ErrorCode.COMPANYINFORMATION_IS_EMPTY.getMessage(), response.getMessage());
+        Mockito.verify(companyInformationRepository, times(1)).findAll();
+        Mockito.verify(companyInformationRepository, never()).save(any(CompanyInformation.class));
+    }
 }
