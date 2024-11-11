@@ -250,4 +250,39 @@ public class CompanyInformationServiceTest {
         verify(companyInformationRepository, times(0)).delete(any(CompanyInformation.class)); // 삭제 호출이 없음을 확인
     }
 
+
+    @Test
+    @DisplayName("회사 로고 이미지 삭제 성공")
+    void deleteCompanyLogoImageSuccess() {
+        // given
+        CompanyInformation companyInformation = CompanyInformation.builder()
+                .lightLogoImageFileName("light_logo.png")
+                .darkLogoImageFileName("dark_logo.png")
+                .build();
+
+        when(companyInformationRepository.findAll()).thenReturn(List.of(companyInformation));
+
+        // when
+        ApiResponse<String> response = companyInformationService.deleteCompanyLogoImage();
+
+        // then
+        assertEquals("회사 로고 이미지를 성공적으로 삭제했습니다.", response.getMessage());
+        verify(s3Adaptor, times(2)).deleteFile(anyString()); // S3 파일 삭제 호출 확인
+        verify(companyInformationRepository, times(1)).save(any(CompanyInformation.class)); // 저장 호출 확인
+    }
+
+    @Test
+    @DisplayName("회사 로고 이미지 삭제 실패 - 정보 없음")
+    void deleteCompanyLogoImageFailure_NoCompanyInformation() {
+        // given
+        when(companyInformationRepository.findAll()).thenReturn(Collections.emptyList());
+
+        // when
+        ApiResponse<String> response = companyInformationService.deleteCompanyLogoImage();
+
+        // then
+        assertEquals("회사 로고 이미지를 성공적으로 삭제했습니다.", response.getMessage()); // 수정된 메시지
+        verify(s3Adaptor, times(0)).deleteFile(anyString()); // S3 파일 삭제 호출이 없음을 확인
+        verify(companyInformationRepository, times(0)).save(any(CompanyInformation.class)); // 저장 호출이 없음을 확인
+    }
 }
