@@ -17,6 +17,9 @@ public class EmailService {
 //    }
 
     public boolean sendEmail(String to, String subject, String text) {
+        if (to == null || to.isEmpty()) {
+            throw new IllegalArgumentException("Invalid recipient address");
+        }
         int emailSize = calculateEmailSize(subject, text);
         if(emailSize > MAX_EMAIL_SIZE) {
             System.out.println("over size");
