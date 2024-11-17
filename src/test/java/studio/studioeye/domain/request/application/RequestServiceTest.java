@@ -112,4 +112,18 @@ public class RequestServiceTest {
 		assertNotNull(response.getData());
 		verify(requestService, times(1)).retrieveAllRequest();
 	}
+
+	@Test
+	@DisplayName("문의 전체 조회 실패 테스트 - 데이터 없음")
+	void retrieveAllRequestFailDueToNoData() {
+		// given
+		when(requestService.retrieveAllRequest()).thenReturn(ApiResponse.ok("문의가 존재하지 않습니다."));
+		// when
+		ApiResponse<List<Request>> response = requestController.retrieveAllRequest();
+		// then
+		assertEquals(HttpStatus.OK, response.getStatus());
+		assertNull(response.getData());
+		verify(requestService, times(1)).retrieveAllRequest();
+	}
+
 }
