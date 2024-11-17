@@ -152,4 +152,25 @@ public class RequestServiceTest {
 		assertEquals(ErrorCode.INVALID_REQUEST_ID.getStatus(), response.getStatus());
 		verify(requestService, times(1)).retrieveRequest(requestId);
 	}
+
+	@Test
+	@DisplayName("기간 및 상태에 따른 문의 수 조회 성공 테스트")
+	void retrieveRequestCountByCategoryAndStateSuccess() {
+		// given
+		String category = "category";
+		String state = "APPROVED";
+		Integer startYear = 2023;
+		Integer startMonth = 1;
+		Integer endYear = 2023;
+		Integer endMonth = 12;
+		when(requestService.retrieveRequestCountByCategoryAndState(category, state, startYear, startMonth, endYear, endMonth))
+				.thenReturn(ApiResponse.ok(List.of(Map.of("year", 2023, "month", 1, "RequestCount", 10L))));
+		// when
+		ApiResponse<List<Map<String, Object>>> response = requestController.retrieveStateRequestCountByPeriod(
+				category, state, startYear, startMonth, endYear, endMonth);
+		// then
+		assertEquals(HttpStatus.OK, response.getStatus());
+		assertNotNull(response.getData());
+		verify(requestService, times(1)).retrieveRequestCountByCategoryAndState(category, state, startYear, startMonth, endYear, endMonth);
+	}
 }
