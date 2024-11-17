@@ -139,4 +139,17 @@ public class RequestServiceTest {
 		assertNotNull(response.getData());
 		verify(requestService, times(1)).retrieveRequest(requestId);
 	}
+
+	@Test
+	@DisplayName("문의 상세 조회 실패 테스트 - 유효하지 않은 ID")
+	void retrieveRequestFailDueToInvalidId() {
+		// given
+		Long requestId = 1L;
+		when(requestService.retrieveRequest(requestId)).thenReturn(ApiResponse.withError(ErrorCode.INVALID_REQUEST_ID));
+		// when
+		ApiResponse<Request> response = requestController.retrieveRequest(requestId);
+		// then
+		assertEquals(ErrorCode.INVALID_REQUEST_ID.getStatus(), response.getStatus());
+		verify(requestService, times(1)).retrieveRequest(requestId);
+	}
 }
