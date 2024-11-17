@@ -188,4 +188,17 @@ public class RequestServiceTest {
 		assertEquals("답변을 성공적으로 작성했습니다.", response.getData());
 		verify(requestService, times(1)).updateRequestComment(eq(requestId), any());
 	}
+	@Test
+	@DisplayName("문의 답변 등록 실패 테스트 - 유효하지 않은 ID")
+	void updateRequestCommentFailDueToInvalidId() {
+		// given
+		Long requestId = 1L;
+		when(requestService.updateRequestComment(requestId, updateRequestCommentDto.toServiceRequest()))
+				.thenReturn(ApiResponse.withError(ErrorCode.INVALID_REQUEST_ID));
+		// when
+		ApiResponse<String> response = requestController.updateRequestComment(requestId, updateRequestCommentDto);
+		// then
+		assertEquals(ErrorCode.INVALID_REQUEST_ID.getStatus(), response.getStatus());
+		verify(requestService, times(1)).updateRequestComment(requestId, updateRequestCommentDto.toServiceRequest());
+	}
 }
