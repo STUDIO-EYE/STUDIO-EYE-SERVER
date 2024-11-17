@@ -78,4 +78,26 @@ public class RequestServiceTest {
 		verify(requestService, times(1)).createRequest(any(), any());
 	}
 
+	@Test
+	@DisplayName("문의 등록 실패 테스트 - 잘못된 입력")
+	void createRequestFailDueToInvalidInput() throws IOException {
+		// given
+		CreateRequestDto invalidDto = new CreateRequestDto(
+				"", // 잘못된 category 입력
+				"projectName",
+				"clientName",
+				"organization",
+				"010-1234-5678",
+				"test@example.com",
+				"Developer",
+				"description"
+		);
+		when(requestService.createRequest(any(), any())).thenReturn(ApiResponse.withError(ErrorCode.INVALID_INPUT_VALUE));
+		// when
+		ApiResponse<Request> response = requestController.createRequest(invalidDto, Collections.emptyList());
+		// then
+		assertEquals(ErrorCode.INVALID_INPUT_VALUE.getStatus(), response.getStatus());
+		verify(requestService, times(1)).createRequest(any(), any());
+	}
+
 }
