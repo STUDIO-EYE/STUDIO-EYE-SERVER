@@ -126,4 +126,17 @@ public class RequestServiceTest {
 		verify(requestService, times(1)).retrieveAllRequest();
 	}
 
+	@Test
+	@DisplayName("문의 상세 조회 성공 테스트")
+	void retrieveRequestSuccess() {
+		// given
+		Long requestId = 1L;
+		when(requestService.retrieveRequest(requestId)).thenReturn(ApiResponse.ok(request));
+		// when
+		ApiResponse<Request> response = requestController.retrieveRequest(requestId);
+		// then
+		assertEquals(HttpStatus.OK, response.getStatus());
+		assertNotNull(response.getData());
+		verify(requestService, times(1)).retrieveRequest(requestId);
+	}
 }
