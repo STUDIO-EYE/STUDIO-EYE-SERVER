@@ -173,4 +173,19 @@ public class RequestServiceTest {
 		assertNotNull(response.getData());
 		verify(requestService, times(1)).retrieveRequestCountByCategoryAndState(category, state, startYear, startMonth, endYear, endMonth);
 	}
+
+	// 테스트 실패...
+	@Test
+	@DisplayName("문의 답변 등록 성공 테스트")
+	void updateRequestCommentSuccess() {
+		// given
+		Long requestId = 1L;
+		when(requestService.updateRequestComment(eq(requestId), any())).thenReturn(ApiResponse.ok("답변을 성공적으로 작성했습니다."));
+		// when
+		ApiResponse<String> response = requestController.updateRequestComment(requestId, updateRequestCommentDto);
+		// then
+		assertEquals(HttpStatus.OK, response.getStatus());
+		assertEquals("답변을 성공적으로 작성했습니다.", response.getData());
+		verify(requestService, times(1)).updateRequestComment(eq(requestId), any());
+	}
 }
