@@ -100,4 +100,16 @@ public class RequestServiceTest {
 		verify(requestService, times(1)).createRequest(any(), any());
 	}
 
+	@Test
+	@DisplayName("문의 전체 조회 성공 테스트")
+	void retrieveAllRequestSuccess() {
+		// given
+		when(requestService.retrieveAllRequest()).thenReturn(ApiResponse.ok(List.of(request)));
+		// when
+		ApiResponse<List<Request>> response = requestController.retrieveAllRequest();
+		// then
+		assertEquals(HttpStatus.OK, response.getStatus());
+		assertNotNull(response.getData());
+		verify(requestService, times(1)).retrieveAllRequest();
+	}
 }
