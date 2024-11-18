@@ -1272,5 +1272,4 @@ public class ProjectServiceTest {
         assertEquals(response.getSize(), size);
         Mockito.verify(projectRepository, times(1)).findAll(pageable);
     }
-
 }
