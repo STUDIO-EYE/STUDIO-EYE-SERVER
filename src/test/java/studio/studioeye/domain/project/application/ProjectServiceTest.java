@@ -500,20 +500,24 @@ public class ProjectServiceTest {
 
         ApiResponse<List<Project>> response = projectService.retrieveAllArtworkProject();
 
+        assertNotNull(response);
+        assertNotNull(response.getData());
         assertEquals("프로젝트 목록을 성공적으로 조회했습니다.", response.getMessage());
         assertEquals(projects, response.getData()); // 프로젝트 목록이 반환되었는지 확인
         Mockito.verify(projectRepository, times(1)).findAllWithImagesAndOrderBySequenceAsc();
     }
-//
-//    @Test
-//    @DisplayName("프로젝트 전체 조회 실패 - 프로젝트가 없는 경우")
-//    void RetrieveAllArtworkProjectFail() {
-//        when(projectRepository.findAllWithImagesAndOrderBySequenceAsc()).thenReturn(new ArrayList<>());
-//
-//        ApiResponse<List<Project>> response = projectService.retrieveAllArtworkProject();
-//
-//        assertEquals("프로젝트가 존재하지 않습니다.", response.getMessage());
-//    }
+
+    @Test
+    @DisplayName("프로젝트 전체 조회 실패 - 프로젝트가 없는 경우")
+    void RetrieveAllArtworkProjectFail() {
+        when(projectRepository.findAllWithImagesAndOrderBySequenceAsc()).thenReturn(new ArrayList<>());
+
+        ApiResponse<List<Project>> response = projectService.retrieveAllArtworkProject();
+
+        assertNotNull(response);
+        assertNotNull(response.getData());
+        assertEquals("프로젝트가 존재하지 않습니다.", response.getMessage());
+    }
 //
 //    @Test
 //    @DisplayName("메인 프로젝트 전체 조회 성공")
