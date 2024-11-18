@@ -393,7 +393,7 @@ public class CompanyInformationService {
     public ApiResponse<CompanyInformation> deleteCompanyDetailInformation() {
         List<CompanyInformation> companyInformations = companyInformationRepository.findAll();
         if (companyInformations.isEmpty()) {
-            ApiResponse.withError(ErrorCode.COMPANYINFORMATION_IS_EMPTY);
+            return ApiResponse.withError(ErrorCode.COMPANYINFORMATION_IS_EMPTY);
         }
         CompanyInformation companyInformation = companyInformations.get(0);
         companyInformation.deleteCompanyDetailInformation();
