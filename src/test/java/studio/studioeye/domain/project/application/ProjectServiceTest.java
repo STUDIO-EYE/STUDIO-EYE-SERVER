@@ -564,21 +564,35 @@ public class ProjectServiceTest {
 
         assertEquals("프로젝트가 존재하지 않습니다.", response.getMessage());
     }
-//
-//    @Test
-//    @DisplayName("단일 프로젝트 조회 성공")
-//    void RetrieveProjectSuccess() {
-//        Long projectId = 1L;
-//        Project project = new Project("Test Department", "Entertainment", "Test Name", "Test Client",
-//                "2024-01-01", "Test Link", "Test Overview", mockFile.getName(), null, 0, 0, "main", true);
-//
-//        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
-//
-//        ApiResponse<Project> response = projectService.retrieveProject(projectId);
-//
-//        assertEquals("프로젝트를 성공적으로 조회했습니다.", response.getMessage());
-//        assertEquals(project, response.getData());
-//    }
+
+    @Test
+    @DisplayName("단일 프로젝트 조회 성공 테스트")
+    void RetrieveProjectSuccess() {
+        Long projectId = 1L;
+        Project project = Project.builder()
+                .name("Test Name")
+                .category("Entertainment")
+                .department("Test Department")
+                .date("2024-01-01")
+                .link("Test Link")
+                .overView("Test Overview")
+                .isPosted(true)
+                .projectType("main")
+                .mainImg("test url")
+                .mainImgFileName(mockFile.getName())
+                .responsiveMainImg("test url")
+                .responsiveMainImgFileName(mockFile.getName())
+                .mainSequence(0)
+                .sequence(0)
+                .build();
+
+        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
+
+        ApiResponse<Project> response = projectService.retrieveProject(projectId);
+
+        assertEquals("프로젝트를 성공적으로 조회했습니다.", response.getMessage());
+        assertEquals(project, response.getData());
+    }
 //
 //    @Test
 //    @DisplayName("단일 프로젝트 조회 실패 - 유효하지 않은 ID")
