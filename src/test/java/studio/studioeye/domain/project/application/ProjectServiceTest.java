@@ -238,32 +238,7 @@ public class ProjectServiceTest {
     }
 
     @Test
-    @DisplayName("프로젝트 타입 수정 성공 - 기존 타입이 main인 경우")
-    void UpdateProjectTypeSuccess_mainType() {
-        Long projectId = 1L;
-        String newType = "main"; // 변경할 타입
-        UpdateProjectTypeDto dto = new UpdateProjectTypeDto(projectId, newType);
-        Project mockProject = Project.builder()
-                .name("Test Name")
-                .category("Entertainment")
-                .department("Test Department")
-                .date("2024-01-01")
-                .link("Test Link")
-                .overView("Test Overview")
-                .isPosted(true)
-                .projectType("main")
-                .build();
-
-        when(projectRepository.findById(projectId)).thenReturn(Optional.of(mockProject));
-
-        ApiResponse<Project> response = projectService.updateProjectType(dto);
-
-        assertEquals("프로젝트 타입을 성공적으로 변경하였습니다.", response.getMessage());
-        assertEquals(newType, mockProject.getProjectType()); // 타입이 변경되었는지 확인
-    }
-
-    @Test
-    @DisplayName("프로젝트 타입 수정 성공 - 기존 타입이 top인 경우")
+    @DisplayName("프로젝트 타입 수정 성공 테스트 - 기존 타입이 top인 경우")
     void UpdateProjectTypeSuccess_topType() {
         Long projectId = 1L;
         String newType = "main"; // 변경할 타입
@@ -288,6 +263,56 @@ public class ProjectServiceTest {
         assertEquals(newType, mockProject.getProjectType()); // 타입이 변경되었는지 확인
     }
 
+    @Test
+    @DisplayName("프로젝트 타입 수정 성공 테스트 - 기존 타입이 main인 경우")
+    void UpdateProjectTypeSuccess_mainType() {
+        Long projectId = 1L;
+        String newType = "main"; // 변경할 타입
+        UpdateProjectTypeDto dto = new UpdateProjectTypeDto(projectId, newType);
+        Project mockProject = Project.builder()
+                .name("Test Name")
+                .category("Entertainment")
+                .department("Test Department")
+                .date("2024-01-01")
+                .link("Test Link")
+                .overView("Test Overview")
+                .isPosted(true)
+                .projectType("main")
+                .build();
+
+        when(projectRepository.findById(projectId)).thenReturn(Optional.of(mockProject));
+
+        ApiResponse<Project> response = projectService.updateProjectType(dto);
+
+        assertEquals("프로젝트 타입을 성공적으로 변경하였습니다.", response.getMessage());
+        assertEquals(newType, mockProject.getProjectType()); // 타입이 변경되었는지 확인
+    }
+
+    @Test
+    @DisplayName("프로젝트 타입 수정 성공 테스트 - 기존 타입이 other인 경우")
+    void UpdateProjectTypeSuccess_otherType() {
+        Long projectId = 1L;
+        String newType = "main"; // 변경할 타입
+        UpdateProjectTypeDto dto = new UpdateProjectTypeDto(projectId, newType);
+        Project mockProject = Project.builder()
+                .name("Test Name")
+                .category("Entertainment")
+                .department("Test Department")
+                .date("2024-01-01")
+                .link("Test Link")
+                .overView("Test Overview")
+                .isPosted(true)
+                .projectType("other")
+                .build();
+
+        when(projectRepository.findById(projectId)).thenReturn(Optional.of(mockProject));
+        when(projectRepository.findByProjectType(newType)).thenReturn(new ArrayList<>());
+
+        ApiResponse<Project> response = projectService.updateProjectType(dto);
+
+        assertEquals("프로젝트 타입을 성공적으로 변경하였습니다.", response.getMessage());
+        assertEquals(newType, mockProject.getProjectType()); // 타입이 변경되었는지 확인
+    }
 
 //
 //    @Test
