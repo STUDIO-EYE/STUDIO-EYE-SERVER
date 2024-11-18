@@ -224,8 +224,8 @@ public class ProjectServiceTest {
     }
 
     @Test
-    @DisplayName("Project 생성 실패 테스트 - 이미지 업로드 실패")
-    public void createProjectFail() throws IOException {
+    @DisplayName("Project 생성 실패 테스트 - 유효하지 않은 projectType인 경우")
+    public void createProjectFail_invalidProjectType() throws IOException {
         // given
         CreateProjectServiceRequestDto requestDto = new CreateProjectServiceRequestDto(
                 "Test Department",
@@ -235,12 +235,13 @@ public class ProjectServiceTest {
                 "2024-01-01",
                 "Test Link",
                 "Test Overview",
-                "main",
+                "invalidType",
                 true
         );
 
         // stub - S3 upload 실패
-        when(s3Adapter.uploadFile(any(MultipartFile.class))).thenReturn(ApiResponse.withError(ErrorCode.ERROR_S3_UPDATE_OBJECT));
+        when(s3Adapter.uploadFile(any(MultipartFile.class)))
+                .thenReturn(ApiResponse.ok("프로젝트를 성공적으로 등록하였습니다.", "http://example.com/testImage.jpg"));
 
         // when
         List<MultipartFile> projectImages = List.of(mockFile);
@@ -248,8 +249,8 @@ public class ProjectServiceTest {
 
         // then
         assertNotNull(response);
-        assertEquals(ErrorCode.ERROR_S3_UPDATE_OBJECT.getStatus(), response.getStatus()); // 적절한 상태 코드 수정
-        assertEquals(ErrorCode.ERROR_S3_UPDATE_OBJECT.getMessage(), response.getMessage()); // 예외 메시지 수정
+        assertEquals(ErrorCode.INVALID_PROJECT_TYPE.getStatus(), response.getStatus()); // 적절한 상태 코드 수정
+        assertEquals(ErrorCode.INVALID_PROJECT_TYPE.getMessage(), response.getMessage()); // 예외 메시지 수정
         Mockito.verify(projectRepository, never()).save(any(Project.class));
     }
 
