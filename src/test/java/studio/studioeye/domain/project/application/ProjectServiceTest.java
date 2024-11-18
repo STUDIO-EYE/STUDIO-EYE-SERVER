@@ -519,25 +519,41 @@ public class ProjectServiceTest {
         assertEquals("프로젝트가 존재하지 않습니다.", response.getMessage());
         Mockito.verify(projectRepository, times(1)).findAllWithImagesAndOrderBySequenceAsc();
     }
-//
-//    @Test
-//    @DisplayName("메인 프로젝트 전체 조회 성공")
-//    void RetrieveAllMainProjectSuccess() {
-//        List<Project> projects = new ArrayList<>();
-//        projects.add(new Project("Test Department", "Entertainment", "Test Name", "Test Client",
-//                "2024-01-01", "Test Link", "Test Overview", mockFile.getName(), null, 0, 0, "main", true));
-//        List<Project> topProjects = new ArrayList<>();
-//        topProjects.add(new Project("Test Department", "Entertainment", "Test Name", "Test Client",
-//                "2024-01-01", "Test Link", "Test Overview", mockFile.getName(), null, 0, 0, "main", true));
-//
-//        when(projectRepository.findAllWithImagesAndOrderByMainSequenceAsc()).thenReturn(projects);
-//        when(projectRepository.findByProjectType("top")).thenReturn(topProjects);
-//
-//        ApiResponse<List<Project>> response = projectService.retrieveAllMainProject();
-//
-//        assertEquals("프로젝트 목록을 성공적으로 조회했습니다.", response.getMessage());
-//        assertEquals(1 + projects.size(), response.getData().size());
-//    }
+
+    @Test
+    @DisplayName("메인 프로젝트 전체 조회 성공")
+    void RetrieveAllMainProjectSuccess() {
+        List<Project> projects = new ArrayList<>();
+        projects.add(Project.builder()
+                .name("Test Name")
+                .category("Entertainment")
+                .department("Test Department")
+                .date("2024-01-01")
+                .link("Test Link")
+                .overView("Test Overview")
+                .isPosted(true)
+                .projectType("main")
+                .build());
+        List<Project> topProjects = new ArrayList<>();
+        topProjects.add(Project.builder()
+                .name("Test Name")
+                .category("Entertainment")
+                .department("Test Department")
+                .date("2024-01-01")
+                .link("Test Link")
+                .overView("Test Overview")
+                .isPosted(true)
+                .projectType("main")
+                .build());
+
+        when(projectRepository.findAllWithImagesAndOrderByMainSequenceAsc()).thenReturn(projects);
+        when(projectRepository.findByProjectType("top")).thenReturn(topProjects);
+
+        ApiResponse<List<Project>> response = projectService.retrieveAllMainProject();
+
+        assertEquals("프로젝트 목록을 성공적으로 조회했습니다.", response.getMessage());
+        assertEquals(1 + projects.size(), response.getData().size());
+    }
 //
 //    @Test
 //    @DisplayName("메인 프로젝트 전체 조회 실패 - 프로젝트가 없는 경우")
