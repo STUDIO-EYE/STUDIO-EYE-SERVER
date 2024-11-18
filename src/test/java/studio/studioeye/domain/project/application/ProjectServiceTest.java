@@ -975,4 +975,33 @@ public class ProjectServiceTest {
         assertEquals("아트워크 페이지에 보여질 프로젝트의 순서를 성공적으로 수정하였습니다.", response.getMessage());
         Mockito.verify(projectRepository, times(3)).findById(any(Long.class));
     }
+
+    @Test
+    @DisplayName("Artwork Page 프로젝트 순서 변경 실패 테스트 - 유효하지 않은 ID")
+    void changeSequenceProjectFail_invalidID() {
+        // given
+        List<ChangeSequenceProjectReq> changeSequenceProjectReqList = new ArrayList<>();
+        ChangeSequenceProjectReq req1 = new ChangeSequenceProjectReq();
+        req1.setProjectId(0L);
+        req1.setSequence(1);
+        changeSequenceProjectReqList.add(req1);
+        ChangeSequenceProjectReq req2 = new ChangeSequenceProjectReq();
+        req2.setProjectId(1L);
+        req2.setSequence(2);
+        changeSequenceProjectReqList.add(req2);
+        ChangeSequenceProjectReq req3 = new ChangeSequenceProjectReq();
+        req3.setProjectId(2L);
+        req3.setSequence(0);
+        changeSequenceProjectReqList.add(req3);
+
+        // stub
+        when(projectRepository.findById(req1.getProjectId())).thenReturn(Optional.empty());
+
+        // when
+        ApiResponse<String> response = projectService.changeSequenceProject(changeSequenceProjectReqList);
+
+        // then
+        assertEquals(ErrorCode.INVALID_PROJECT_ID.getStatus(), response.getStatus());
+        assertEquals(ErrorCode.INVALID_PROJECT_ID.getMessage(), response.getMessage());
+    }
 }
