@@ -375,6 +375,50 @@ public class ProjectServiceTest {
     }
 
     @Test
+    @DisplayName("Project 생성 실패 테스트 - main인데 isPosted를 false로 할 경우")
+    public void createProjectFail_isPostedFalseMain() throws IOException {
+        // given
+        CreateProjectServiceRequestDto requestDto = new CreateProjectServiceRequestDto(
+                "Test Department",
+                "Entertainment",
+                "Test Name",
+                "Test Client",
+                "2024-01-01",
+                "Test Link",
+                "Test Overview",
+                "main",
+                false
+        );
+
+        Project mockProject = Project.builder()
+                .name("Test Name")
+                .category("Entertainment")
+                .department("Test Department")
+                .date("2024-01-01")
+                .link("Test Link")
+                .overView("Test Overview")
+                .isPosted(true)
+                .projectType("main")
+                .build();
+
+
+        // stub - S3 upload 실패
+        when(s3Adapter.uploadFile(any(MultipartFile.class)))
+                .thenReturn(ApiResponse.ok("프로젝트를 성공적으로 등록하였습니다.", "http://example.com/testImage.jpg"));
+        when(projectRepository.findByProjectType(requestDto.projectType())).thenReturn(List.of(mockProject, mockProject, mockProject, mockProject));
+
+        // when
+        List<MultipartFile> projectImages = List.of(mockFile);
+        ApiResponse<Project> response = projectService.createProject(requestDto, mockFile, mockFile, projectImages);
+
+        // then
+        assertNotNull(response);
+        assertEquals(ErrorCode.PROJECT_TYPE_AND_IS_POSTED_MISMATCH.getStatus(), response.getStatus()); // 적절한 상태 코드 수정
+        assertEquals(ErrorCode.PROJECT_TYPE_AND_IS_POSTED_MISMATCH.getMessage(), response.getMessage()); // 예외 메시지 수정
+        Mockito.verify(projectRepository, never()).save(any(Project.class));
+    }
+
+    @Test
     @DisplayName("Project 수정 성공 테스트")
     void updateProjectSuccess() throws IOException {
         // given
