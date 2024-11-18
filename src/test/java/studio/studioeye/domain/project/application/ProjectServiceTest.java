@@ -314,18 +314,18 @@ public class ProjectServiceTest {
         assertEquals(newType, mockProject.getProjectType()); // 타입이 변경되었는지 확인
     }
 
-//
-//    @Test
-//    @DisplayName("프로젝트 타입 수정 실패 - 유효하지 않은 ID")
-//    void UpdateProjectTypeFail() {
-//        UpdateProjectTypeDto dto = new UpdateProjectTypeDto(999L, "top"); // 유효하지 않은 ID
-//
-//        when(projectRepository.findById(dto.projectId())).thenReturn(Optional.empty());
-//
-//        ApiResponse<Project> response = projectService.updateProjectType(dto);
-//
-//        assertEquals(ErrorCode.INVALID_PROJECT_ID.getStatus(), response.getStatus());
-//    }
+    @Test
+    @DisplayName("프로젝트 타입 수정 실패 테스트 - 유효하지 않은 ID")
+    void UpdateProjectTypeFail_invalidID() {
+        UpdateProjectTypeDto dto = new UpdateProjectTypeDto(999L, "top"); // 유효하지 않은 ID
+
+        when(projectRepository.findById(dto.projectId())).thenReturn(Optional.empty());
+
+        ApiResponse<Project> response = projectService.updateProjectType(dto);
+
+        assertEquals(ErrorCode.INVALID_PROJECT_ID.getStatus(), response.getStatus());
+        assertEquals(ErrorCode.INVALID_PROJECT_ID.getMessage(), response.getMessage());
+    }
 //
 //    @Test
 //    @DisplayName("프로젝트 삭제 성공")
