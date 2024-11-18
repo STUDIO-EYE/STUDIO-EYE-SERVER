@@ -12,14 +12,18 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 import studio.studioeye.domain.project.dao.ProjectRepository;
 import studio.studioeye.domain.project.domain.Project;
+import studio.studioeye.domain.project.domain.ProjectImage;
 import studio.studioeye.domain.project.dto.request.CreateProjectServiceRequestDto;
+import studio.studioeye.domain.project.dto.request.UpdateProjectServiceRequestDto;
 import studio.studioeye.domain.recruitment.domain.Recruitment;
 import studio.studioeye.global.common.response.ApiResponse;
 import studio.studioeye.global.exception.error.ErrorCode;
 import studio.studioeye.infrastructure.s3.S3Adapter;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -123,36 +127,55 @@ public class ProjectServiceTest {
         Mockito.verify(projectRepository, never()).save(any(Project.class));
     }
 
-////    @Test
-////    @DisplayName("Project 수정 성공 테스트")
-////    void updateProjectSuccess() throws IOException {
-////        // given
-////        Long id = 1L;
-////        UpdateProjectServiceRequestDto requestDto = new UpdateProjectServiceRequestDto(
-////                id, "Updated Department", "Entertainment", "Updated Name", "Updated Client", "2024-01-02", "Updated Link", "Updated Overview", "main", true);
-////
-////        Project savedProject = new Project("Test Department", "Entertainment", "Test Name", "Test Client",
-////                "2024-01-01", "Test Link", "Test Overview", mockFile.getName(), null, 0, 0, "main", true);
-////
-////        // Mock existing images as MultipartFile
-////        List<MultipartFile> existingImages = List.of(mockFile);
-////
-////        // stub
-////        when(projectRepository.findById(requestDto.projectId())).thenReturn(Optional.of(savedProject));
-////        when(s3Adapter.deleteFile(savedProject.getMainImg())).thenReturn(ApiResponse.ok("S3에서 파일 삭제 성공"));
-////        when(s3Adapter.uploadFile(any(MultipartFile.class)))
-////                .thenReturn(ApiResponse.ok("S3에 이미지 업로드 성공", "Updated Test ImageUrl"));
-////        when(projectRepository.save(any(Project.class))).thenReturn(savedProject);
-////
-////        // when
-////        ApiResponse<Project> response = projectService.updateProject(requestDto, mockFile, existingImages);
-////
-////        // then
-////        assertNotNull(response);
-////        assertEquals(HttpStatus.OK, response.getStatus());
-////        assertEquals("프로젝트를 성공적으로 수정했습니다.", response.getMessage());
-////        assertEquals("Updated Test ImageUrl", savedProject.getMainImg());
-////    }
+    @Test
+    @DisplayName("Project 수정 성공 테스트")
+    void updateProjectSuccess() throws IOException {
+        // given
+        Long id = 1L;
+        UpdateProjectServiceRequestDto requestDto = new UpdateProjectServiceRequestDto(
+                id, "Updated Department", "Entertainment", "Updated Name", "Updated Client", "2024-01-02", "Updated Link", "Updated Overview", "main", true);
+
+        // Mock existing images as MultipartFile
+        List<MultipartFile> existingImages = List.of(mockFile);
+
+        Project mockProject = Project.builder()
+                .name("Test Name")
+                .category("Entertainment")
+                .department("Test Department")
+                .date("2024-01-01")
+                .link("Test Link")
+                .overView("Test Overview")
+                .isPosted(true)
+                .projectType("main")
+                .build();
+
+        List<ProjectImage> mockProjectImages = new ArrayList<>();
+        mockProjectImages.add(ProjectImage.builder()
+                .project(mockProject)
+                .fileName(mockProject.getName())
+                .imageUrlList(mockProject.getMainImg())
+                .build());
+
+        mockProject.setProjectImages(mockProjectImages);
+
+        // stub
+        when(projectRepository.findById(requestDto.projectId())).thenReturn(Optional.of(mockProject));
+        when(s3Adapter.deleteFile(any(String.class))).thenReturn(
+                ApiResponse.ok("S3 버킷에서 이미지를 성공적으로 삭제하였습니다.", "http://example.com/testImage.jpg"));
+        when(s3Adapter.uploadFile(any(MultipartFile.class)))
+                .thenReturn(ApiResponse.ok("S3 버킷에 이미지 업로드를 성공하였습니다.", "Updated Test ImageUrl"));
+        when(projectRepository.save(any(Project.class))).thenReturn(mockProject);
+
+        // when
+        ApiResponse<Project> response = projectService.updateProject(requestDto, mockFile, mockFile, existingImages);
+
+        // then
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatus());
+        assertEquals("프로젝트를 성공적으로 수정했습니다.", response.getMessage());
+        assertEquals("Updated Test ImageUrl", mockProject.getMainImg());
+        Mockito.verify(projectRepository, times(1)).save(any(Project.class));
+    }
 //
 //    @Test
 //    @DisplayName("Project 수정 실패 - 유효하지 않은 ID")
