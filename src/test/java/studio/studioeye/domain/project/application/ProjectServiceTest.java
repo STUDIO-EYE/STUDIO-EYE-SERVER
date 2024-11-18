@@ -176,26 +176,27 @@ public class ProjectServiceTest {
         assertEquals("Updated Test ImageUrl", mockProject.getMainImg());
         Mockito.verify(projectRepository, times(1)).save(any(Project.class));
     }
-//
-//    @Test
-//    @DisplayName("Project 수정 실패 - 유효하지 않은 ID")
-//    void updateProjectFail() throws IOException {
-//        // given
-//        Long id = 1L;
-//        UpdateProjectServiceRequestDto requestDto = new UpdateProjectServiceRequestDto(
-//                id, "Updated Department", "Entertainment", "Updated Name", "Updated Client", "2024-01-02", "Updated Link", "Updated Overview", "main", true);
-//
-//        // stub
-//        when(projectRepository.findById(requestDto.projectId())).thenReturn(Optional.empty());
-//
-//        // when
-//        ApiResponse<Project> response = projectService.updateProject(requestDto, mockFile, List.of(mockFile));
-//
-//        // then
-//        assertNotNull(response);
-//        assertEquals(HttpStatus.BAD_REQUEST, response.getStatus());
-//        assertEquals("유효하지 않은 project 식별자입니다.", response.getMessage());
-//    }
+
+    @Test
+    @DisplayName("Project 수정 실패 테스트 - 유효하지 않은 ID")
+    void updateProjectFail_invalidID() throws IOException {
+        // given
+        Long id = 1L;
+        UpdateProjectServiceRequestDto requestDto = new UpdateProjectServiceRequestDto(
+                id, "Updated Department", "Entertainment", "Updated Name", "Updated Client", "2024-01-02", "Updated Link", "Updated Overview", "main", true);
+
+        // stub
+        when(projectRepository.findById(requestDto.projectId())).thenReturn(Optional.empty());
+
+        // when
+        ApiResponse<Project> response = projectService.updateProject(requestDto, mockFile, mockFile, List.of(mockFile));
+
+        // then
+        assertNotNull(response);
+        assertEquals(ErrorCode.INVALID_PROJECT_ID.getStatus(), response.getStatus());
+        assertEquals(ErrorCode.INVALID_PROJECT_ID.getMessage(), response.getMessage());
+        Mockito.verify(projectRepository, never()).save(any(Project.class));
+    }
 //
 //
 //    @Test
