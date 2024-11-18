@@ -521,7 +521,7 @@ public class ProjectServiceTest {
     }
 
     @Test
-    @DisplayName("메인 프로젝트 전체 조회 성공")
+    @DisplayName("메인 프로젝트 전체 조회 성공 테스트")
     void RetrieveAllMainProjectSuccess() {
         List<Project> projects = new ArrayList<>();
         projects.add(Project.builder()
@@ -554,16 +554,16 @@ public class ProjectServiceTest {
         assertEquals("프로젝트 목록을 성공적으로 조회했습니다.", response.getMessage());
         assertEquals(1 + projects.size(), response.getData().size());
     }
-//
-//    @Test
-//    @DisplayName("메인 프로젝트 전체 조회 실패 - 프로젝트가 없는 경우")
-//    void RetrieveAllMainProjectFail() {
-//        when(projectRepository.findAllWithImagesAndOrderByMainSequenceAsc()).thenReturn(new ArrayList<>());
-//
-//        ApiResponse<List<Project>> response = projectService.retrieveAllMainProject();
-//
-//        assertEquals("프로젝트가 존재하지 않습니다.", response.getMessage());
-//    }
+
+    @Test
+    @DisplayName("메인 프로젝트 전체 조회 실패 테스트 - 프로젝트가 없는 경우")
+    void RetrieveAllMainProjectFail() {
+        when(projectRepository.findAllWithImagesAndOrderByMainSequenceAsc()).thenReturn(new ArrayList<>());
+
+        ApiResponse<List<Project>> response = projectService.retrieveAllMainProject();
+
+        assertEquals("프로젝트가 존재하지 않습니다.", response.getMessage());
+    }
 //
 //    @Test
 //    @DisplayName("단일 프로젝트 조회 성공")
