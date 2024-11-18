@@ -1114,4 +1114,50 @@ public class ProjectServiceTest {
         assertEquals(ErrorCode.INVALID_PROJECT_ID.getStatus(), response.getStatus());
         assertEquals(ErrorCode.INVALID_PROJECT_ID.getMessage(), response.getMessage());
     }
+
+    @Test
+    @DisplayName("Main Page 프로젝트 순서 변경 실패 테스트 - main type이 아닌 경우")
+    void changeMainSequenceProjectFail_invalidProjectType() {
+        // given
+        Project project1 = Project.builder()
+                .name("Test Name")
+                .category("Entertainment")
+                .department("Test Department")
+                .date("2024-01-01")
+                .link("Test Link")
+                .overView("Test Overview")
+                .isPosted(true)
+                .projectType("others")
+                .mainImg("test url")
+                .mainImgFileName(mockFile.getName())
+                .responsiveMainImg("test url")
+                .responsiveMainImgFileName(mockFile.getName())
+                .mainSequence(1)
+                .sequence(0)
+                .build();
+
+        List<ChangeMainSequenceProjectReq> changeMainSequenceProjectReqList = new ArrayList<>();
+        ChangeMainSequenceProjectReq req1 = new ChangeMainSequenceProjectReq();
+        req1.setProjectId(0L);
+        req1.setMainSequence(1);
+        changeMainSequenceProjectReqList.add(req1);
+        ChangeMainSequenceProjectReq req2 = new ChangeMainSequenceProjectReq();
+        req2.setProjectId(1L);
+        req2.setMainSequence(2);
+        changeMainSequenceProjectReqList.add(req2);
+        ChangeMainSequenceProjectReq req3 = new ChangeMainSequenceProjectReq();
+        req3.setProjectId(2L);
+        req3.setMainSequence(0);
+        changeMainSequenceProjectReqList.add(req3);
+
+        // stub
+        when(projectRepository.findById(req1.getProjectId())).thenReturn(Optional.of(project1));
+
+        // when
+        ApiResponse<String> response = projectService.changeMainSequenceProject(changeMainSequenceProjectReqList);
+
+        // then
+        assertEquals(ErrorCode.INVALID_PROJECT_ID.getStatus(), response.getStatus());
+        assertEquals(ErrorCode.INVALID_PROJECT_ID.getMessage(), response.getMessage());
+    }
 }
