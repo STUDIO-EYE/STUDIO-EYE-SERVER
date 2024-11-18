@@ -378,7 +378,7 @@ public class CompanyInformationService {
     public ApiResponse<CompanyInformation> deleteCompanyIntroductionInformation() {
         List<CompanyInformation> companyInformations = companyInformationRepository.findAll();
         if (companyInformations.isEmpty()) {
-            ApiResponse.withError(ErrorCode.COMPANYINFORMATION_IS_EMPTY);
+            return ApiResponse.withError(ErrorCode.COMPANYINFORMATION_IS_EMPTY);
         }
         for (CompanyInformation companyInformation : companyInformations) {
             String fileName = companyInformation.getSloganImageFileName();
