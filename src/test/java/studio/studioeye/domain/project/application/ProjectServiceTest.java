@@ -434,21 +434,38 @@ public class ProjectServiceTest {
         assertEquals(ErrorCode.MAIN_PROJECT_LIMIT_EXCEEDED.getStatus(), response.getStatus());
         assertEquals(ErrorCode.MAIN_PROJECT_LIMIT_EXCEEDED.getMessage(), response.getMessage());
     }
-//
-//    @Test
-//    @DisplayName("프로젝트 삭제 성공")
-//    void DeleteProjectSuccess() {
-//        Long projectId = 1L;
-//        Project project = new Project("Test Department", "Entertainment", "Test Name", "Test Client",
-//                "2024-01-01", "Test Link", "Test Overview", mockFile.getName(), null, 0, 0, "main", true);
-//
-//        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
-//
-//        ApiResponse<String> response = projectService.deleteProject(projectId);
-//
-//        assertEquals("프로젝트를 성공적으로 삭제했습니다.", response.getMessage());
-//        verify(projectRepository).delete(project);
-//    }
+
+    @Test
+    @DisplayName("프로젝트 삭제 성공 테스트")
+    void DeleteProjectSuccess() {
+        Long projectId = 1L;
+        Project project = Project.builder()
+                .name("Test Name")
+                .category("Entertainment")
+                .department("Test Department")
+                .date("2024-01-01")
+                .link("Test Link")
+                .overView("Test Overview")
+                .isPosted(true)
+                .projectType("top")
+                .build();
+
+        List<ProjectImage> mockProjectImages = new ArrayList<>();
+        mockProjectImages.add(ProjectImage.builder()
+                .project(project)
+                .fileName(project.getName())
+                .imageUrlList(project.getMainImg())
+                .build());
+
+        project.setProjectImages(mockProjectImages);
+
+        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
+
+        ApiResponse<String> response = projectService.deleteProject(projectId);
+
+        assertEquals("프로젝트를 성공적으로 삭제했습니다.", response.getMessage());
+        verify(projectRepository).delete(project);
+    }
 //
 //    @Test
 //    @DisplayName("프로젝트 삭제 실패 - 유효하지 않은 ID")
