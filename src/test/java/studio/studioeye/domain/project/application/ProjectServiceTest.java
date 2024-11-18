@@ -224,6 +224,36 @@ public class ProjectServiceTest {
     }
 
     @Test
+    @DisplayName("Project 생성 실패 테스트 - 이미지 업로드 실패")
+    public void createProjectFail() throws IOException {
+        // given
+        CreateProjectServiceRequestDto requestDto = new CreateProjectServiceRequestDto(
+                "Test Department",
+                "Entertainment",
+                "Test Name",
+                "Test Client",
+                "2024-01-01",
+                "Test Link",
+                "Test Overview",
+                "main",
+                true
+        );
+
+        // stub - S3 upload 실패
+        when(s3Adapter.uploadFile(any(MultipartFile.class))).thenReturn(ApiResponse.withError(ErrorCode.ERROR_S3_UPDATE_OBJECT));
+
+        // when
+        List<MultipartFile> projectImages = List.of(mockFile);
+        ApiResponse<Project> response = projectService.createProject(requestDto, mockFile, mockFile, projectImages);
+
+        // then
+        assertNotNull(response);
+        assertEquals(ErrorCode.ERROR_S3_UPDATE_OBJECT.getStatus(), response.getStatus()); // 적절한 상태 코드 수정
+        assertEquals(ErrorCode.ERROR_S3_UPDATE_OBJECT.getMessage(), response.getMessage()); // 예외 메시지 수정
+        Mockito.verify(projectRepository, never()).save(any(Project.class));
+    }
+
+    @Test
     @DisplayName("Project 수정 성공 테스트")
     void updateProjectSuccess() throws IOException {
         // given
@@ -384,7 +414,7 @@ public class ProjectServiceTest {
     }
 
     @Test
-    @DisplayName("프로젝트 타입 수정 성공 테스트 - 기존 타입이 other인 경우")
+    @DisplayName("프로젝트 타입 수정 성공 테스트 - 기존 타입이 others인 경우")
     void UpdateProjectTypeSuccess_otherType() {
         Long projectId = 1L;
         String newType = "main"; // 변경할 타입
@@ -397,7 +427,7 @@ public class ProjectServiceTest {
                 .link("Test Link")
                 .overView("Test Overview")
                 .isPosted(true)
-                .projectType("other")
+                .projectType("others")
                 .build();
 
         when(projectRepository.findById(projectId)).thenReturn(Optional.of(mockProject));
