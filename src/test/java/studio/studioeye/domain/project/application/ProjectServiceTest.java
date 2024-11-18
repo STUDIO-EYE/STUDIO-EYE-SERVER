@@ -326,6 +326,30 @@ public class ProjectServiceTest {
         assertEquals(ErrorCode.INVALID_PROJECT_ID.getStatus(), response.getStatus());
         assertEquals(ErrorCode.INVALID_PROJECT_ID.getMessage(), response.getMessage());
     }
+
+    @Test
+    @DisplayName("프로젝트 타입 수정 실패 테스트 - 유효하지 projectType인 경우")
+    void UpdateProjectTypeFail_invalidProjectType() {
+        UpdateProjectTypeDto dto = new UpdateProjectTypeDto(1L, "invalidValue"); // 유효하지 않은 ID
+
+        Project mockProject = Project.builder()
+                .name("Test Name")
+                .category("Entertainment")
+                .department("Test Department")
+                .date("2024-01-01")
+                .link("Test Link")
+                .overView("Test Overview")
+                .isPosted(true)
+                .projectType("other")
+                .build();
+
+        when(projectRepository.findById(dto.projectId())).thenReturn(Optional.of(mockProject));
+
+        ApiResponse<Project> response = projectService.updateProjectType(dto);
+
+        assertEquals(ErrorCode.INVALID_PROJECT_TYPE.getStatus(), response.getStatus());
+        assertEquals(ErrorCode.INVALID_PROJECT_TYPE.getMessage(), response.getMessage());
+    }
 //
 //    @Test
 //    @DisplayName("프로젝트 삭제 성공")
