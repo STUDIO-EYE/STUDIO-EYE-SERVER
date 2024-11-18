@@ -1272,4 +1272,18 @@ public class ProjectServiceTest {
         assertEquals(response.getSize(), size);
         Mockito.verify(projectRepository, times(1)).findAll(pageable);
     }
+
+    @Test
+    @DisplayName("프로젝트 페이지네이션 조회 실패 테스트 - 잘못된 page인 경우")
+    void retrieveArtworkProjectPageFail_invalidPage() {
+        // given
+        int page = -1; // 잘못된 페이지 번호
+        int size = 10;
+
+        // when & then
+        Exception exception = assertThrows(IllegalArgumentException.class,
+                () -> projectService.retrieveArtworkProjectPage(page, size));
+        assertEquals("Page index must not be less than zero", exception.getMessage());
+    }
+
 }
