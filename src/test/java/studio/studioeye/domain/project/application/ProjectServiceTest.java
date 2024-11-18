@@ -18,7 +18,6 @@ import studio.studioeye.domain.project.dto.request.CreateProjectServiceRequestDt
 import studio.studioeye.domain.project.dto.request.UpdatePostingStatusDto;
 import studio.studioeye.domain.project.dto.request.UpdateProjectServiceRequestDto;
 import studio.studioeye.domain.project.dto.request.UpdateProjectTypeDto;
-import studio.studioeye.domain.recruitment.domain.Recruitment;
 import studio.studioeye.global.common.response.ApiResponse;
 import studio.studioeye.global.exception.error.ErrorCode;
 import studio.studioeye.infrastructure.s3.S3Adapter;
