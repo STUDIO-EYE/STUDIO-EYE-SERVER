@@ -508,15 +508,16 @@ public class ProjectServiceTest {
     }
 
     @Test
-    @DisplayName("프로젝트 전체 조회 실패 - 프로젝트가 없는 경우")
+    @DisplayName("프로젝트 전체 조회 실패 테스트 - 프로젝트가 없는 경우")
     void RetrieveAllArtworkProjectFail() {
         when(projectRepository.findAllWithImagesAndOrderBySequenceAsc()).thenReturn(new ArrayList<>());
 
         ApiResponse<List<Project>> response = projectService.retrieveAllArtworkProject();
 
         assertNotNull(response);
-        assertNotNull(response.getData());
+        assertNull(response.getData());
         assertEquals("프로젝트가 존재하지 않습니다.", response.getMessage());
+        Mockito.verify(projectRepository, times(1)).findAllWithImagesAndOrderBySequenceAsc();
     }
 //
 //    @Test
