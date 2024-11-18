@@ -590,8 +590,10 @@ public class ProjectServiceTest {
 
         ApiResponse<Project> response = projectService.retrieveProject(projectId);
 
+        assertEquals(HttpStatus.OK, response.getStatus());
         assertEquals("프로젝트를 성공적으로 조회했습니다.", response.getMessage());
         assertEquals(project, response.getData());
+        Mockito.verify(projectRepository, times(1)).findById(any(Long.class));
     }
 
     @Test
@@ -604,6 +606,8 @@ public class ProjectServiceTest {
         ApiResponse<Project> response = projectService.retrieveProject(projectId);
 
         assertEquals(ErrorCode.INVALID_PROJECT_ID.getStatus(), response.getStatus());
+        assertEquals(ErrorCode.INVALID_PROJECT_ID.getMessage(), response.getMessage());
+        Mockito.verify(projectRepository, times(1)).findById(any(Long.class));
     }
 
 }
