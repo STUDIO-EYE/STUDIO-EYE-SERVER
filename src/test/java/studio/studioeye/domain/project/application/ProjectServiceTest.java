@@ -14,10 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 import studio.studioeye.domain.project.dao.ProjectRepository;
 import studio.studioeye.domain.project.domain.Project;
 import studio.studioeye.domain.project.domain.ProjectImage;
-import studio.studioeye.domain.project.dto.request.CreateProjectServiceRequestDto;
-import studio.studioeye.domain.project.dto.request.UpdatePostingStatusDto;
-import studio.studioeye.domain.project.dto.request.UpdateProjectServiceRequestDto;
-import studio.studioeye.domain.project.dto.request.UpdateProjectTypeDto;
+import studio.studioeye.domain.project.dto.request.*;
 import studio.studioeye.global.common.response.ApiResponse;
 import studio.studioeye.global.exception.error.ErrorCode;
 import studio.studioeye.infrastructure.s3.S3Adapter;
@@ -898,4 +895,84 @@ public class ProjectServiceTest {
         Mockito.verify(projectRepository, times(1)).findById(any(Long.class));
     }
 
+    @Test
+    @DisplayName("Artwork Page 프로젝트 순서 변경 성공 테스트")
+    void changeSequenceProjectSuccess() {
+        // given
+        Project project1 = Project.builder()
+                .name("Test Name")
+                .category("Entertainment")
+                .department("Test Department")
+                .date("2024-01-01")
+                .link("Test Link")
+                .overView("Test Overview")
+                .isPosted(true)
+                .projectType("main")
+                .mainImg("test url")
+                .mainImgFileName(mockFile.getName())
+                .responsiveMainImg("test url")
+                .responsiveMainImgFileName(mockFile.getName())
+                .mainSequence(1)
+                .sequence(0)
+                .build();
+        Project project2 = Project.builder()
+                .name("Test Name")
+                .category("Entertainment")
+                .department("Test Department")
+                .date("2024-01-01")
+                .link("Test Link")
+                .overView("Test Overview")
+                .isPosted(true)
+                .projectType("main")
+                .mainImg("test url")
+                .mainImgFileName(mockFile.getName())
+                .responsiveMainImg("test url")
+                .responsiveMainImgFileName(mockFile.getName())
+                .mainSequence(1)
+                .sequence(0)
+                .build();
+        Project project3 = Project.builder()
+                .name("Test Name")
+                .category("Entertainment")
+                .department("Test Department")
+                .date("2024-01-01")
+                .link("Test Link")
+                .overView("Test Overview")
+                .isPosted(true)
+                .projectType("main")
+                .mainImg("test url")
+                .mainImgFileName(mockFile.getName())
+                .responsiveMainImg("test url")
+                .responsiveMainImgFileName(mockFile.getName())
+                .mainSequence(1)
+                .sequence(0)
+                .build();
+
+        List<ChangeSequenceProjectReq> changeSequenceProjectReqList = new ArrayList<>();
+        ChangeSequenceProjectReq req1 = new ChangeSequenceProjectReq();
+        req1.setProjectId(0L);
+        req1.setSequence(1);
+        changeSequenceProjectReqList.add(req1);
+        ChangeSequenceProjectReq req2 = new ChangeSequenceProjectReq();
+        req2.setProjectId(1L);
+        req2.setSequence(2);
+        changeSequenceProjectReqList.add(req2);
+        ChangeSequenceProjectReq req3 = new ChangeSequenceProjectReq();
+        req3.setProjectId(2L);
+        req3.setSequence(0);
+        changeSequenceProjectReqList.add(req3);
+
+        // stub
+        when(projectRepository.findById(req1.getProjectId())).thenReturn(Optional.of(project1));
+        when(projectRepository.findById(req2.getProjectId())).thenReturn(Optional.of(project2));
+        when(projectRepository.findById(req3.getProjectId())).thenReturn(Optional.of(project3));
+
+        // when
+        ApiResponse<String> response = projectService.changeSequenceProject(changeSequenceProjectReqList);
+
+        // then
+        assertEquals(HttpStatus.OK, response.getStatus());
+        assertEquals("아트워크 페이지에 보여질 프로젝트의 순서를 성공적으로 수정하였습니다.", response.getMessage());
+        Mockito.verify(projectRepository, times(3)).findById(any(Long.class));
+    }
 }
