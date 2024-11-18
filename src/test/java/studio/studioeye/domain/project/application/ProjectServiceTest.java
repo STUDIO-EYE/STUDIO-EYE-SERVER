@@ -352,7 +352,7 @@ public class ProjectServiceTest {
 
     @Test
     @DisplayName("프로젝트 게시 상태 수정 실패 테스트 - 유효하지 않은 ID")
-    void UpdatePostingStatusFail() {
+    void UpdatePostingStatusFail_invalidID() {
         UpdatePostingStatusDto dto = new UpdatePostingStatusDto(999L, true); // 유효하지 않은 ID
 
         when(projectRepository.findById(dto.projectId())).thenReturn(Optional.empty());
