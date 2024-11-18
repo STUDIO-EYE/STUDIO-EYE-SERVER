@@ -593,17 +593,17 @@ public class ProjectServiceTest {
         assertEquals("프로젝트를 성공적으로 조회했습니다.", response.getMessage());
         assertEquals(project, response.getData());
     }
-//
-//    @Test
-//    @DisplayName("단일 프로젝트 조회 실패 - 유효하지 않은 ID")
-//    void RetrieveProjectFail() {
-//        Long projectId = 999L; // 유효하지 않은 ID
-//
-//        when(projectRepository.findById(projectId)).thenReturn(Optional.empty());
-//
-//        ApiResponse<Project> response = projectService.retrieveProject(projectId);
-//
-//        assertEquals(ErrorCode.INVALID_PROJECT_ID.getStatus(), response.getStatus());
-//    }
-//
+
+    @Test
+    @DisplayName("단일 프로젝트 조회 실패 테스트 - 유효하지 않은 ID")
+    void RetrieveProjectFail() {
+        Long projectId = 999L; // 유효하지 않은 ID
+
+        when(projectRepository.findById(projectId)).thenReturn(Optional.empty());
+
+        ApiResponse<Project> response = projectService.retrieveProject(projectId);
+
+        assertEquals(ErrorCode.INVALID_PROJECT_ID.getStatus(), response.getStatus());
+    }
+
 }
