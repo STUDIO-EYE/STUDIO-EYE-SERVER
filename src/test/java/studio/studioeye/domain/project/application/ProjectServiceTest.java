@@ -224,18 +224,18 @@ public class ProjectServiceTest {
         assertTrue(mockProject.getIsPosted()); // 게시 상태가 true로 변경되었는지 확인
     }
 
-//    @Test
-//    @DisplayName("프로젝트 게시 상태 수정 실패 - 유효하지 않은 ID")
-//    void UpdatePostingStatusFail() {
-//        UpdatePostingStatusDto dto = new UpdatePostingStatusDto(999L, true); // 유효하지 않은 ID
-//
-//        when(projectRepository.findById(dto.projectId())).thenReturn(Optional.empty());
-//
-//        ApiResponse<Project> response = projectService.updatePostingStatus(dto);
-//
-//        assertEquals(ErrorCode.INVALID_PROJECT_ID.getStatus(), response.getStatus());
-//    }
-//
+    @Test
+    @DisplayName("프로젝트 게시 상태 수정 실패 테스트 - 유효하지 않은 ID")
+    void UpdatePostingStatusFail() {
+        UpdatePostingStatusDto dto = new UpdatePostingStatusDto(999L, true); // 유효하지 않은 ID
+
+        when(projectRepository.findById(dto.projectId())).thenReturn(Optional.empty());
+
+        ApiResponse<Project> response = projectService.updatePostingStatus(dto);
+
+        assertEquals(ErrorCode.INVALID_PROJECT_ID.getStatus(), response.getStatus());
+    }
+
 ////    @Test
 ////    @DisplayName("프로젝트 타입 수정 성공")
 ////    void UpdateProjectTypeSuccess() {
