@@ -9,6 +9,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.multipart.MultipartFile;
 import studio.studioeye.domain.project.dao.ProjectRepository;
 import studio.studioeye.domain.project.domain.Project;
@@ -349,6 +350,49 @@ public class ProjectServiceTest {
 
         assertEquals(ErrorCode.INVALID_PROJECT_TYPE.getStatus(), response.getStatus());
         assertEquals(ErrorCode.INVALID_PROJECT_TYPE.getMessage(), response.getMessage());
+    }
+
+    @Test
+    @DisplayName("프로젝트 타입 수정 실패 테스트 - TOP 프로젝트가 이미 존재하고, 전달된 프로젝트 id가 이미 존재하는 TOP 프로젝트 id와 다른 경우")
+    void UpdateProjectTypeFail_alreadyExistedTopAndinvalidTopProjectID() {
+        UpdateProjectTypeDto dto = new UpdateProjectTypeDto(1L, "top"); // 유효하지 않은 ID
+
+        Project newProject = Project.builder()
+                .name("Test Name")
+                .category("Entertainment")
+                .department("Test Department")
+                .date("2024-01-01")
+                .link("Test Link")
+                .overView("Test Overview")
+                .isPosted(true)
+                .projectType("top")
+                .build();
+        // 리플렉션으로 ID 설정
+        ReflectionTestUtils.setField(newProject, "id", 1L);
+
+        String newType = "top"; // 변경할 타입
+
+        Project mockProject = Project.builder()
+                .name("Test Name")
+                .category("Entertainment")
+                .department("Test Department")
+                .date("2024-01-01")
+                .link("Test Link")
+                .overView("Test Overview")
+                .isPosted(true)
+                .projectType("top")
+                .build();
+
+        // 리플렉션으로 ID 설정
+        ReflectionTestUtils.setField(mockProject, "id", 500L);
+
+        when(projectRepository.findById(dto.projectId())).thenReturn(Optional.of(newProject));
+        when(projectRepository.findByProjectType(newType)).thenReturn(List.of(mockProject));
+
+        ApiResponse<Project> response = projectService.updateProjectType(dto);
+
+        assertEquals(ErrorCode.TOP_PROJECT_ALREADY_EXISTS.getStatus(), response.getStatus());
+        assertEquals(ErrorCode.TOP_PROJECT_ALREADY_EXISTS.getMessage(), response.getMessage());
     }
 //
 //    @Test
