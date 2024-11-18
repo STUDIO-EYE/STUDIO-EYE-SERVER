@@ -14,6 +14,7 @@ import studio.studioeye.domain.project.dao.ProjectRepository;
 import studio.studioeye.domain.project.domain.Project;
 import studio.studioeye.domain.project.domain.ProjectImage;
 import studio.studioeye.domain.project.dto.request.CreateProjectServiceRequestDto;
+import studio.studioeye.domain.project.dto.request.UpdatePostingStatusDto;
 import studio.studioeye.domain.project.dto.request.UpdateProjectServiceRequestDto;
 import studio.studioeye.domain.recruitment.domain.Recruitment;
 import studio.studioeye.global.common.response.ApiResponse;
@@ -25,8 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -197,24 +197,33 @@ public class ProjectServiceTest {
         assertEquals(ErrorCode.INVALID_PROJECT_ID.getMessage(), response.getMessage());
         Mockito.verify(projectRepository, never()).save(any(Project.class));
     }
-//
-//
-//    @Test
-//    @DisplayName("프로젝트 게시 상태 수정 성공")
-//    void UpdatePostingStatusSuccess() {
-//        Long projectId = 1L;
-//        UpdatePostingStatusDto dto = new UpdatePostingStatusDto(projectId, true);
-//        Project project = new Project("Test Department", "Entertainment", "Test Name", "Test Client",
-//                "2024-01-01", "Test Link", "Test Overview", mockFile.getName(), null, 0, 0, "main", true);
-//
-//        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
-//
-//        ApiResponse<Project> response = projectService.updatePostingStatus(dto);
-//
-//        assertEquals("프로젝트 게시 여부를 성공적으로 변경하였습니다.", response.getMessage());
-//        assertTrue(project.getIsPosted()); // 게시 상태가 true로 변경되었는지 확인
-//    }
-//
+
+
+    @Test
+    @DisplayName("프로젝트 게시 상태 수정 성공 테스트")
+    void UpdatePostingStatusSuccess() {
+        Long projectId = 1L;
+        UpdatePostingStatusDto dto = new UpdatePostingStatusDto(projectId, true);
+
+        Project mockProject = Project.builder()
+                .name("Test Name")
+                .category("Entertainment")
+                .department("Test Department")
+                .date("2024-01-01")
+                .link("Test Link")
+                .overView("Test Overview")
+                .isPosted(true)
+                .projectType("main")
+                .build();
+
+        when(projectRepository.findById(projectId)).thenReturn(Optional.of(mockProject));
+
+        ApiResponse<Project> response = projectService.updatePostingStatus(dto);
+
+        assertEquals("프로젝트 게시 여부를 성공적으로 변경하였습니다.", response.getMessage());
+        assertTrue(mockProject.getIsPosted()); // 게시 상태가 true로 변경되었는지 확인
+    }
+
 //    @Test
 //    @DisplayName("프로젝트 게시 상태 수정 실패 - 유효하지 않은 ID")
 //    void UpdatePostingStatusFail() {
