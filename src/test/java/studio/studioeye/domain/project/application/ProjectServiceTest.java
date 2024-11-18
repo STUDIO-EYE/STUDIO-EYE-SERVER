@@ -331,7 +331,7 @@ public class ProjectServiceTest {
     @Test
     @DisplayName("프로젝트 타입 수정 실패 테스트 - 유효하지 projectType인 경우")
     void UpdateProjectTypeFail_invalidProjectType() {
-        UpdateProjectTypeDto dto = new UpdateProjectTypeDto(1L, "invalidValue"); // 유효하지 않은 ID
+        UpdateProjectTypeDto dto = new UpdateProjectTypeDto(1L, "invalidValue");
 
         Project mockProject = Project.builder()
                 .name("Test Name")
@@ -355,7 +355,7 @@ public class ProjectServiceTest {
     @Test
     @DisplayName("프로젝트 타입 수정 실패 테스트 - TOP 프로젝트가 이미 존재하고, 전달된 프로젝트 id가 이미 존재하는 TOP 프로젝트 id와 다른 경우")
     void UpdateProjectTypeFail_alreadyExistedTopAndinvalidTopProjectID() {
-        UpdateProjectTypeDto dto = new UpdateProjectTypeDto(1L, "top"); // 유효하지 않은 ID
+        UpdateProjectTypeDto dto = new UpdateProjectTypeDto(1L, "top");
 
         Project newProject = Project.builder()
                 .name("Test Name")
@@ -393,6 +393,46 @@ public class ProjectServiceTest {
 
         assertEquals(ErrorCode.TOP_PROJECT_ALREADY_EXISTS.getStatus(), response.getStatus());
         assertEquals(ErrorCode.TOP_PROJECT_ALREADY_EXISTS.getMessage(), response.getMessage());
+    }
+
+    @Test
+    @DisplayName("프로젝트 타입 수정 실패 테스트 - main인 프로젝트가 이미 5개 이상인 경우")
+    void UpdateProjectTypeFail_overMainProjectCount() {
+        UpdateProjectTypeDto dto = new UpdateProjectTypeDto(1L, "main");
+
+        Project newProject = Project.builder()
+                .name("Test Name")
+                .category("Entertainment")
+                .department("Test Department")
+                .date("2024-01-01")
+                .link("Test Link")
+                .overView("Test Overview")
+                .isPosted(true)
+                .projectType("top")
+                .build();
+        // 리플렉션으로 ID 설정
+//        ReflectionTestUtils.setField(newProject, "id", 1L);
+
+        String newType = "main"; // 변경할 타입
+
+        Project mockProject = Project.builder()
+                .name("Test Name")
+                .category("Entertainment")
+                .department("Test Department")
+                .date("2024-01-01")
+                .link("Test Link")
+                .overView("Test Overview")
+                .isPosted(true)
+                .projectType("main")
+                .build();
+
+        when(projectRepository.findById(dto.projectId())).thenReturn(Optional.of(newProject));
+        when(projectRepository.findByProjectType(newType)).thenReturn(List.of(mockProject, mockProject, mockProject, mockProject, mockProject));
+
+        ApiResponse<Project> response = projectService.updateProjectType(dto);
+
+        assertEquals(ErrorCode.MAIN_PROJECT_LIMIT_EXCEEDED.getStatus(), response.getStatus());
+        assertEquals(ErrorCode.MAIN_PROJECT_LIMIT_EXCEEDED.getMessage(), response.getMessage());
     }
 //
 //    @Test
