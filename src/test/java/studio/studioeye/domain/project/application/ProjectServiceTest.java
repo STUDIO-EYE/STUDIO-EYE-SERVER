@@ -468,7 +468,7 @@ public class ProjectServiceTest {
     }
 
     @Test
-    @DisplayName("프로젝트 삭제 실패 - 유효하지 않은 ID")
+    @DisplayName("프로젝트 삭제 실패 테스트 - 유효하지 않은 ID")
     void DeleteProjectFail() {
         Long projectId = 999L; // 유효하지 않은 ID
 
@@ -480,21 +480,30 @@ public class ProjectServiceTest {
         assertEquals(ErrorCode.INVALID_PROJECT_ID.getMessage(), response.getMessage());
         Mockito.verify(projectRepository, never()).delete(any(Project.class));
     }
-//
-//    @Test
-//    @DisplayName("프로젝트 전체 조회 성공")
-//    void RetrieveAllArtworkProjectSuccess() {
-//        List<Project> projects = new ArrayList<>();
-//        projects.add(new Project("Test Department", "Entertainment", "Test Name", "Test Client",
-//                "2024-01-01", "Test Link", "Test Overview", mockFile.getName(), null, 0, 0, "main", true));
-//
-//        when(projectRepository.findAllWithImagesAndOrderBySequenceAsc()).thenReturn(projects);
-//
-//        ApiResponse<List<Project>> response = projectService.retrieveAllArtworkProject();
-//
-//        assertEquals("프로젝트 목록을 성공적으로 조회했습니다.", response.getMessage());
-//        assertEquals(projects, response.getData()); // 프로젝트 목록이 반환되었는지 확인
-//    }
+
+    @Test
+    @DisplayName("프로젝트 전체 조회 성공 테스트")
+    void RetrieveAllArtworkProjectSuccess() {
+        List<Project> projects = new ArrayList<>();
+        projects.add(Project.builder()
+                .name("Test Name")
+                .category("Entertainment")
+                .department("Test Department")
+                .date("2024-01-01")
+                .link("Test Link")
+                .overView("Test Overview")
+                .isPosted(true)
+                .projectType("top")
+                .build());
+
+        when(projectRepository.findAllWithImagesAndOrderBySequenceAsc()).thenReturn(projects);
+
+        ApiResponse<List<Project>> response = projectService.retrieveAllArtworkProject();
+
+        assertEquals("프로젝트 목록을 성공적으로 조회했습니다.", response.getMessage());
+        assertEquals(projects, response.getData()); // 프로젝트 목록이 반환되었는지 확인
+        Mockito.verify(projectRepository, times(1)).findAllWithImagesAndOrderBySequenceAsc();
+    }
 //
 //    @Test
 //    @DisplayName("프로젝트 전체 조회 실패 - 프로젝트가 없는 경우")
