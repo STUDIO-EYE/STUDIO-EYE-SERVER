@@ -1286,4 +1286,16 @@ public class ProjectServiceTest {
         assertEquals("Page index must not be less than zero", exception.getMessage());
     }
 
+    @Test
+    @DisplayName("프로젝트 페이지네이션 조회 실패 테스트 - 잘못된 size인 경우")
+    void retrieveArtworkProjectPageFail_invalidSize() {
+        // given
+        int page = 0;
+        int size = 0; // 잘못된 크기
+
+        // when & then
+        Exception exception = assertThrows(IllegalArgumentException.class,
+                () -> projectService.retrieveArtworkProjectPage(page, size));
+        assertEquals("Page size must not be less than one", exception.getMessage());
+    }
 }
