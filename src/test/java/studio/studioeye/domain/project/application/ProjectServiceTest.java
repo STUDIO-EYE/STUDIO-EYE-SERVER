@@ -464,20 +464,22 @@ public class ProjectServiceTest {
         ApiResponse<String> response = projectService.deleteProject(projectId);
 
         assertEquals("프로젝트를 성공적으로 삭제했습니다.", response.getMessage());
-        verify(projectRepository).delete(project);
+        Mockito.verify(projectRepository, times(1)).delete(project);
     }
-//
-//    @Test
-//    @DisplayName("프로젝트 삭제 실패 - 유효하지 않은 ID")
-//    void DeleteProjectFail() {
-//        Long projectId = 999L; // 유효하지 않은 ID
-//
-//        when(projectRepository.findById(projectId)).thenReturn(Optional.empty());
-//
-//        ApiResponse<String> response = projectService.deleteProject(projectId);
-//
-//        assertEquals(ErrorCode.INVALID_PROJECT_ID.getStatus(), response.getStatus());
-//    }
+
+    @Test
+    @DisplayName("프로젝트 삭제 실패 - 유효하지 않은 ID")
+    void DeleteProjectFail() {
+        Long projectId = 999L; // 유효하지 않은 ID
+
+        when(projectRepository.findById(projectId)).thenReturn(Optional.empty());
+
+        ApiResponse<String> response = projectService.deleteProject(projectId);
+
+        assertEquals(ErrorCode.INVALID_PROJECT_ID.getStatus(), response.getStatus());
+        assertEquals(ErrorCode.INVALID_PROJECT_ID.getMessage(), response.getMessage());
+        Mockito.verify(projectRepository, never()).delete(any(Project.class));
+    }
 //
 //    @Test
 //    @DisplayName("프로젝트 전체 조회 성공")
