@@ -53,8 +53,8 @@ public class ProjectServiceTest {
     );
 
     @Test
-    @DisplayName("Project 생성 성공 테스트")
-    public void createProjectSuccess() throws IOException {
+    @DisplayName("Project 생성 성공 테스트_mainType인 경우")
+    public void createProjectSuccess_mainType() throws IOException {
         // given
         CreateProjectServiceRequestDto requestDto = new CreateProjectServiceRequestDto(
                 "Test Department",
@@ -80,6 +80,53 @@ public class ProjectServiceTest {
                 .overView("Test Overview")
                 .isPosted(true)
                 .projectType("main")
+                .build();
+
+        // stub
+        // Mock S3 upload 동작 설정
+        when(s3Adapter.uploadFile(any(MultipartFile.class)))
+                .thenReturn(ApiResponse.ok("프로젝트를 성공적으로 등록하였습니다.", "http://example.com/testImage.jpg"));
+        when(projectRepository.save(any(Project.class))).thenReturn(mockProject);
+
+        // when
+        ApiResponse<Project> response = projectService.createProject(requestDto, mockFile, mockFile, projectImages);
+
+        // then
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatus());
+        assertNotNull(response.getData());
+        assertEquals("프로젝트를 성공적으로 등록하였습니다.", response.getMessage());
+        Mockito.verify(projectRepository, times(1)).save(any(Project.class));
+    }
+
+    @Test
+    @DisplayName("Project 생성 성공 테스트_topType인 경우")
+    public void createProjectSuccess_topType() throws IOException {
+        // given
+        CreateProjectServiceRequestDto requestDto = new CreateProjectServiceRequestDto(
+                "Test Department",
+                "Entertainment",
+                "Test Name",
+                "Test Client",
+                "2024-01-01",
+                "Test Link",
+                "Test Overview",
+                "top",
+                true
+        );
+
+        // List<MultipartFile>로 변환
+        List<MultipartFile> projectImages = List.of(mockFile);
+
+        Project mockProject = Project.builder()
+                .name("Test Name")
+                .category("Entertainment")
+                .department("Test Department")
+                .date("2024-01-01")
+                .link("Test Link")
+                .overView("Test Overview")
+                .isPosted(true)
+                .projectType("top")
                 .build();
 
         // stub
