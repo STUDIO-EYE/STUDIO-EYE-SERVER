@@ -1,88 +1,98 @@
-//package studio.studioeye.domain.project.application;
-//
-//import org.junit.jupiter.api.DisplayName;
-//import org.junit.jupiter.api.Test;
-//import org.junit.jupiter.api.extension.ExtendWith;
-//import org.mockito.InjectMocks;
-//import org.mockito.Mock;
-//import org.mockito.junit.jupiter.MockitoExtension;
-//import org.springframework.http.HttpStatus;
-//import org.springframework.mock.web.MockMultipartFile;
-//import org.springframework.web.multipart.MultipartFile;
-//import studio.studioeye.domain.project.application.ProjectService;
-//import studio.studioeye.domain.project.dao.ProjectRepository;
-//import studio.studioeye.domain.project.domain.Project;
-//import studio.studioeye.domain.project.dto.request.CreateProjectServiceRequestDto;
-//import studio.studioeye.domain.project.dto.request.UpdatePostingStatusDto;
-//import studio.studioeye.domain.project.dto.request.UpdateProjectServiceRequestDto;
-//import studio.studioeye.domain.project.dto.request.UpdateProjectTypeDto;
-//import studio.studioeye.global.common.response.ApiResponse;
-//import studio.studioeye.global.exception.error.ErrorCode;
-//import studio.studioeye.infrastructure.s3.S3Adapter;
-//
-//import java.io.IOException;
-//import java.util.ArrayList;
-//import java.util.Collections;
-//import java.util.List;
-//import java.util.Optional;
-//
-//import static org.junit.jupiter.api.Assertions.*;
-//import static org.mockito.ArgumentMatchers.any;
-//import static org.mockito.Mockito.*;
-//
-//@ExtendWith(MockitoExtension.class)
-//public class ProjectServiceTest {
-//
-//    @InjectMocks
-//    private ProjectService projectService;
-//
-//    @Mock
-//    private ProjectRepository projectRepository;
-//
-//    @Mock
-//    private S3Adapter s3Adapter;
-//
-//    // Mock MultipartFile 생성
-//    MockMultipartFile mockFile = new MockMultipartFile(
-//            "file",
-//            "testImage.jpg",
-//            "image/jpeg",
-//            "Test Image Content".getBytes()
-//    );
-//
-////    @Test
-////    @DisplayName("Project 생성 성공")
-////    public void createProjectSuccess() throws IOException {
-////        // given
-////        CreateProjectServiceRequestDto requestDto = new CreateProjectServiceRequestDto(
-////                "Test Department",
-////                "Entertainment",
-////                "Test Name",
-////                "Test Client",
-////                "2024-01-01",
-////                "Test Link",
-////                "Test Overview",
-////                "main",
-////                true
-////        );
-////
-////        // Mock S3 upload 동작 설정
-////        when(s3Adapter.uploadFile(any(MultipartFile.class)))
-////                .thenReturn(ApiResponse.ok("프로젝트를 성공적으로 등록하였습니다.", "http://example.com/testImage.jpg"));
-////
-////        // List<MultipartFile>로 변환
-////        List<MultipartFile> projectImages = List.of(mockFile);
-////
-////        // when
-////        ApiResponse<Project> response = projectService.createProject(requestDto, mockFile, projectImages);
-////
-////        // then
-////        assertNotNull(response);
-////        assertEquals(HttpStatus.OK, response.getStatus());
-////        assertEquals("프로젝트를 성공적으로 등록하였습니다.", response.getMessage());
-////        assertNotNull(response.getData());
-////    }
-//
+package studio.studioeye.domain.project.application;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
+import studio.studioeye.domain.project.dao.ProjectRepository;
+import studio.studioeye.domain.project.domain.Project;
+import studio.studioeye.domain.project.dto.request.CreateProjectServiceRequestDto;
+import studio.studioeye.domain.recruitment.domain.Recruitment;
+import studio.studioeye.global.common.response.ApiResponse;
+import studio.studioeye.infrastructure.s3.S3Adapter;
+
+import java.io.IOException;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
+public class ProjectServiceTest {
+
+    @InjectMocks
+    private ProjectService projectService;
+
+    @Mock
+    private ProjectRepository projectRepository;
+
+    @Mock
+    private S3Adapter s3Adapter;
+
+    // Mock MultipartFile 생성
+    MockMultipartFile mockFile = new MockMultipartFile(
+            "file",
+            "testImage.jpg",
+            "image/jpeg",
+            "Test Image Content".getBytes()
+    );
+
+    @Test
+    @DisplayName("Project 생성 성공 테스트")
+    public void createProjectSuccess() throws IOException {
+        // given
+        CreateProjectServiceRequestDto requestDto = new CreateProjectServiceRequestDto(
+                "Test Department",
+                "Entertainment",
+                "Test Name",
+                "Test Client",
+                "2024-01-01",
+                "Test Link",
+                "Test Overview",
+                "main",
+                true
+        );
+
+        // List<MultipartFile>로 변환
+        List<MultipartFile> projectImages = List.of(mockFile);
+
+        Project mockProject = Project.builder()
+                .name("Test Name")
+                .category("Entertainment")
+                .department("Test Department")
+                .date("2024-01-01")
+                .link("Test Link")
+                .overView("Test Overview")
+                .isPosted(true)
+                .projectType("main")
+                .build();
+
+        // stub
+        // Mock S3 upload 동작 설정
+        when(s3Adapter.uploadFile(any(MultipartFile.class)))
+                .thenReturn(ApiResponse.ok("프로젝트를 성공적으로 등록하였습니다.", "http://example.com/testImage.jpg"));
+        when(projectRepository.save(any(Project.class))).thenReturn(mockProject);
+
+        // when
+        ApiResponse<Project> response = projectService.createProject(requestDto, mockFile, mockFile, projectImages);
+
+        // then
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatus());
+        assertNotNull(response.getData());
+        assertEquals("프로젝트를 성공적으로 등록하였습니다.", response.getMessage());
+        Mockito.verify(projectRepository, times(1)).save(any(Project.class));
+    }
+
 ////    @Test
 ////    @DisplayName("Project 생성 실패 - 이미지 업로드 실패")
 ////    public void createProjectFail() throws IOException {
@@ -331,4 +341,4 @@
 //        assertEquals(ErrorCode.INVALID_PROJECT_ID.getStatus(), response.getStatus());
 //    }
 //
-//}
+}
