@@ -220,6 +220,10 @@ public class RequestService {
 	}
 
 	public Page<Request> retrieveRequestPage(int page, int size) {
+		// 음수도 넘겨져서 입력값 검증 로직 추가함
+		if (page < 0) {
+			throw new IllegalArgumentException("Page index must not be less than zero");
+		}
 		Pageable pageable = PageRequest.of(page, size);
 		return requestRepository.findAll(pageable);
 	}
