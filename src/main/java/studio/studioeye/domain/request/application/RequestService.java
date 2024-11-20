@@ -230,32 +230,44 @@ public class RequestService {
 
 	public ApiResponse<String> updateRequestState(Long requestId, UpdateRequestStateServiceDto dto) {
 		Optional<Request> optionalRequest = requestRepository.findById(requestId);
-		if(optionalRequest.isEmpty()){
+		if (optionalRequest.isEmpty()) {
 			return ApiResponse.withError(ErrorCode.INVALID_REQUEST_ID);
 		}
 		Request request = optionalRequest.get();
 		request.updateState(dto.state());
-		requestRepository.save(request);
-//		Request updatedRequest = requestRepository.save(request);
-
-//		if(dto.state() != null) {
-//			String subject = "[studio-eye] [" + convertState(dto.state()) + "]" + updatedRequest.getClientName() + "님의 문의에 의뢰 상태가 " + convertState(dto.state()) + "으로 변경되었습니다."; // 이메일 제목
-//			String text = "카테고리: " + updatedRequest.getCategory() + "\n"
-//					+ "프로젝트명: " + updatedRequest.getProjectName() + "\n"
-//					+ "의뢰인 이름: " + updatedRequest.getClientName() + "\n"
-//					+ "기관 혹은 기업: " + updatedRequest.getOrganization() + "\n"
-//					+ "연락처: " + updatedRequest.getContact() + "\n"
-//					+ "이메일 주소: " + updatedRequest.getEmail() + "\n"
-//					+ "직책: " + updatedRequest.getPosition() + "\n"
-//					+ "의뢰 내용: " + updatedRequest.getDescription() + "\n\n"
-//					+ "답변: " + updatedRequest.getAnswer() + "\n"
-//					+ "의뢰 상태: " + convertState(dto.state());
-//
-//			emailService.sendEmail(updatedRequest.getEmail(), subject, text);
-//		}
-
-		return ApiResponse.ok("상태를 성공적으로 수정했습니다.");
+		requestRepository.save(request); // 저장 로직
+		return ApiResponse.ok("상태를 성공적으로 수정했습니다."); // 반환값 생성
 	}
+
+
+//	public ApiResponse<String> updateRequestState(Long requestId, UpdateRequestStateServiceDto dto) {
+//		Optional<Request> optionalRequest = requestRepository.findById(requestId);
+//		if(optionalRequest.isEmpty()){
+//			return ApiResponse.withError(ErrorCode.INVALID_REQUEST_ID);
+//		}
+//		Request request = optionalRequest.get();
+//		request.updateState(dto.state());
+//		requestRepository.save(request);
+////		Request updatedRequest = requestRepository.save(request);
+//
+////		if(dto.state() != null) {
+////			String subject = "[studio-eye] [" + convertState(dto.state()) + "]" + updatedRequest.getClientName() + "님의 문의에 의뢰 상태가 " + convertState(dto.state()) + "으로 변경되었습니다."; // 이메일 제목
+////			String text = "카테고리: " + updatedRequest.getCategory() + "\n"
+////					+ "프로젝트명: " + updatedRequest.getProjectName() + "\n"
+////					+ "의뢰인 이름: " + updatedRequest.getClientName() + "\n"
+////					+ "기관 혹은 기업: " + updatedRequest.getOrganization() + "\n"
+////					+ "연락처: " + updatedRequest.getContact() + "\n"
+////					+ "이메일 주소: " + updatedRequest.getEmail() + "\n"
+////					+ "직책: " + updatedRequest.getPosition() + "\n"
+////					+ "의뢰 내용: " + updatedRequest.getDescription() + "\n\n"
+////					+ "답변: " + updatedRequest.getAnswer() + "\n"
+////					+ "의뢰 상태: " + convertState(dto.state());
+////
+////			emailService.sendEmail(updatedRequest.getEmail(), subject, text);
+////		}
+//
+//		return ApiResponse.ok("상태를 성공적으로 수정했습니다.");
+//	}
 
 	public ApiResponse<String> updateRequestComment(Long requestId, UpdateRequestCommentServiceDto dto) {
 		String answer = dto.answer().trim();
