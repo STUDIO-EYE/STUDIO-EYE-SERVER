@@ -56,10 +56,10 @@ public class Request {
 	private Date createdAt;
 
 	@Builder
-	public Request(String category, String projectName, String clientName, String organization, String contact, String email,
-				   String position,
-				   List<String> fileUrlList, String description, List<Answer> answers,
+	public Request(Long id, String category, String projectName, String clientName, String organization, String contact, String email,
+				   String position, List<String> fileUrlList, String description, List<Answer> answers,
 				   Integer year, Integer month, State state, Date createdAt) {
+		this.id = id;
 		this.category = category;
 		this.projectName = projectName;
 		this.clientName = clientName;
