@@ -9,9 +9,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
+import studio.studioeye.domain.request.dao.AnswerRepository;
 import studio.studioeye.domain.request.dao.RequestCount;
 import studio.studioeye.domain.request.dao.RequestCountImpl;
 import studio.studioeye.domain.request.dao.RequestRepository;
+import studio.studioeye.domain.request.domain.Answer;
 import studio.studioeye.domain.request.domain.Request;
 import studio.studioeye.domain.request.domain.State;
 import studio.studioeye.domain.request.dto.request.CreateRequestServiceDto;
@@ -43,6 +45,8 @@ public class RequestServiceTest {
 	private EmailService emailService;
 	@Mock
 	private NotificationService notificationService;
+	@Mock
+	private AnswerRepository answerRepository;
 
 	MockMultipartFile mockFile = new MockMultipartFile(
 			"file",
@@ -188,26 +192,30 @@ public class RequestServiceTest {
 				2024, 11, 2024, 12, "CategoryA", State.WAITING
 		);
 	}
-//	@Test
-//	@DisplayName("updateRequestComment - 정상 테스트")
-//	void updateRequestCommentSuccess() {
-//		// given
-//		Request mockRequest = mock(Request.class); // Request 객체를 Mock으로 생성
-//		when(mockRequest.getId()).thenReturn(1L); // Mock id 설정
-//		when(mockRequest.getClientName()).thenReturn("ClientName");
-//		when(mockRequest.getCategory()).thenReturn("Category");
-//		when(mockRequest.getState()).thenReturn(State.WAITING);
-//		UpdateRequestCommentServiceDto dto = new UpdateRequestCommentServiceDto("AnswerText", State.APPROVED);
-//		when(requestRepository.findById(1L)).thenReturn(Optional.of(mockRequest));
-//		when(requestRepository.save(any(Request.class))).thenReturn(mockRequest);
-//		// when
-//		ApiResponse<String> response = requestService.updateRequestComment(1L, dto);
-//		// then
-//		assertNotNull(response);
-//		assertEquals(HttpStatus.OK, response.getStatus());
-//		assertEquals("답변을 성공적으로 작성했습니다.", response.getMessage());
-//		verify(requestRepository, times(1)).save(mockRequest);
-//	}
+
+	@Test
+	@DisplayName("updateRequestComment - 정상 테스트")
+	void updateRequestCommentSuccess() {
+		// given
+		Request mockRequest = mock(Request.class); // Mock 객체 생성
+		lenient().when(mockRequest.getId()).thenReturn(1L); // lenient로 Stubbing 설정
+		lenient().when(mockRequest.getClientName()).thenReturn("ClientName");
+		lenient().when(mockRequest.getCategory()).thenReturn("Category");
+		UpdateRequestCommentServiceDto dto = new UpdateRequestCommentServiceDto("AnswerText", State.APPROVED);
+		when(requestRepository.findById(1L)).thenReturn(Optional.of(mockRequest));
+		when(requestRepository.save(any(Request.class))).thenAnswer(invocation -> invocation.getArgument(0)); // 저장된 객체 반환
+		// when
+		ApiResponse<String> response = requestService.updateRequestComment(1L, dto);
+		// then
+		assertNotNull(response);
+		assertEquals(HttpStatus.OK, response.getStatus());
+		assertEquals("답변을 성공적으로 작성했습니다.", response.getMessage());
+		// 검증
+		verify(answerRepository, times(1)).save(any(Answer.class)); // AnswerRepository 호출 검증
+		verify(requestRepository, times(1)).save(any(Request.class)); // RequestRepository 호출 검증
+	}
+
+
 
 	@Test
 	@DisplayName("retrieveRequest - 정상 테스트")
