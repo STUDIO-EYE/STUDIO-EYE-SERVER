@@ -134,8 +134,18 @@ public class RequestServiceTest {
 				"Organization", "010-1234-5678",
 				"test@example.com", "Position", "Description"
 		);
+		// Mock S3 파일 업로드 동작 설정
 		when(s3Adapter.uploadFile(mockFile))
 				.thenReturn(ApiResponse.ok("파일 업로드 성공", "http://example.com/file.jpg"));
+		// Mock RequestRepository 저장 동작 설정
+		when(requestRepository.saveAndFlush(any(Request.class))).thenAnswer(invocation -> {
+			Request request = invocation.getArgument(0);
+			Field idField = Request.class.getDeclaredField("id");
+			idField.setAccessible(true);
+			idField.set(request, 1L); // ID 강제 설정
+			return request;
+		});
+		// Mock Email 전송 동작 설정 (이메일 전송 실패 시)
 		when(emailService.sendEmail(anyString(), anyString(), anyString())).thenReturn(false);
 		// when
 		ApiResponse<Request> response = requestService.createRequest(dto, List.of(mockFile));
