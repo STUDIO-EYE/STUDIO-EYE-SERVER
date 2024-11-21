@@ -261,5 +261,32 @@ public class RequestServiceTest {
 		assertNotNull(response.getData());
 		verify(requestRepository, times(1)).findReqNumByYearAndMonthBetweenWithCategoryAndState(anyInt(), anyInt(), anyInt(), anyInt(), anyString(), isNull());
 	}
+	@Test
+	@DisplayName("updateRequestComment - 빈 답변 테스트")
+	void updateRequestComment_EmptyAnswer() {
+		// given
+		UpdateRequestCommentServiceDto dto = new UpdateRequestCommentServiceDto("", State.APPROVED);
+		// when
+		ApiResponse<String> response = requestService.updateRequestComment(1L, dto);
+		// then
+		assertNotNull(response);
+		assertEquals(HttpStatus.BAD_REQUEST, response.getStatus());
+		assertEquals(ErrorCode.INVALID_INPUT_VALUE.getMessage(), response.getMessage());
+	}
+	@Test
+	@DisplayName("updateRequestComment - 상태가 null")
+	void updateRequestComment_NullState() {
+		// given
+		Request mockRequest = mock(Request.class);
+		when(mockRequest.getId()).thenReturn(1L); // Mock Request 설정
+		when(requestRepository.findById(1L)).thenReturn(Optional.of(mockRequest)); // 유효한 요청 반환
+		UpdateRequestCommentServiceDto dto = new UpdateRequestCommentServiceDto("Valid Answer", null);
+		// when
+		ApiResponse<String> response = requestService.updateRequestComment(1L, dto);
+		// then
+		assertNotNull(response);
+		assertEquals(HttpStatus.BAD_REQUEST, response.getStatus());
+		assertEquals(ErrorCode.INVALID_INPUT_VALUE.getMessage(), response.getMessage()); // 예상 메시지 검증
+	}
 
 }
