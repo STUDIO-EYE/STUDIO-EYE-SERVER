@@ -274,4 +274,17 @@ public class FaqServiceTest {
         Mockito.verify(faqRepository, times(1)).findAllQuestions();
     }
 
+    @Test
+    @DisplayName("FAQ 제목 조회 실패")
+    public void retrieveAllFaqTitleFail() {
+        // given
+        when(faqRepository.findAllQuestions()).thenReturn(new ArrayList<>());
+        // when
+        ApiResponse<List<FaqQuestions>> response = faqService.retrieveAllFaqTitle();
+        // then
+        assertNotNull(response);
+        assertEquals(ErrorCode.INVALID_FAQ_ID.getStatus(), response.getStatus());
+        assertEquals(ErrorCode.INVALID_FAQ_ID.getMessage(), response.getMessage());
+        Mockito.verify(faqRepository, times(1)).findAllQuestions();
+    }
 }
