@@ -287,4 +287,26 @@ public class FaqServiceTest {
         assertEquals(ErrorCode.INVALID_FAQ_ID.getMessage(), response.getMessage());
         Mockito.verify(faqRepository, times(1)).findAllQuestions();
     }
+
+    @Test
+    @DisplayName("FAQ 다중 삭제 성공")
+    public void deleteFaqsSuccess() {
+        // given
+        List<Long> ids = List.of(1L, 2L, 3L);
+        List<Faq> faqs = ids.stream()
+                .map(id -> new Faq("Test Question " + id, "Test Answer " + id, true))
+                .toList();
+        for (int i = 0; i < ids.size(); i++) {
+            when(faqRepository.findById(ids.get(i))).thenReturn(Optional.of(faqs.get(i)));
+        }
+        // when
+        ApiResponse<String> response = faqService.deleteFaqs(ids);
+        // then
+        assertEquals(HttpStatus.OK, response.getStatus());
+        assertEquals("FAQ를 성공적으로 삭제했습니다.", response.getMessage());
+        for (Faq faq : faqs) {
+            verify(faqRepository, times(1)).delete(faq);
+        }
+    }
+
 }
