@@ -28,19 +28,14 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class RequestServiceTest {
-
 	@InjectMocks
 	private RequestService requestService;
-
 	@Mock
 	private RequestRepository requestRepository;
-
 	@Mock
 	private S3Adapter s3Adapter;
-
 	@Mock
 	private EmailService emailService;
-
 	@Mock
 	private NotificationService notificationService;
 
@@ -60,7 +55,6 @@ public class RequestServiceTest {
 				"Organization", "010-1234-5678",
 				"test@example.com", "Position", "Description"
 		);
-
 		when(s3Adapter.uploadFile(mockFile))
 				.thenReturn(ApiResponse.ok("파일 업로드 성공", "http://example.com/file.jpg"));
 		when(requestRepository.saveAndFlush(any(Request.class))).thenAnswer(invocation -> {
@@ -71,11 +65,13 @@ public class RequestServiceTest {
 			return request;
 		});
 		when(emailService.sendEmail(anyString(), anyString(), anyString())).thenReturn(true);
-		doNothing().when(notificationService).subscribe(anyLong());
-
+		doAnswer(invocation -> {
+			Long requestId = invocation.getArgument(0);
+			System.out.println("Notification sent for request ID: " + requestId); // 테스트용 출력
+			return null;
+		}).when(notificationService).subscribe(anyLong());
 		// when
 		ApiResponse<Request> response = requestService.createRequest(dto, List.of(mockFile));
-
 		// then
 		assertNotNull(response);
 		assertEquals(HttpStatus.OK, response.getStatus());
@@ -83,7 +79,7 @@ public class RequestServiceTest {
 		assertNotNull(response.getData());
 		assertEquals(1L, response.getData().getId());
 		verify(s3Adapter, times(1)).uploadFile(mockFile);
-		verify(emailService, times(1)).sendEmail(anyString(), anyString(), anyString());
+		verify(emailService, times(2)).sendEmail(anyString(), anyString(), anyString()); // 두 번 호출 확인
 		verify(notificationService, times(1)).subscribe(1L);
 	}
 
@@ -96,10 +92,8 @@ public class RequestServiceTest {
 				"Organization", "010-1234-5678",
 				"invalid-email", "Position", "Description"
 		);
-
 		// when
 		ApiResponse<Request> response = requestService.createRequest(dto, null);
-
 		// then
 		assertNotNull(response);
 		assertEquals(ErrorCode.INVALID_EMAIL_FORMAT.getStatus(), response.getStatus());
@@ -118,13 +112,10 @@ public class RequestServiceTest {
 				"Organization", "010-1234-5678",
 				"test@example.com", "Position", "Description"
 		);
-
 		when(s3Adapter.uploadFile(mockFile))
 				.thenReturn(ApiResponse.withError(ErrorCode.ERROR_S3_UPDATE_OBJECT));
-
 		// when
 		ApiResponse<Request> response = requestService.createRequest(dto, List.of(mockFile));
-
 		// then
 		assertNotNull(response);
 		assertEquals(ErrorCode.ERROR_S3_UPDATE_OBJECT.getStatus(), response.getStatus());
@@ -143,14 +134,11 @@ public class RequestServiceTest {
 				"Organization", "010-1234-5678",
 				"test@example.com", "Position", "Description"
 		);
-
 		when(s3Adapter.uploadFile(mockFile))
 				.thenReturn(ApiResponse.ok("파일 업로드 성공", "http://example.com/file.jpg"));
 		when(emailService.sendEmail(anyString(), anyString(), anyString())).thenReturn(false);
-
 		// when
 		ApiResponse<Request> response = requestService.createRequest(dto, List.of(mockFile));
-
 		// then
 		assertNotNull(response);
 		assertEquals(ErrorCode.EMAIL_SIZE_EXCEEDED.getStatus(), response.getStatus());
