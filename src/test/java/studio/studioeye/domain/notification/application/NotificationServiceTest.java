@@ -344,5 +344,19 @@ class NotificationServiceTest {
         verify(emitterRepository, times(1)).deleteById(TEST_USER_ID); // 타임아웃 발생 시 deleteById 호출 확인
     }
 
-
+    @Test
+    @DisplayName("createNotification - emitters가 null인 경우 테스트")
+    void createNotification_NullEmitters_WithMock() {
+        // given
+        Notification notification = Notification.builder().build();
+        // Mock 설정
+        when(notificationRepository.save(any(Notification.class))).thenReturn(notification);
+        when(emitterRepository.getAllEmitters()).thenReturn(null); // emitters가 null 반환
+        // when
+        ApiResponse<Notification> response = notificationService.createNotification(TEST_USER_ID, notification);
+        // then
+        assertNotNull(response); // 응답이 null이 아님을 확인
+        assertEquals(HttpStatus.OK, response.getStatus()); // 상태 코드 확인
+        assertEquals("알림이 존재하지 않습니다.", response.getMessage()); // 예상 메시지 확인
+    }
 }
