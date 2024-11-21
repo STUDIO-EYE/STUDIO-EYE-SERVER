@@ -1,6 +1,5 @@
 package studio.studioeye.domain.faq.application;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -8,6 +7,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.multipart.MultipartFile;
 import studio.studioeye.domain.faq.dao.FaqQuestions;
@@ -17,14 +20,13 @@ import studio.studioeye.domain.faq.dto.request.CreateFaqServiceRequestDto;
 import studio.studioeye.domain.faq.dto.request.UpdateFaqServiceRequestDto;
 import studio.studioeye.global.common.response.ApiResponse;
 import studio.studioeye.global.exception.error.ErrorCode;
+import studio.studioeye.infrastructure.s3.S3Adapter;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -328,6 +330,22 @@ public class FaqServiceTest {
 //    }
 
 //    @Test
+//    @DisplayName("convertBase64ToImageUrl - 실패 테스트")
+//    void convertBase64ToImageUrlFail() throws IOException {
+//        // given
+//        String invalidBase64Image = "invalid_base64";
+//        when(s3Adapter.uploadImage(any())).thenReturn(ApiResponse.withError(ErrorCode.ERROR_S3_UPDATE_OBJECT));
+//
+//        // when
+//        ApiResponse<String> response = faqService.convertBase64ToImageUrl(invalidBase64Image);
+//
+//        // then
+//        assertEquals(ErrorCode.ERROR_S3_UPDATE_OBJECT.getStatus(), response.getStatus());
+//        assertEquals(ErrorCode.ERROR_S3_UPDATE_OBJECT.getMessage(), response.getMessage());
+//        verify(s3Adapter, times(1)).uploadImage(any());
+//    }
+
+//    @Test
 //    @DisplayName("convert - 성공 테스트")
 //    void convertSuccess() throws IOException {
 //        // given
@@ -339,6 +357,17 @@ public class FaqServiceTest {
 //        assertEquals("image.png", result.getOriginalFilename());
 //        assertEquals("image/png", result.getContentType());
 //    }
+//    @Test
+//    @DisplayName("convert - 실패 테스트")
+//    void convertFail() {
+//        // given
+//        String invalidBase64Image = "invalid_base64";
+//
+//        // when & then
+//        assertThrows(IOException.class, () -> faqService.convert(invalidBase64Image));
+//    }
+
+
     @Test
     @DisplayName("deleteFaqs - 일부 ID 실패 테스트")
     void deleteFaqsPartialFail() {
@@ -357,5 +386,24 @@ public class FaqServiceTest {
         verify(faqRepository, times(1)).findById(1L);
         verify(faqRepository, times(1)).findById(2L);
         verify(faqRepository, times(1)).findById(999L);
+    }
+    @Test
+    @DisplayName("retrieveFaqPage - 성공 테스트")
+    void retrieveFaqPageSuccess() {
+        // given
+        Pageable pageable = PageRequest.of(0, 5);
+        List<Faq> faqList = List.of(
+                new Faq("Question 1", "Answer 1", true),
+                new Faq("Question 2", "Answer 2", true)
+        );
+        Page<Faq> faqPage = new PageImpl<>(faqList, pageable, faqList.size());
+        when(faqRepository.findAll(pageable)).thenReturn(faqPage);
+        // when
+        Page<Faq> result = faqService.retrieveFaqPage(0, 5);
+        // then
+        assertNotNull(result);
+        assertEquals(2, result.getContent().size());
+        assertEquals("Question 1", result.getContent().get(0).getQuestion());
+        verify(faqRepository, times(1)).findAll(pageable);
     }
 }
