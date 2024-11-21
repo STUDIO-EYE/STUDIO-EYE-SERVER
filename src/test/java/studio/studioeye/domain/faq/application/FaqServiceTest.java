@@ -438,4 +438,15 @@ public class FaqServiceTest {
         Mockito.verify(faqRepository, never()).save(any());
     }
 
+    @Test
+    @DisplayName("retrieveFaqPage 실패 테스트 - 페이지가 음수인 경우")
+    void retrieveFaqPage_NegativePage_Fail() {
+        // given
+        int invalidPage = -1; // 음수 페이지
+        int pageSize = 5;
+        // when
+        assertThrows(IllegalArgumentException.class, () -> faqService.retrieveFaqPage(invalidPage, pageSize));
+        verify(faqRepository, never()).findAll(any(Pageable.class));
+    }
+
 }
