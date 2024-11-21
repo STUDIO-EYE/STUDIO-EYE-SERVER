@@ -117,7 +117,7 @@ public class RequestService {
 		return ApiResponse.ok("문의를 성공적으로 등록하였습니다.", savedRequest);
 	}
 
-	public ApiResponse<List<Request>> retrieveAllRequest() {
+	public ApiResponse<List<Request>> retlrieveAllRequest() {
 		List<Request> requestList = requestRepository.findAll();
 
 		if (requestList.isEmpty()){
@@ -136,10 +136,10 @@ public class RequestService {
 		return ApiResponse.ok("문의를 성공적으로 조회했습니다.", request);
 	}
 
-	public ApiResponse<Long> retrieveRequestCount() {
-		Long requestCount = requestRepository.count();
-		return ApiResponse.ok("전체 문의수를 성공적으로 조회했습니다.", requestCount);
-	}
+//	public ApiResponse<Long> retrieveRequestCount() {
+//		Long requestCount = requestRepository.count();
+//		return ApiResponse.ok("전체 문의수를 성공적으로 조회했습니다.", requestCount);
+//	}
 
 	public ApiResponse<List<Map<String, Object>>> retrieveRequestCountByCategoryAndState(String category, String state,
 																						 Integer startYear,
@@ -205,10 +205,10 @@ public class RequestService {
 		return ApiResponse.ok("문의수 목록을 성공적으로 조회했습니다.", responseList);
 	}
 
-	public ApiResponse<Long> retrieveWaitingRequestCount() {
-		Long requestCount = requestRepository.countByState(State.WAITING);
-		return ApiResponse.ok("접수 대기 중인 문의 수를 성공적으로 조회했습니다.", requestCount);
-	}
+//	public ApiResponse<Long> retrieveWaitingRequestCount() {
+//		Long requestCount = requestRepository.countByState(State.WAITING);
+//		return ApiResponse.ok("접수 대기 중인 문의 수를 성공적으로 조회했습니다.", requestCount);
+//	}
 
 	public ApiResponse<List<Request>> retrieveWaitingRequest() {
 		List<Request> requestList = requestRepository.findByState(State.WAITING);
@@ -219,25 +219,25 @@ public class RequestService {
 		return ApiResponse.ok("접수 대기 중인 문의 목록을 성공적으로 조회했습니다.", requestList);
 	}
 
-	public Page<Request> retrieveRequestPage(int page, int size) {
-		// 음수도 넘겨져서 입력값 검증 로직 추가함
-		if (page < 0) {
-			throw new IllegalArgumentException("Page index must not be less than zero");
-		}
-		Pageable pageable = PageRequest.of(page, size);
-		return requestRepository.findAll(pageable);
-	}
+//	public Page<Request> retrieveRequestPage(int page, int size) {
+//		// 음수도 넘겨져서 입력값 검증 로직 추가함
+//		if (page < 0) {
+//			throw new IllegalArgumentException("Page index must not be less than zero");
+//		}
+//		Pageable pageable = PageRequest.of(page, size);
+//		return requestRepository.findAll(pageable);
+//	}
 
-	public ApiResponse<String> updateRequestState(Long requestId, UpdateRequestStateServiceDto dto) {
-		Optional<Request> optionalRequest = requestRepository.findById(requestId);
-		if (optionalRequest.isEmpty()) {
-			return ApiResponse.withError(ErrorCode.INVALID_REQUEST_ID);
-		}
-		Request request = optionalRequest.get();
-		request.updateState(dto.state());
-		requestRepository.save(request); // 저장 로직
-		return ApiResponse.ok("상태를 성공적으로 수정했습니다."); // 반환값 생성
-	}
+//	public ApiResponse<String> updateRequestState(Long requestId, UpdateRequestStateServiceDto dto) {
+//		Optional<Request> optionalRequest = requestRepository.findById(requestId);
+//		if (optionalRequest.isEmpty()) {
+//			return ApiResponse.withError(ErrorCode.INVALID_REQUEST_ID);
+//		}
+//		Request request = optionalRequest.get();
+//		request.updateState(dto.state());
+//		requestRepository.save(request); // 저장 로직
+//		return ApiResponse.ok("상태를 성공적으로 수정했습니다."); // 반환값 생성
+//	}
 
 
 //	public ApiResponse<String> updateRequestState(Long requestId, UpdateRequestStateServiceDto dto) {
@@ -316,21 +316,21 @@ public class RequestService {
 		return ApiResponse.ok("답변을 성공적으로 작성했습니다.");
 	}
 
-	public ApiResponse<String> deleteRequest(Long requestId) {
-		Optional<Request> optionalRequest = requestRepository.findById(requestId);
-		if(optionalRequest.isEmpty()){
-			return ApiResponse.withError(ErrorCode.INVALID_REQUEST_ID);
-		}
+//	public ApiResponse<String> deleteRequest(Long requestId) {
+//		Optional<Request> optionalRequest = requestRepository.findById(requestId);
+//		if(optionalRequest.isEmpty()){
+//			return ApiResponse.withError(ErrorCode.INVALID_REQUEST_ID);
+//		}
+//
+//		Request request = optionalRequest.get();
+//		requestRepository.delete(request);
+//
+//		return ApiResponse.ok("문의를 성공적으로 삭제했습니다.");
+//	}
 
-		Request request = optionalRequest.get();
-		requestRepository.delete(request);
-
-		return ApiResponse.ok("문의를 성공적으로 삭제했습니다.");
-	}
-
-	private boolean checkMonth(int month) {
-		return (month>=1 && month<=12);
-	}
+//	private boolean checkMonth(int month) {
+//		return (month>=1 && month<=12);
+//	}
 
 	public static boolean isValidEmail(String email) {
 		Pattern pattern = Pattern.compile(EMAIL_REGEX);
