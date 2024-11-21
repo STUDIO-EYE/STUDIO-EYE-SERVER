@@ -50,9 +50,17 @@ public class NotificationService {
     public ApiResponse<Notification> createNotification(Long userId, Notification notification) {
         // notification 저장
         Notification savedNotification = notificationRepository.save(notification);
+        // 방어코드 추가
+        if (savedNotification == null) {
+            return ApiResponse.withError(ErrorCode.INVALID_INPUT_VALUE); // 적절한 에러 응답
+        }
         // user_notification 저장
         userNotificationService.createUserNotification(userId, savedNotification.getId());
         Collection<SseEmitter> emitters = emitterRepository.getAllEmitters();
+        //방어코드 추가
+        if (emitters == null || emitters.isEmpty()) {
+            return ApiResponse.ok("알림이 존재하지 않습니다.");
+        }
         for (SseEmitter emitter : emitters) {
             if (emitter != null) {
                 try {
