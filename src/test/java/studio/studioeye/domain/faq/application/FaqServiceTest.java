@@ -9,6 +9,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
+import studio.studioeye.domain.faq.dao.FaqQuestions;
 import studio.studioeye.domain.faq.dao.FaqRepository;
 import studio.studioeye.domain.faq.domain.Faq;
 import studio.studioeye.domain.faq.dto.request.CreateFaqServiceRequestDto;
@@ -28,7 +29,6 @@ import static org.mockito.Mockito.*;
 public class FaqServiceTest {
     @InjectMocks
     private FaqService faqService;
-
     @Mock
     private FaqRepository faqRepository;
 
@@ -42,10 +42,8 @@ public class FaqServiceTest {
         CreateFaqServiceRequestDto requestDto = new CreateFaqServiceRequestDto(
                 question, answer, visibility
         );
-
         // when
         ApiResponse<Faq> response = faqService.createFaq(requestDto);
-
         // then
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatus());
@@ -63,10 +61,8 @@ public class FaqServiceTest {
         CreateFaqServiceRequestDto requestDto = new CreateFaqServiceRequestDto(
                 question, answer, visibility
         );
-
         // when
         ApiResponse<Faq> response = faqService.createFaq(requestDto);
-
         // then
         assertNotNull(response);
         assertEquals(ErrorCode.FAQ_IS_EMPTY.getStatus(), response.getStatus());
@@ -82,16 +78,12 @@ public class FaqServiceTest {
         faqList.add(new Faq("Test Question1", "Test Answer1", true));
         faqList.add(new Faq("Test Question2", "Test Answer2", true));
         faqList.add(new Faq("Test Question3", "Test Answer3", true));
-
         List<Faq> savedFaqList = faqList;
-
         // stub
         when(faqRepository.findAll()).thenReturn(savedFaqList);
-
         // when
         ApiResponse<List<Faq>> response = faqService.retrieveAllFaq();
         List<Faq> findFaq = response.getData();
-
         // then
         assertNotNull(response);
         assertEquals(findFaq, savedFaqList);
@@ -106,14 +98,11 @@ public class FaqServiceTest {
     public void retrieveAllFaqFail() {
         // given
         List<Faq> savedFaqList = new ArrayList<>();
-
         // stub
         when(faqRepository.findAll()).thenReturn(savedFaqList);
-
         // when
         ApiResponse<List<Faq>> response = faqService.retrieveAllFaq();
         List<Faq> findFaq = response.getData();
-
         // then
         assertNotNull(response);
         assertNull(findFaq);
@@ -128,14 +117,11 @@ public class FaqServiceTest {
         // given
         Long id = 1L;
         Faq savedFaq = new Faq("Test Question1", "Test Answer1", true);
-
         // stub
         when(faqRepository.findById(id)).thenReturn(Optional.of(savedFaq));
-
         // when
         ApiResponse<Faq> response = faqService.retrieveFaqById(id);
         Faq findFaq = response.getData();
-
         // then
         assertNotNull(findFaq);
         assertEquals(HttpStatus.OK, response.getStatus());
@@ -153,14 +139,11 @@ public class FaqServiceTest {
         // given
         Long id = 2L;
         Faq savedFaq = new Faq("Test Question1", "Test Answer1", true);
-
         // stub
         when(faqRepository.findById(id)).thenReturn(Optional.empty());
-
         // when
         ApiResponse<Faq> response = faqService.retrieveFaqById(id);
         Faq findFaq = response.getData();
-
         // then
         assertNotNull(response);
         assertNotEquals(findFaq, savedFaq);
@@ -174,15 +157,12 @@ public class FaqServiceTest {
     public void updateFaqSuccess() {
         // given
         Faq savedFaq = new Faq("Test Question1", "Test Answer1", true);
-
         String question = "Test Question2";
         String answer = "Test Answer2";
         Boolean visibility = false;
-
         UpdateFaqServiceRequestDto requestDto = new UpdateFaqServiceRequestDto(
                 1L, question, answer, visibility
         );
-
         // stub
         when(faqRepository.findById(requestDto.id())).thenReturn(Optional.of(savedFaq));
         when(faqRepository.save(any(Faq.class))).thenAnswer(invocation -> {
@@ -192,11 +172,9 @@ public class FaqServiceTest {
             argumentFaq.updateVisibility(visibility);
             return new Faq(argumentFaq.getQuestion(), argumentFaq.getAnswer(), argumentFaq.getVisibility());
         });
-
         // when
         ApiResponse<Faq> response = faqService.updateFaq(requestDto);
         Faq findFaq = response.getData();
-
         // then
         assertNotNull(findFaq);
         assertEquals(HttpStatus.OK, response.getStatus());
@@ -217,23 +195,18 @@ public class FaqServiceTest {
     public void updateFaqFail() {
         // given
         Faq savedFaq = new Faq("Test Question1", "Test Answer1", true);
-
         Long invalidId = 999L;
         String question = "Test Question2";
         String answer = "Test Answer2";
         Boolean visibility = false;
-
         UpdateFaqServiceRequestDto requestDto = new UpdateFaqServiceRequestDto(
                 invalidId, question, answer, visibility
         );
-
         // stub
         when(faqRepository.findById(requestDto.id())).thenReturn(Optional.empty());
-
         // when
         ApiResponse<Faq> response = faqService.updateFaq(requestDto);
         Faq findFaq = response.getData();
-
         // then
         assertEquals(ErrorCode.INVALID_FAQ_ID.getStatus(), response.getStatus());
         assertEquals(ErrorCode.INVALID_FAQ_ID.getMessage(), response.getMessage());
@@ -249,13 +222,10 @@ public class FaqServiceTest {
         // given
         Long id = 1L;
         Faq savedFaq = new Faq("Test Question1", "Test Answer1", true);
-
         // stub
         when(faqRepository.findById(id)).thenReturn(Optional.of(savedFaq));
-
         // when
         ApiResponse<String> response = faqService.deleteFaq(id);
-
         // then
         assertEquals(HttpStatus.OK, response.getStatus());
         assertEquals("FAQ를 성공적으로 삭제했습니다.", response.getMessage());
@@ -268,17 +238,40 @@ public class FaqServiceTest {
     public void deleteFaqFail() {
         // given
         Long invalidId = 999L;
-
         // stub
         when(faqRepository.findById(invalidId)).thenReturn(Optional.empty());
-
         // when
         ApiResponse<String> response = faqService.deleteFaq(invalidId);
-
         // then
         assertEquals(ErrorCode.INVALID_FAQ_ID.getStatus(), response.getStatus());
         assertEquals(ErrorCode.INVALID_FAQ_ID.getMessage(), response.getMessage());
         Mockito.verify(faqRepository, times(1)).findById(invalidId);
         Mockito.verify(faqRepository, never()).delete(any());
     }
+    @Test
+    @DisplayName("FAQ 제목 조회 성공")
+    public void retrieveAllFaqTitleSuccess() {
+        // given
+        List<FaqQuestions> faqTitles = List.of(
+                new FaqQuestions() {
+                    public Long getId() { return 1L; }
+                    public String getQuestion() { return "Title 1"; }
+                },
+                new FaqQuestions() {
+                    public Long getId() { return 2L; }
+                    public String getQuestion() { return "Title 2"; }
+                }
+        );
+        when(faqRepository.findAllQuestions()).thenReturn(faqTitles);
+        // when
+        ApiResponse<List<FaqQuestions>> response = faqService.retrieveAllFaqTitle();
+        List<FaqQuestions> retrievedTitles = response.getData();
+        // then
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatus());
+        assertEquals("FAQ 목록을 성공적으로 조회했습니다.", response.getMessage());
+        assertEquals(faqTitles.size(), retrievedTitles.size());
+        Mockito.verify(faqRepository, times(1)).findAllQuestions();
+    }
+
 }
