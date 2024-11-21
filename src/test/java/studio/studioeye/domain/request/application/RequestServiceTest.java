@@ -9,10 +9,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
+import studio.studioeye.domain.request.dao.RequestCount;
+import studio.studioeye.domain.request.dao.RequestCountImpl;
 import studio.studioeye.domain.request.dao.RequestRepository;
 import studio.studioeye.domain.request.domain.Request;
 import studio.studioeye.domain.request.domain.State;
 import studio.studioeye.domain.request.dto.request.CreateRequestServiceDto;
+import studio.studioeye.domain.request.dto.request.UpdateRequestCommentServiceDto;
 import studio.studioeye.global.common.response.ApiResponse;
 import studio.studioeye.global.exception.error.ErrorCode;
 import studio.studioeye.infrastructure.s3.S3Adapter;
@@ -22,6 +25,8 @@ import studio.studioeye.domain.notification.application.NotificationService;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -159,4 +164,66 @@ public class RequestServiceTest {
 		verify(emailService, times(1)).sendEmail(anyString(), anyString(), anyString());
 		verify(notificationService, never()).subscribe(anyLong());
 	}
+	@Test
+	@DisplayName("retrieveRequestCountByCategoryAndState - 정상 테스트")
+	void retrieveRequestCountByCategoryAndStateSuccess() {
+		// given
+		List<RequestCount> mockResult = List.of(
+				new RequestCountImpl(2024, 11, 5L, "CategoryA", State.WAITING),
+				new RequestCountImpl(2024, 12, 10L, "CategoryB", State.APPROVED)
+		);
+		when(requestRepository.findReqNumByYearAndMonthBetweenWithCategoryAndState(
+				2024, 11, 2024, 12, "CategoryA", State.WAITING
+		)).thenReturn(mockResult);
+		// when
+		ApiResponse<List<Map<String, Object>>> response = requestService.retrieveRequestCountByCategoryAndState(
+				"CategoryA", "WAITING", 2024, 11, 2024, 12
+		);
+		// then
+		assertNotNull(response);
+		assertEquals(HttpStatus.OK, response.getStatus());
+		assertNotNull(response.getData());
+		assertEquals(2, response.getData().size());
+		verify(requestRepository, times(1)).findReqNumByYearAndMonthBetweenWithCategoryAndState(
+				2024, 11, 2024, 12, "CategoryA", State.WAITING
+		);
+	}
+//	@Test
+//	@DisplayName("updateRequestComment - 정상 테스트")
+//	void updateRequestCommentSuccess() {
+//		// given
+//		Request mockRequest = mock(Request.class); // Request 객체를 Mock으로 생성
+//		when(mockRequest.getId()).thenReturn(1L); // Mock id 설정
+//		when(mockRequest.getClientName()).thenReturn("ClientName");
+//		when(mockRequest.getCategory()).thenReturn("Category");
+//		when(mockRequest.getState()).thenReturn(State.WAITING);
+//		UpdateRequestCommentServiceDto dto = new UpdateRequestCommentServiceDto("AnswerText", State.APPROVED);
+//		when(requestRepository.findById(1L)).thenReturn(Optional.of(mockRequest));
+//		when(requestRepository.save(any(Request.class))).thenReturn(mockRequest);
+//		// when
+//		ApiResponse<String> response = requestService.updateRequestComment(1L, dto);
+//		// then
+//		assertNotNull(response);
+//		assertEquals(HttpStatus.OK, response.getStatus());
+//		assertEquals("답변을 성공적으로 작성했습니다.", response.getMessage());
+//		verify(requestRepository, times(1)).save(mockRequest);
+//	}
+
+	@Test
+	@DisplayName("retrieveRequest - 정상 테스트")
+	void retrieveRequestSuccess() {
+		// given
+		Request mockRequest = mock(Request.class); // Request 객체를 Mock으로 생성
+		when(mockRequest.getId()).thenReturn(1L); // Mock id 설정
+		when(requestRepository.findById(1L)).thenReturn(Optional.of(mockRequest));
+		// when
+		ApiResponse<Request> response = requestService.retrieveRequest(1L);
+		// then
+		assertNotNull(response); // 응답이 null이 아닌지 확인
+		assertEquals(HttpStatus.OK, response.getStatus()); // 응답 상태 확인
+		assertNotNull(response.getData()); // 응답 데이터가 null이 아닌지 확인
+		assertEquals(1L, response.getData().getId()); // 데이터의 id 확인
+		verify(requestRepository, times(1)).findById(1L); // findById 호출 횟수 검증
+	}
+
 }
