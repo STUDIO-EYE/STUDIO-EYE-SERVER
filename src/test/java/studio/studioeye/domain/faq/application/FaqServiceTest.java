@@ -9,6 +9,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.multipart.MultipartFile;
 import studio.studioeye.domain.faq.dao.FaqQuestions;
 import studio.studioeye.domain.faq.dao.FaqRepository;
 import studio.studioeye.domain.faq.domain.Faq;
@@ -17,6 +18,7 @@ import studio.studioeye.domain.faq.dto.request.UpdateFaqServiceRequestDto;
 import studio.studioeye.global.common.response.ApiResponse;
 import studio.studioeye.global.exception.error.ErrorCode;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -308,5 +310,52 @@ public class FaqServiceTest {
             verify(faqRepository, times(1)).delete(faq);
         }
     }
+//    @Test
+//    @DisplayName("convertBase64ToImageUrl - 성공 테스트")
+//    void convertBase64ToImageUrlSuccess() throws IOException {
+//        // given
+//        String base64Image = "data:image/png;base64,iVBORw0KGgoAAAANS...";
+//        when(s3Adapter.uploadImage(any())).thenReturn(ApiResponse.ok("http://mock-url.com/image.png"));
+//
+//        // when
+//        ApiResponse<String> response = faqService.convertBase64ToImageUrl(base64Image);
+//
+//        // then
+//        assertEquals(HttpStatus.OK, response.getStatus());
+//        assertEquals("FAQ base64 이미지를 성공적으로 저장했습니다.", response.getMessage());
+//        assertEquals("http://mock-url.com/image.png", response.getData());
+//        verify(s3Adapter, times(1)).uploadImage(any());
+//    }
 
+//    @Test
+//    @DisplayName("convert - 성공 테스트")
+//    void convertSuccess() throws IOException {
+//        // given
+//        String validBase64Image = "data:image/png;base64,iVBORw0KGgoAAAANS...";
+//        // when
+//        MultipartFile result = faqService.convert(validBase64Image);
+//        // then
+//        assertNotNull(result);
+//        assertEquals("image.png", result.getOriginalFilename());
+//        assertEquals("image/png", result.getContentType());
+//    }
+    @Test
+    @DisplayName("deleteFaqs - 일부 ID 실패 테스트")
+    void deleteFaqsPartialFail() {
+        // given
+        List<Long> ids = List.of(1L, 2L, 999L);
+        Faq faq1 = new Faq("Question 1", "Answer 1", true);
+        Faq faq2 = new Faq("Question 2", "Answer 2", true);
+        when(faqRepository.findById(1L)).thenReturn(Optional.of(faq1));
+        when(faqRepository.findById(2L)).thenReturn(Optional.of(faq2));
+        when(faqRepository.findById(999L)).thenReturn(Optional.empty());
+        // when
+        ApiResponse<String> response = faqService.deleteFaqs(ids);
+        // then
+        assertEquals(ErrorCode.INVALID_FAQ_ID.getStatus(), response.getStatus());
+        assertEquals(ErrorCode.INVALID_FAQ_ID.getMessage(), response.getMessage());
+        verify(faqRepository, times(1)).findById(1L);
+        verify(faqRepository, times(1)).findById(2L);
+        verify(faqRepository, times(1)).findById(999L);
+    }
 }
