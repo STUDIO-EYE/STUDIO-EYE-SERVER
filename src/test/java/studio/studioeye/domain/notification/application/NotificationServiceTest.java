@@ -114,14 +114,41 @@ class NotificationServiceTest {
     @DisplayName("알림 생성 실패 테스트 - Emitter Null")
     void createNotificationFail_NullEmitters() throws IOException {
         // given
+        Notification mockNotification = Notification.builder().requestId(TEST_REQUEST_ID).build(); // Mock Notification 생성
+        when(notificationRepository.save(any(Notification.class))).thenReturn(mockNotification); // save 동작 설정
+        when(emitterRepository.getAllEmitters()).thenReturn(null); // Emitters가 null 반환
+        // when
+        ApiResponse<Notification> response = notificationService.createNotification(TEST_USER_ID, mockNotification);
+        // then
+        assertNotNull(response); // 응답이 null이 아님을 확인
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatus()); // 상태가 INTERNAL_SERVER_ERROR인지 확인
+        assertEquals(ErrorCode.INVALID_SSE_ID.getMessage(), response.getMessage()); // 에러 메시지 확인
+        // verify
+        verify(notificationRepository, times(1)).save(any(Notification.class)); // notificationRepository 호출 검증
+        verify(emitterRepository, times(1)).getAllEmitters(); // emitterRepository 호출 검증
+    }
+
+    @Test
+    @DisplayName("알림 생성 실패 테스트 - 모든 Emitter 실패")
+    void createNotification_AllEmitterFail() throws IOException {
+        // given
         Notification notification = Notification.builder().requestId(TEST_REQUEST_ID).build();
-        when(emitterRepository.getAllEmitters()).thenReturn(null); // null 반환
+        SseEmitter failingEmitter = mock(SseEmitter.class);
+        // Mock IOException 발생
+        doThrow(new IOException("Emitter failed")).when(failingEmitter).send(any(Notification.class));
+        // Mock Repository와 Emitter 설정
+        when(notificationRepository.save(any())).thenReturn(notification);
+        when(emitterRepository.getAllEmitters()).thenReturn(List.of(failingEmitter));
         // when
         ApiResponse<Notification> response = notificationService.createNotification(TEST_USER_ID, notification);
         // then
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatus());
-        assertEquals(ErrorCode.INVALID_SSE_ID.getMessage(), response.getMessage());
-        verify(emitterRepository, times(1)).getAllEmitters();
+        assertNotNull(response); // 응답이 null이 아님을 확인
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatus()); // NotificationService의 기존 설정에 맞춘 상태 코드 검증
+        assertEquals(ErrorCode.INVALID_SSE_ID.getMessage(), response.getMessage()); // 예상 메시지 검증
+        // 호출 검증
+        verify(notificationRepository, times(1)).save(notification); // Notification 저장 호출 확인
+        verify(userNotificationService, times(1)).createUserNotification(TEST_USER_ID, notification.getId()); // UserNotification 호출 확인
+        verify(emitterRepository, times(1)).getAllEmitters(); // 모든 Emitter 가져오기 호출 확인
     }
 
     @Test
@@ -164,4 +191,17 @@ class NotificationServiceTest {
         assertEquals("알림 조회 중 오류가 발생했습니다.", response.getMessage());
         verify(notificationRepository, times(1)).findAll();
     }
+
+//    @Test
+//    @DisplayName("subscribe 호출 시 Emitter가 생성된다")
+//    void testSubscribeCreatesEmitter() {
+//        // given
+//        List<Long> userIds = List.of(1L, 2L, 3L);
+//        when(userService.getAllApprovedUserIds()).thenReturn(userIds);
+//        // when
+//        ApiResponse<Long> response = notificationService.subscribe(1L);
+//        // then
+//        assertEquals(HttpStatus.OK, response.getStatus());
+//        verify(emitterRepository, times(userIds.size())).save(any(), any(SseEmitter.class)); // Emitter가 저장되었는지 확인
+//    }
 }
