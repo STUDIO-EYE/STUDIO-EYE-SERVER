@@ -79,28 +79,28 @@ class PartnerInformationServiceTest {
         Mockito.verify(partnerInformationRepository, times(1)).save(any(PartnerInformation.class));
     }
 
-//    @Test
-//    @DisplayName("파트너 정보 생성 실패 테스트 - S3 업로드 실패")
-//    void createPartnerInfoFailDueToS3UploadFailure() throws IOException {
-//        // given
-//        CreatePartnerInfoServiceRequestDto requestDto = new CreatePartnerInfoServiceRequestDto(
-//                "PartnerName",
-//                true,
-//                "http://partner-link.com"
-//        );
-//        // Mock S3 upload failure
-//        when(s3Adapter.uploadFile(any(MultipartFile.class)))
-//                .thenReturn(ApiResponse.withError(ErrorCode.ERROR_S3_UPDATE_OBJECT));
-//        // when
-//        ApiResponse<PartnerInformation> response = partnerInformationService.createPartnerInfo(requestDto, mockFile);
-//
-//        // then
-//        assertNull(response.getData());
-//        assertEquals(ErrorCode.ERROR_S3_UPDATE_OBJECT.getStatus(), response.getStatus());
-//        assertEquals(ErrorCode.ERROR_S3_UPDATE_OBJECT.getMessage(), response.getMessage());
-//
-//        Mockito.verify(partnerInformationRepository, never()).save(any(PartnerInformation.class));
-//    }
+    @Test
+    @DisplayName("파트너 정보 생성 실패 테스트 - S3 업로드 실패")
+    void createPartnerInfoFailDueToS3UploadFailure() throws IOException {
+        // given
+        CreatePartnerInfoServiceRequestDto requestDto = new CreatePartnerInfoServiceRequestDto(
+                "PartnerName",
+                true,
+                "http://partner-link.com"
+        );
+        // Mock S3 upload failure
+        when(s3Adapter.uploadImage(any(MultipartFile.class)))
+                .thenReturn(ApiResponse.withError(ErrorCode.ERROR_S3_UPDATE_OBJECT));
+        // when
+        ApiResponse<PartnerInformation> response = partnerInformationService.createPartnerInfo(requestDto, mockFile);
+
+        // then
+        assertNull(response.getData());
+        assertEquals(ErrorCode.ERROR_S3_UPDATE_OBJECT.getStatus(), response.getStatus());
+        assertEquals(ErrorCode.ERROR_S3_UPDATE_OBJECT.getMessage(), response.getMessage());
+
+        Mockito.verify(partnerInformationRepository, never()).save(any(PartnerInformation.class));
+    }
 
     @Test
     @DisplayName("협력사 정보 목록 조회 성공 테스트")
@@ -255,26 +255,48 @@ class PartnerInformationServiceTest {
         verify(partnerInformationRepository, times(1)).findAll(pageable);
     }
 
-//    @Test
-//    @DisplayName("협력사 정보 업데이트 성공 테스트")
-//    void updatePartnerInfoSuccess() throws IOException {
-//        // given
-//        PartnerInformation partnerInformation = new PartnerInformation("Logo1", "Partner1", true, "http://link1.com");
-//        UpdatePartnerInfoServiceRequestDto requestDto = new UpdatePartnerInfoServiceRequestDto(1L, "UpdatedName", true, "http://updated-link.com");
-//        MockMultipartFile mockFile = new MockMultipartFile("file", "testImage.jpg", "image/jpeg", "Test Image Content".getBytes());
-//        // stub
-//        when(partnerInformationRepository.findById(1L)).thenReturn(Optional.of(partnerInformation));
-//        when(s3Adapter.uploadFile(any(MultipartFile.class)))
-//                .thenReturn(ApiResponse.ok("S3에 이미지 업로드 성공", "http://example.com/newTestImage.jpg"));
-//        when(s3Adapter.deleteFile(anyString())).thenReturn(ApiResponse.ok("S3에서 기존 이미지 삭제 성공"));
-//
-//        // when
-//        ApiResponse<PartnerInformation> response = partnerInformationService.updatePartnerInfo(requestDto, mockFile);
-//
-//        // then
-//        assertEquals("UpdatedName", response.getData().getName());
-//        assertEquals("http://example.com/newTestImage.jpg", response.getData().getLogoImageUrl());
-//    }
+    @Test
+    @DisplayName("협력사 정보 업데이트 성공 테스트")
+    void updatePartnerInfoSuccess() throws IOException {
+        // given
+        Long validPartnerId = 1L;
+        String oldLogoImageUrl = "https://example-bucket.s3.amazonaws.com/path/to/old-logo.png";
+        String newLogoImageUrl = "https://example-bucket.s3.amazonaws.com/path/to/new-logo.png";
+
+        PartnerInformation mockPartnerInformation = PartnerInformation.builder()
+                .name("Old Name")
+                .logoImageUrl(oldLogoImageUrl)
+                .is_main(false)
+                .link("http://old-link.com")
+                .build();
+
+        UpdatePartnerInfoServiceRequestDto dto = new UpdatePartnerInfoServiceRequestDto(
+                validPartnerId,
+                "New Name",
+                true,
+                "http://new-link.com"
+        );
+
+        MultipartFile mockFile = mock(MultipartFile.class);
+
+        when(partnerInformationRepository.findById(validPartnerId)).thenReturn(Optional.of(mockPartnerInformation));
+        when(s3Adapter.uploadImage(mockFile)).thenReturn(ApiResponse.ok("S3 버킷에 이미지 업로드를 성공하였습니다.", newLogoImageUrl));
+        when(s3Adapter.deleteFile("path")).thenReturn(ApiResponse.ok("S3 버킷에서 이미지를 성공적으로 삭제하였습니다."));
+        when(partnerInformationRepository.save(any(PartnerInformation.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        // when
+        ApiResponse<PartnerInformation> response = partnerInformationService.updatePartnerInfo(dto, mockFile);
+
+        // then
+        assertEquals("협력사 정보를 성공적으로 수정했습니다.", response.getMessage());
+        assertEquals("New Name", response.getData().getName());
+        assertEquals(newLogoImageUrl, response.getData().getLogoImageUrl());
+        assertEquals("http://new-link.com", response.getData().getLink());
+        assertTrue(response.getData().getIs_main());
+        verify(s3Adapter, times(1)).deleteFile("path");
+        verify(s3Adapter, times(1)).uploadImage(mockFile);
+        verify(partnerInformationRepository, times(1)).save(any(PartnerInformation.class));
+    }
 
     @Test
     @DisplayName("협력사 정보 업데이트 실패 테스트 - 유효하지 않은 협력사 ID")
@@ -292,25 +314,25 @@ class PartnerInformationServiceTest {
         assertEquals(ErrorCode.INVALID_PARTNER_INFORMATION_ID.getMessage(), response.getMessage());
     }
 
-//    @Test
-//    @DisplayName("협력사 정보 업데이트 실패 테스트 - S3 이미지 업데이트 실패")
-//    void updatePartnerInfoS3UpdateFail() throws IOException {
-//        // given
-//        PartnerInformation partnerInformation = new PartnerInformation("Logo1", "Partner1", true, "http://link1.com");
-//        UpdatePartnerInfoServiceRequestDto requestDto = new UpdatePartnerInfoServiceRequestDto(1L, "UpdatedName", true, "http://updated-link.com");
-//        MockMultipartFile mockFile = new MockMultipartFile("file", "testImage.jpg", "image/jpeg", "Test Image Content".getBytes());
-//
-//        when(partnerInformationRepository.findById(1L)).thenReturn(Optional.of(partnerInformation));
-//        when(s3Adapter.uploadFile(any(MultipartFile.class)))
-//                .thenReturn(ApiResponse.withError(ErrorCode.ERROR_S3_UPDATE_OBJECT));
-//
-//        // when
-//        ApiResponse<PartnerInformation> response = partnerInformationService.updatePartnerInfo(requestDto, mockFile);
-//
-//        // then
-//        assertEquals(ErrorCode.ERROR_S3_UPDATE_OBJECT.getStatus(), response.getStatus());
-//        assertEquals(ErrorCode.ERROR_S3_UPDATE_OBJECT.getMessage(), response.getMessage());
-//    }
+    @Test
+    @DisplayName("협력사 정보 업데이트 실패 테스트 - S3 이미지 업데이트 실패")
+    void updatePartnerInfoS3UpdateFail() throws IOException {
+        // given
+        PartnerInformation partnerInformation = new PartnerInformation("Logo1", "Partner1", true, "http://link1.com");
+        UpdatePartnerInfoServiceRequestDto requestDto = new UpdatePartnerInfoServiceRequestDto(1L, "UpdatedName", true, "http://updated-link.com");
+        MockMultipartFile mockFile = new MockMultipartFile("file", "testImage.jpg", "image/jpeg", "Test Image Content".getBytes());
+
+        when(partnerInformationRepository.findById(1L)).thenReturn(Optional.of(partnerInformation));
+        when(s3Adapter.uploadImage(any(MultipartFile.class)))
+                .thenReturn(ApiResponse.withError(ErrorCode.ERROR_S3_UPDATE_OBJECT));
+
+        // when
+        ApiResponse<PartnerInformation> response = partnerInformationService.updatePartnerInfo(requestDto, mockFile);
+
+        // then
+        assertEquals(ErrorCode.ERROR_S3_UPDATE_OBJECT.getStatus(), response.getStatus());
+        assertEquals(ErrorCode.ERROR_S3_UPDATE_OBJECT.getMessage(), response.getMessage());
+    }
 
     @Test
     @DisplayName("협력사 텍스트 정보 업데이트 성공 테스트")
@@ -346,24 +368,29 @@ class PartnerInformationServiceTest {
         assertEquals(ErrorCode.INVALID_PARTNER_INFORMATION_ID.getMessage(), response.getMessage());
     }
 
-//    @Test
-//    @DisplayName("협력사 로고 이미지 업데이트 성공 테스트")
-//    void updatePartnerLogoImgSuccess() throws IOException {
-//        // given
-//        PartnerInformation partnerInformation = new PartnerInformation("Logo1", "Partner1", true, "http://link1.com");
-//        MockMultipartFile mockFile = new MockMultipartFile("file", "newTestImage.jpg", "image/jpeg", "New Test Image Content".getBytes());
-//
-//        when(partnerInformationRepository.findById(1L)).thenReturn(Optional.of(partnerInformation));
-//        when(s3Adapter.uploadFile(any(MultipartFile.class)))
-//                .thenReturn(ApiResponse.ok("S3에 이미지 업로드 성공", "http://example.com/newTestImage.jpg"));
-//        when(partnerInformationRepository.save(any(PartnerInformation.class))).thenReturn(partnerInformation);
-//
-//        // when
-//        ApiResponse<PartnerInformation> response = partnerInformationService.updatePartnerLogoImg(1L, mockFile);
-//
-//        // then
-//        assertEquals("http://example.com/newTestImage.jpg", response.getData().getLogoImageUrl());
-//    }
+    @Test
+    @DisplayName("협력사 로고 이미지 업데이트 성공 테스트")
+    void updatePartnerLogoImgSuccess() throws IOException {
+        // given
+        PartnerInformation existingPartner = new PartnerInformation("Logo1", "Partner1", true, "http://link1.com");
+        String newLogoImgUrl = "http://example.com/new-logo.png";
+
+        when(partnerInformationRepository.findById(1L)).thenReturn(Optional.of(existingPartner));
+        when(s3Adapter.uploadImage(any(MultipartFile.class)))
+                .thenReturn(ApiResponse.ok("S3 버킷에 이미지 업로드를 성공하였습니다.", newLogoImgUrl));
+        when(partnerInformationRepository.save(any(PartnerInformation.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        // when
+        ApiResponse<PartnerInformation> response = partnerInformationService.updatePartnerLogoImg(1L, mockFile);
+
+        // then
+        assertEquals("협력사 로고 이미지를 성공적으로 수정했습니다.", response.getMessage());
+        PartnerInformation updatedPartner = response.getData();
+        assertEquals(newLogoImgUrl, updatedPartner.getLogoImageUrl());
+        verify(partnerInformationRepository, times(1)).save(existingPartner);
+    }
+
 
     @Test
     @DisplayName("협력사 로고 이미지 업데이트 실패 테스트 - 유효하지 않은 협력사 ID")
@@ -379,37 +406,45 @@ class PartnerInformationServiceTest {
         assertEquals(ErrorCode.INVALID_PARTNER_INFORMATION_ID.getMessage(), response.getMessage());
     }
 
-//    @Test
-//    @DisplayName("협력사 로고 이미지 업데이트 실패 테스트 - S3 이미지 업데이트 실패")
-//    void updatePartnerLogoImgS3UpdateFail() throws IOException {
-//        // given
-//        PartnerInformation partnerInformation = new PartnerInformation("Logo1", "Partner1", true, "http://link1.com");
-//        when(partnerInformationRepository.findById(1L)).thenReturn(Optional.of(partnerInformation));
-//        when(s3Adapter.uploadFile(any(MultipartFile.class)))
-//                .thenReturn(ApiResponse.withError(ErrorCode.ERROR_S3_UPDATE_OBJECT));
-//
-//        // when
-//        ApiResponse<PartnerInformation> response = partnerInformationService.updatePartnerLogoImg(1L, mockFile);
-//
-//        // then
-//        assertEquals(ErrorCode.ERROR_S3_UPDATE_OBJECT.getStatus(), response.getStatus());
-//        assertEquals(ErrorCode.ERROR_S3_UPDATE_OBJECT.getMessage(), response.getMessage());
-//    }
+    @Test
+    @DisplayName("협력사 로고 이미지 업데이트 실패 테스트 - S3 이미지 업데이트 실패")
+    void updatePartnerLogoImgS3UpdateFail() throws IOException {
+        // given
+        PartnerInformation partnerInformation = new PartnerInformation("Logo1", "Partner1", true, "http://link1.com");
+        when(partnerInformationRepository.findById(1L)).thenReturn(Optional.of(partnerInformation));
+        when(s3Adapter.uploadImage(any(MultipartFile.class)))
+                .thenReturn(ApiResponse.withError(ErrorCode.ERROR_S3_UPDATE_OBJECT));
 
-//    @Test
-//    @DisplayName("협력사 정보 삭제 성공 테스트")
-//    void deletePartnerInfoSuccess() {
-//        // given
-//        PartnerInformation partnerInformation = new PartnerInformation("Logo1", "Partner1", true, "http://link1.com");
-//        when(partnerInformationRepository.findById(1L)).thenReturn(Optional.of(partnerInformation));
-//        when(s3Adapter.deleteFile(anyString())).thenReturn(ApiResponse.ok("S3에서 이미지 삭제 성공"));
-//
-//        // when
-//        ApiResponse<String> response = partnerInformationService.deletePartnerInfo(1L);
-//
-//        // then
-//        assertEquals("협력사 정보를 성공적으로 삭제하였습니다.", response.getMessage());
-//    }
+        // when
+        ApiResponse<PartnerInformation> response = partnerInformationService.updatePartnerLogoImg(1L, mockFile);
+
+        // then
+        assertEquals(ErrorCode.ERROR_S3_UPDATE_OBJECT.getStatus(), response.getStatus());
+        assertEquals(ErrorCode.ERROR_S3_UPDATE_OBJECT.getMessage(), response.getMessage());
+    }
+
+    @Test
+    @DisplayName("협력사 정보 삭제 성공 테스트")
+    void deletePartnerInfoSuccess() {
+        // given
+        Long validPartnerId = 1L;
+        String logoImageUrl = "https://example-bucket.s3.amazonaws.com/path/to/logo.png";
+        PartnerInformation mockPartnerInformation = PartnerInformation.builder()
+                .logoImageUrl(logoImageUrl)
+                .build();
+
+        when(partnerInformationRepository.findById(validPartnerId))
+                .thenReturn(Optional.of(mockPartnerInformation));
+        when(s3Adapter.deleteFile(any(String.class)))
+                .thenReturn(ApiResponse.ok("협력사 정보를 성공적으로 삭제하였습니다."));
+
+        // when
+        ApiResponse<String> response = partnerInformationService.deletePartnerInfo(validPartnerId);
+
+        // then
+        assertEquals("협력사 정보를 성공적으로 삭제하였습니다.", response.getMessage());
+        verify(partnerInformationRepository, times(1)).delete(mockPartnerInformation);
+    }
 
     @Test
     @DisplayName("협력사 정보 삭제 실패 테스트 - 유효하지 않은 협력사 ID")
@@ -423,5 +458,29 @@ class PartnerInformationServiceTest {
         // then
         assertEquals(ErrorCode.INVALID_PARTNER_INFORMATION_ID.getStatus(), response.getStatus());
         assertEquals(ErrorCode.INVALID_PARTNER_INFORMATION_ID.getMessage(), response.getMessage());
+    }
+
+    @Test
+    @DisplayName("협력사 정보 삭제 실패 테스트 - S3 5xx 에러")
+    void deletePartnerInfoSuccess_S3_5xx() {
+        // given
+        Long validPartnerId = 1L;
+        String logoImageUrl = "https://example-bucket.s3.amazonaws.com/path/to/logo.png";
+        PartnerInformation mockPartnerInformation = PartnerInformation.builder()
+                .logoImageUrl(logoImageUrl)
+                .build();
+
+        when(partnerInformationRepository.findById(validPartnerId))
+                .thenReturn(Optional.of(mockPartnerInformation));
+        when(s3Adapter.deleteFile(any(String.class)))
+                .thenReturn(ApiResponse.withError(ErrorCode.ERROR_S3_DELETE_OBJECT));
+
+        // when
+        ApiResponse<String> response = partnerInformationService.deletePartnerInfo(validPartnerId);
+
+        // then
+        assertEquals(ErrorCode.ERROR_S3_DELETE_OBJECT.getStatus(), response.getStatus());
+        assertEquals(ErrorCode.ERROR_S3_DELETE_OBJECT.getMessage(), response.getMessage());
+        verify(partnerInformationRepository, times(0)).delete(mockPartnerInformation);
     }
 }
