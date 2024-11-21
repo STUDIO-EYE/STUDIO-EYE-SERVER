@@ -215,8 +215,6 @@ public class RequestServiceTest {
 		verify(requestRepository, times(1)).save(any(Request.class)); // RequestRepository 호출 검증
 	}
 
-
-
 	@Test
 	@DisplayName("retrieveRequest - 정상 테스트")
 	void retrieveRequestSuccess() {
@@ -233,6 +231,7 @@ public class RequestServiceTest {
 		assertEquals(1L, response.getData().getId()); // 데이터의 id 확인
 		verify(requestRepository, times(1)).findById(1L); // findById 호출 횟수 검증
 	}
+
 	@Test
 	@DisplayName("retrieveRequestCountByCategoryAndState - 잘못된 기간")
 	void retrieveRequestCount_InvalidPeriod() {
@@ -245,6 +244,7 @@ public class RequestServiceTest {
 		assertEquals(HttpStatus.BAD_REQUEST, response.getStatus());
 		assertEquals(ErrorCode.INVALID_PERIOD_FORMAT.getMessage(), response.getMessage());
 	}
+
 	@Test
 	@DisplayName("retrieveRequestCountByCategoryAndState - 상태가 all")
 	void retrieveRequestCount_StateAll() {
@@ -261,6 +261,7 @@ public class RequestServiceTest {
 		assertNotNull(response.getData());
 		verify(requestRepository, times(1)).findReqNumByYearAndMonthBetweenWithCategoryAndState(anyInt(), anyInt(), anyInt(), anyInt(), anyString(), isNull());
 	}
+
 	@Test
 	@DisplayName("updateRequestComment - 빈 답변 테스트")
 	void updateRequestComment_EmptyAnswer() {
@@ -273,15 +274,14 @@ public class RequestServiceTest {
 		assertEquals(HttpStatus.BAD_REQUEST, response.getStatus());
 		assertEquals(ErrorCode.INVALID_INPUT_VALUE.getMessage(), response.getMessage());
 	}
+
 	@Test
 	@DisplayName("updateRequestComment - 상태가 null")
 	void updateRequestComment_NullState() {
 		// given
 		UpdateRequestCommentServiceDto dto = new UpdateRequestCommentServiceDto("AnswerText", null);
-
 		// when
 		ApiResponse<String> response = requestService.updateRequestComment(1L, dto);
-
 		// then
 		assertNotNull(response); // 응답이 null이 아님을 확인
 		assertEquals(HttpStatus.BAD_REQUEST, response.getStatus()); // 응답 상태 확인

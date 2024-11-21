@@ -34,16 +34,12 @@ class NotificationServiceTest {
 
     @InjectMocks
     private NotificationService notificationService;
-
     @Mock
     private NotificationRepository notificationRepository;
-
     @Mock
     private EmitterRepository emitterRepository;
-
     @Mock
     private UserService userService;
-
     @Mock
     private UserNotificationService userNotificationService;
 
@@ -74,13 +70,28 @@ class NotificationServiceTest {
     void subscribeFail() {
         // given
         when(userService.getAllApprovedUserIds()).thenReturn(new ArrayList<>());
-
         // when
         ApiResponse<Long> response = notificationService.subscribe(TEST_REQUEST_ID);
-
         // then
         assertThat(response.getStatus()).isEqualTo(ErrorCode.USER_IS_EMPTY.getStatus());
         assertThat(response.getMessage()).isEqualTo(ErrorCode.USER_IS_EMPTY.getMessage());
+    }
+
+    @Test
+    @DisplayName("알림 구독 실패 테스트 - Emitter 저장 실패")
+    void subscribeFail_EmitterSaveError() {
+        // given
+        List<Long> userIds = List.of(TEST_USER_ID);
+        when(userService.getAllApprovedUserIds()).thenReturn(userIds);
+        doThrow(new RuntimeException("Emitter 저장 실패")).when(emitterRepository).save(any(), any(SseEmitter.class));
+        // when
+        RuntimeException exception = assertThrows(RuntimeException.class,
+                () -> notificationService.subscribe(TEST_REQUEST_ID)
+        );
+        // then
+        assertEquals("Emitter 저장 실패", exception.getMessage());
+        verify(userService, times(1)).getAllApprovedUserIds();
+        verify(emitterRepository, times(1)).save(any(), any(SseEmitter.class));
     }
 
     @Test
@@ -91,10 +102,8 @@ class NotificationServiceTest {
         Collection<SseEmitter> emitters = List.of(new SseEmitter());
         when(notificationRepository.save(any())).thenReturn(notification);
         when(emitterRepository.getAllEmitters()).thenReturn(emitters);
-
         // when
         ApiResponse<Notification> response = notificationService.createNotification(TEST_USER_ID, notification);
-
         // then
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK);
         assertThat(response.getMessage()).isEqualTo("알림을 성공적으로 등록하였습니다.");
@@ -110,10 +119,8 @@ class NotificationServiceTest {
 //        SseEmitter emitter = mock(SseEmitter.class);
 //        doThrow(new IOException()).when(emitter).send(Optional.ofNullable(any()));
 //        when(emitterRepository.getAllEmitters()).thenReturn(List.of(emitter));
-//
 //        // when
 //        ApiResponse<Notification> response = notificationService.createNotification(TEST_USER_ID, notification);
-//
 //        // then
 //        assertThat(response.getStatus()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
 //        assertThat(response.getMessage()).isEqualTo(ErrorCode.INVALID_SSE_ID.getMessage());
@@ -125,10 +132,8 @@ class NotificationServiceTest {
         // given
         List<Notification> notificationList = List.of(Notification.builder().build(), Notification.builder().build());
         when(notificationRepository.findAll()).thenReturn(notificationList);
-
         // when
         ApiResponse<List<Notification>> response = notificationService.retrieveAllNotification();
-
         // then
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK);
         assertThat(response.getData()).isEqualTo(notificationList);
@@ -140,10 +145,8 @@ class NotificationServiceTest {
     void retrieveAllNotificationFail() {
         // given
         when(notificationRepository.findAll()).thenReturn(new ArrayList<>());
-
         // when
         ApiResponse<List<Notification>> response = notificationService.retrieveAllNotification();
-
         // then
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK);
         assertThat(response.getMessage()).isEqualTo("알림이 존재하지 않습니다.");
