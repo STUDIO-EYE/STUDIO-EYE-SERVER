@@ -392,4 +392,79 @@ public class FaqServiceTest {
         assertEquals("Question 1", result.getContent().get(0).getQuestion());
         verify(faqRepository, times(1)).findAll(pageable);
     }
+
+    @Test
+    @DisplayName("FAQ 생성 실패 - answer가 비어 있는 경우")
+    public void createFaqFail_EmptyAnswer() {
+        // given
+        String question = "test question";
+        String answer = ""; // 비어 있는 답변
+        Boolean visibility = true;
+        CreateFaqServiceRequestDto requestDto = new CreateFaqServiceRequestDto(question, answer, visibility);
+
+        // when
+        ApiResponse<Faq> response = faqService.createFaq(requestDto);
+
+        // then
+        assertNotNull(response);
+        assertEquals(ErrorCode.FAQ_IS_EMPTY.getStatus(), response.getStatus());
+        assertEquals(ErrorCode.FAQ_IS_EMPTY.getMessage(), response.getMessage());
+        Mockito.verify(faqRepository, never()).save(any());
+    }
+//
+//    @Test
+//    @DisplayName("convertBase64ToImageUrl - 빈 문자열 실패 테스트")
+//    void convertBase64ToImageUrl_EmptyString_Fail() throws IOException {
+//        // given
+//        String emptyBase64Image = "";
+//        // when
+//        ApiResponse<String> response = faqService.convertBase64ToImageUrl(emptyBase64Image);
+//        // then
+//        assertErrorResponse(response, ErrorCode.ERROR_S3_UPDATE_OBJECT);
+//        verify(s3Adapter, never()).uploadImage(any());
+//    }
+//    @Test
+//    @DisplayName("convertBase64ToImageUrl - 접두사 없는 Base64 실패 테스트")
+//    void convertBase64ToImageUrl_MissingPrefix_Fail() throws IOException {
+//        // given
+//        String invalidBase64Image = "invalid_base64_data";
+//        // when
+//        ApiResponse<String> response = faqService.convertBase64ToImageUrl(invalidBase64Image);
+//        // then
+//        assertErrorResponse(response, ErrorCode.ERROR_S3_UPDATE_OBJECT);
+//        verify(s3Adapter, never()).uploadImage(any());
+//    }
+//    @Test
+//    @DisplayName("updateFaq - 모든 필드 null 실패 테스트")
+//    void updateFaq_AllFieldsNull_Fail() {
+//        // given
+//        UpdateFaqServiceRequestDto invalidRequest = new UpdateFaqServiceRequestDto(1L, null, null, null);
+//        when(faqRepository.findById(1L)).thenReturn(Optional.empty());
+//        // when
+//        ApiResponse<Faq> response = faqService.updateFaq(invalidRequest);
+//        // then
+//        assertErrorResponse(response, ErrorCode.INVALID_FAQ_ID);
+//        verify(faqRepository, never()).save(any());
+//    }
+//    @Test
+//    @DisplayName("deleteFaqs - 빈 ID 리스트 실패 테스트")
+//    void deleteFaqs_EmptyList_Fail() {
+//        // given
+//        List<Long> emptyIds = Collections.emptyList();
+//        // when
+//        ApiResponse<String> response = faqService.deleteFaqs(emptyIds);
+//        // then
+//        assertErrorResponse(response, ErrorCode.INVALID_FAQ_ID);
+//        verify(faqRepository, never()).findById(any());
+//    }
+    @Test
+    @DisplayName("retrieveFaqPage - 잘못된 페이지 크기 테스트")
+    void retrieveFaqPage_InvalidPageSize_Fail() {
+        // given
+        int invalidPageSize = -1;
+        // when
+        assertThrows(IllegalArgumentException.class, () -> faqService.retrieveFaqPage(0, invalidPageSize));
+        verify(faqRepository, never()).findAll(any(Pageable.class));
+    }
+
 }
