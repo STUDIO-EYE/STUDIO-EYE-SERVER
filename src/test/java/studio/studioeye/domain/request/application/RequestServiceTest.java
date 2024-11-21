@@ -277,16 +277,14 @@ public class RequestServiceTest {
 	@DisplayName("updateRequestComment - 상태가 null")
 	void updateRequestComment_NullState() {
 		// given
-		Request mockRequest = mock(Request.class);
-		when(mockRequest.getId()).thenReturn(1L); // Mock Request 설정
-		when(requestRepository.findById(1L)).thenReturn(Optional.of(mockRequest)); // 유효한 요청 반환
-		UpdateRequestCommentServiceDto dto = new UpdateRequestCommentServiceDto("Valid Answer", null);
+		UpdateRequestCommentServiceDto dto = new UpdateRequestCommentServiceDto("AnswerText", null);
+
 		// when
 		ApiResponse<String> response = requestService.updateRequestComment(1L, dto);
-		// then
-		assertNotNull(response);
-		assertEquals(HttpStatus.BAD_REQUEST, response.getStatus());
-		assertEquals(ErrorCode.INVALID_INPUT_VALUE.getMessage(), response.getMessage()); // 예상 메시지 검증
-	}
 
+		// then
+		assertNotNull(response); // 응답이 null이 아님을 확인
+		assertEquals(HttpStatus.BAD_REQUEST, response.getStatus()); // 응답 상태 확인
+		assertEquals(ErrorCode.INVALID_INPUT_VALUE.getMessage(), response.getMessage()); // 메시지가 예상값과 일치
+	}
 }
