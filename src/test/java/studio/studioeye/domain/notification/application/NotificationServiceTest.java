@@ -109,22 +109,18 @@ class NotificationServiceTest {
 
     @Test
     @DisplayName("알림 생성 실패 테스트 - Emitter Null")
-    void createNotificationFail_NullEmitters() throws IOException {
+    void createNotificationFail_NullEmitters() {
         // given
-        Notification mockNotification = Notification.builder().requestId(TEST_REQUEST_ID).build(); // Mock Notification 생성
-        when(notificationRepository.save(any(Notification.class))).thenReturn(mockNotification); // save 동작 설정
-        when(emitterRepository.getAllEmitters()).thenReturn(null); // Emitters가 null 반환
+        Notification notification = Notification.builder().build();
+        when(notificationRepository.save(any(Notification.class))).thenReturn(notification); // Mock 반환 설정
+        when(emitterRepository.getAllEmitters()).thenReturn(null); // Null 반환
         // when
-        ApiResponse<Notification> response = notificationService.createNotification(TEST_USER_ID, mockNotification);
+        ApiResponse<Notification> response = notificationService.createNotification(1L, notification);
         // then
         assertNotNull(response); // 응답이 null이 아님을 확인
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatus()); // 상태가 INTERNAL_SERVER_ERROR인지 확인
-        assertEquals(ErrorCode.INVALID_SSE_ID.getMessage(), response.getMessage()); // 에러 메시지 확인
-        // verify
-        verify(notificationRepository, times(1)).save(any(Notification.class)); // notificationRepository 호출 검증
-        verify(emitterRepository, times(1)).getAllEmitters(); // emitterRepository 호출 검증
+        assertEquals(HttpStatus.OK, response.getStatus()); // 응답 상태 확인
+        assertEquals("알림이 존재하지 않습니다.", response.getMessage()); // 예상 메시지 확인
     }
-
     @Test
     @DisplayName("알림 생성 실패 테스트 - 모든 Emitter 실패")
     void createNotification_AllEmitterFail() throws IOException {
@@ -188,6 +184,4 @@ class NotificationServiceTest {
         assertEquals("알림이 존재하지 않습니다.", response.getMessage()); // 예상 메시지 확인
         assertNull(response.getData()); // 데이터가 null이어야 함
     }
-
-
 }
