@@ -24,8 +24,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -111,20 +110,19 @@ class NotificationServiceTest {
         verify(userNotificationService, times(1)).createUserNotification(TEST_USER_ID, notification.getId());
     }
 
-//    @Test
-//    @DisplayName("알림 생성 실패 테스트")
-//    void createNotificationFail() throws IOException {
-//        // given
-//        Notification notification = Notification.builder().build();
-//        SseEmitter emitter = mock(SseEmitter.class);
-//        doThrow(new IOException()).when(emitter).send(Optional.ofNullable(any()));
-//        when(emitterRepository.getAllEmitters()).thenReturn(List.of(emitter));
-//        // when
-//        ApiResponse<Notification> response = notificationService.createNotification(TEST_USER_ID, notification);
-//        // then
-//        assertThat(response.getStatus()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
-//        assertThat(response.getMessage()).isEqualTo(ErrorCode.INVALID_SSE_ID.getMessage());
-//    }
+    @Test
+    @DisplayName("알림 생성 실패 테스트 - Emitter Null")
+    void createNotificationFail_NullEmitters() throws IOException {
+        // given
+        Notification notification = Notification.builder().requestId(TEST_REQUEST_ID).build();
+        when(emitterRepository.getAllEmitters()).thenReturn(null); // null 반환
+        // when
+        ApiResponse<Notification> response = notificationService.createNotification(TEST_USER_ID, notification);
+        // then
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatus());
+        assertEquals(ErrorCode.INVALID_SSE_ID.getMessage(), response.getMessage());
+        verify(emitterRepository, times(1)).getAllEmitters();
+    }
 
     @Test
     @DisplayName("모든 알림 조회 성공 테스트")
@@ -151,5 +149,19 @@ class NotificationServiceTest {
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK);
         assertThat(response.getMessage()).isEqualTo("알림이 존재하지 않습니다.");
         assertThat(response.getData()).isNull();
+    }
+
+    @Test
+    @DisplayName("모든 알림 조회 실패 테스트 - null 반환")
+    void retrieveAllNotificationFail_NullReturn() {
+        // given
+        when(notificationRepository.findAll()).thenReturn(null);
+        // when
+        ApiResponse<List<Notification>> response = notificationService.retrieveAllNotification();
+        // then
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatus());
+        assertNull(response.getData());
+        assertEquals("알림 조회 중 오류가 발생했습니다.", response.getMessage());
+        verify(notificationRepository, times(1)).findAll();
     }
 }
