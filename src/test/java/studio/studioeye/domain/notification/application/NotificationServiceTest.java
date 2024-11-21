@@ -184,4 +184,102 @@ class NotificationServiceTest {
         assertEquals("알림이 존재하지 않습니다.", response.getMessage()); // 예상 메시지 확인
         assertNull(response.getData()); // 데이터가 null이어야 함
     }
+
+//    @Test
+//    @DisplayName("subscribe - 성공 테스트")
+//    void subscribeSuccess() {
+//        // given
+//        List<Long> userIds = List.of(TEST_USER_ID);
+//        when(userService.getAllApprovedUserIds()).thenReturn(userIds);
+//        doNothing().when(emitterRepository).save(anyLong(), any(SseEmitter.class));
+//        doNothing().when(userNotificationService).createUserNotification(anyLong(), anyLong());
+//        // when
+//        ApiResponse<Long> response = notificationService.subscribe(TEST_REQUEST_ID);
+//        // then
+//        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK);
+//        assertThat(response.getMessage()).isEqualTo("알림을 성공적으로 구독하였습니다.");
+//        verify(emitterRepository, times(userIds.size())).save(anyLong(), any(SseEmitter.class));
+//    }
+
+//    @Test
+//    @DisplayName("subscribe - 실패 테스트 (Emitter 생성 실패)")
+//    void subscribeFail_EmitterError() {
+//        // given
+//        List<Long> userIds = List.of(TEST_USER_ID);
+//        when(userService.getAllApprovedUserIds()).thenReturn(userIds);
+//        doThrow(new RuntimeException("Emitter creation failed")).when(emitterRepository).save(anyLong(), any(SseEmitter.class));
+//
+//        // when
+//        ApiResponse<Long> response = notificationService.subscribe(TEST_REQUEST_ID);
+//
+//        // then
+//        assertThat(response.getStatus()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+//        assertThat(response.getMessage()).isEqualTo("Emitter creation failed");
+//    }
+//    @Test
+//    @DisplayName("createEmitter - 성공 테스트")
+//    void createEmitterSuccess() {
+//        // given
+//        Long emitterId = TEST_USER_ID;
+//
+//        // when
+//        SseEmitter emitter = invokePrivateMethod(notificationService, "createEmitter", emitterId);
+//
+//        // then
+//        assertNotNull(emitter);
+//        verify(emitterRepository, times(1)).save(emitterId, emitter);
+//    }
+
+//    @Test
+//    @DisplayName("Emitter onTimeout - 동작 확인")
+//    void emitterOnTimeout() {
+//        // given
+//        SseEmitter emitter = new SseEmitter();
+//        Long emitterId = TEST_USER_ID;
+//        doNothing().when(emitterRepository).deleteById(emitterId);
+//
+//        // when
+//        emitter.onTimeout(() -> emitterRepository.deleteById(emitterId));
+//        emitter.completeWithTimeout();
+//
+//        // then
+//        verify(emitterRepository, times(1)).deleteById(emitterId);
+//    }
+
+//    @Test
+//    @DisplayName("Emitter onCompletion - 동작 확인")
+//    void emitterOnCompletion() {
+//        // given
+//        SseEmitter emitter = new SseEmitter();
+//        Long emitterId = TEST_USER_ID;
+//        doNothing().when(emitterRepository).deleteById(emitterId);
+//        // when
+//        emitter.onCompletion(() -> emitterRepository.deleteById(emitterId));
+//        emitter.complete();
+//        // then
+//        verify(emitterRepository, times(1)).deleteById(emitterId);
+//        }
+
+    @Test
+    @DisplayName("createNotification - 실패 테스트 (savedNotification이 null)")
+    void createNotificationFail_SavedNotificationNull() {
+        // given
+        lenient().when(notificationRepository.save(any(Notification.class))).thenReturn(null); // lenient로 설정
+        Notification notification = Notification.builder()
+                .requestId(TEST_REQUEST_ID)
+                .build();
+        Collection<SseEmitter> emitters = List.of(new SseEmitter());
+        lenient().when(emitterRepository.getAllEmitters()).thenReturn(emitters); // lenient 설정 추가
+        // when
+        ApiResponse<Notification> response = notificationService.createNotification(TEST_USER_ID, notification);
+        // then
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST); // 상태 코드 검증
+        assertThat(response.getMessage()).isIn(
+                ErrorCode.INVALID_SSE_ID.getMessage(),
+                ErrorCode.INVALID_INPUT_VALUE.getMessage()
+        );
+    }
+
+
+
 }
