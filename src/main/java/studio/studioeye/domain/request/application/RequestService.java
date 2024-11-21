@@ -108,12 +108,12 @@ public class RequestService {
 				+ "프로젝트명: " + savedRequest.getProjectName() + "\n"
 				+ "문의 내용: " + savedRequest.getDescription() + "\n";
 
-		emailService.sendEmail(savedRequest.getEmail(), subject, text);
 		boolean isExceeded = emailService.sendEmail(savedRequest.getEmail(), subject, text);
-		if(!isExceeded) {
+		if (!isExceeded) {
 			return ApiResponse.withError(ErrorCode.EMAIL_SIZE_EXCEEDED);
 		}
-		notificationService.subscribe(request.getId());    // 문의 등록 알림 보내기
+
+		notificationService.subscribe(request.getId()); // 문의 등록 알림 보내기
 		return ApiResponse.ok("문의를 성공적으로 등록하였습니다.", savedRequest);
 	}
 
