@@ -187,21 +187,28 @@ class NotificationServiceTest {
         verify(emitterRepository, times(userIds.size())).save(anyLong(), any(SseEmitter.class));
     }
 
-//    @Test
-//    @DisplayName("subscribe - 실패 테스트 (Emitter 생성 실패)")
-//    void subscribeFail_EmitterError() {
-//        // given
-//        List<Long> userIds = List.of(TEST_USER_ID);
-//        when(userService.getAllApprovedUserIds()).thenReturn(userIds);
-//        doThrow(new RuntimeException("Emitter creation failed")).when(emitterRepository).save(anyLong(), any(SseEmitter.class));
-//
-//        // when
-//        ApiResponse<Long> response = notificationService.subscribe(TEST_REQUEST_ID);
-//
-//        // then
-//        assertThat(response.getStatus()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
-//        assertThat(response.getMessage()).isEqualTo("Emitter creation failed");
-//    }
+    @Test
+    @DisplayName("구독 실패 테스트 - Emitter 생성 실패")
+    void subscribeFail_EmitterError() {
+        // given
+        List<Long> userIds = List.of(1L);
+        // 유저 리스트 Mock 반환
+        when(userService.getAllApprovedUserIds()).thenReturn(userIds);
+        // createEmitter 메서드에서 예외를 던지도록 설정
+        doThrow(new RuntimeException("Emitter creation failed"))
+                .when(notificationService).createEmitter(anyLong());
+        // when
+        RuntimeException exception = assertThrows(
+                RuntimeException.class,
+                () -> notificationService.subscribe(1L)
+        );
+        // then
+        assertEquals("Emitter creation failed", exception.getMessage());
+        // 호출 검증
+        verify(userService, times(1)).getAllApprovedUserIds();
+        verify(emitterRepository, never()).save(anyLong(), any(SseEmitter.class)); // 저장되지 않아야 함
+    }
+
 
 //    @Test
 //    @DisplayName("createEmitter - 성공 테스트")
