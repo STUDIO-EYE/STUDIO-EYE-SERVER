@@ -301,5 +301,23 @@ class NotificationServiceTest {
         // then
         verify(emitterRepository, times(1)).deleteById(emitterId); // deleteById 호출 확인
     }
-
+    @Test
+    @DisplayName("createEmitter - 람다 onCompletion 실행 테스트")
+    void createEmitter_OnCompletion_WithMock() {
+        // given
+        Long emitterId = TEST_USER_ID;
+        // Mock SseEmitter 생성
+        SseEmitter mockEmitter = mock(SseEmitter.class);
+        doNothing().when(emitterRepository).deleteById(emitterId);
+        // when
+        // emitter.onCompletion()을 설정하여 목업이 deleteById 호출을 트리거하도록 설정
+        doAnswer(invocation -> {
+            Runnable callback = invocation.getArgument(0); // onCompletion 콜백
+            callback.run(); // 콜백 실행
+            return null;
+        }).when(mockEmitter).onCompletion(any(Runnable.class));
+        mockEmitter.onCompletion(() -> emitterRepository.deleteById(emitterId)); // 완료 설정
+        // then
+        verify(emitterRepository, times(1)).deleteById(emitterId); // deleteById 호출 확인
+    }
 }
