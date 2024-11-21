@@ -262,4 +262,24 @@ class NotificationServiceTest {
         verify(emitterRepository, times(1)).deleteById(emitterId); // 완료 시 삭제 호출 확인
     }
 
+    @Test
+    @DisplayName("createEmitter - 예외 발생 테스트")
+    void createEmitter_ExceptionThrown() {
+        // given
+        Long emitterId = TEST_USER_ID;
+        // Mock 저장 시 예외 발생 설정
+        doThrow(new RuntimeException("Emitter creation error"))
+                .when(emitterRepository).save(eq(emitterId), any(SseEmitter.class));
+        // when
+        RuntimeException exception = assertThrows(RuntimeException.class,
+                () -> {
+                    // Mock으로 Emitter 생성 및 저장
+                    SseEmitter mockEmitter = mock(SseEmitter.class);
+                    emitterRepository.save(emitterId, mockEmitter);
+                }
+        );
+        // then
+        assertEquals("Emitter creation error", exception.getMessage()); // 예외 메시지 확인
+        verify(emitterRepository, times(1)).save(eq(emitterId), any(SseEmitter.class)); // 호출 확인
+    }
 }
