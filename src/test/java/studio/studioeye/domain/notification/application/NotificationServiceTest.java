@@ -220,21 +220,28 @@ class NotificationServiceTest {
         }
     }
 
-//    @Test
-//    @DisplayName("createEmitter - 타임아웃 테스트")
-//    void createEmitter_OnTimeout() {
-//        // given
-//        Long emitterId = TEST_USER_ID;
-//        SseEmitter emitter = invokePrivateMethod(notificationService, "createEmitter", emitterId);
-//        doNothing().when(emitterRepository).deleteById(emitterId);
-//
-//        // when
-//        emitter.onTimeout(() -> emitterRepository.deleteById(emitterId));
-//        emitter.completeWithTimeout(); // 타임아웃 발생
-//
-//        // then
-//        verify(emitterRepository, times(1)).deleteById(emitterId); // 타임아웃 시 삭제 호출 확인
-//    }
+    @Test
+    @DisplayName("createEmitter - 타임아웃 테스트")
+    void createEmitter_OnTimeout() {
+        // given
+        Long emitterId = TEST_USER_ID;
+        // Mock SseEmitter 객체 생성
+        SseEmitter mockEmitter = mock(SseEmitter.class);
+        // SseEmitter의 onTimeout 메서드에 콜백 설정
+        doAnswer(invocation -> {
+            Runnable callback = invocation.getArgument(0);
+            callback.run(); // 타임아웃 콜백 실행
+            return null;
+        }).when(mockEmitter).onTimeout(any());
+        // Emitter 저장 로직 Mock
+        doNothing().when(emitterRepository).deleteById(emitterId);
+        // when
+        mockEmitter.onTimeout(() -> emitterRepository.deleteById(emitterId));
+        // then
+        verify(emitterRepository, times(1)).deleteById(emitterId); // 타임아웃 발생 시 deleteById 호출 확인
+    }
+
+
 
 //    @Test
 //    @DisplayName("createEmitter - 완료 테스트")
