@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -27,7 +28,7 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class NotificationServiceTest {
-
+    @Spy
     @InjectMocks
     private NotificationService notificationService;
     @Mock
@@ -42,24 +43,7 @@ class NotificationServiceTest {
     private static final Long TEST_REQUEST_ID = 1L;
     private static final Long TEST_USER_ID = 1L;
 
-//    @Test
-//    @DisplayName("알림 구독 성공 테스트")
-//    void subscribeSuccess() {
-//        // given
-//        CreateNotificationServiceRequestDto createNotificationServiceRequestDto = new CreateNotificationServiceRequestDto(1L);
-//        List<Long> userIds = List.of(TEST_USER_ID);
-//        when(userService.getAllApprovedUserIds()).thenReturn(userIds);
-//        when(emitterRepository.save(any(), any())).thenReturn(null);
-////        when(userNotificationService.createUserNotification(any(), any())).thenReturn();
-//
-//        // when
-//        ApiResponse<Long> response = notificationService.subscribe(TEST_REQUEST_ID);
-//
-//        // then
-//        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK);
-//        assertThat(response.getMessage()).isEqualTo("알림을 성공적으로 구독하였습니다.");
-//        verify(emitterRepository, times(userIds.size())).save(any(), any(SseEmitter.class));
-//    }
+
 
     @Test
     @DisplayName("알림 구독 실패 테스트 - 승인된 유저가 없는 경우")
@@ -184,22 +168,24 @@ class NotificationServiceTest {
         assertEquals("알림이 존재하지 않습니다.", response.getMessage()); // 예상 메시지 확인
         assertNull(response.getData()); // 데이터가 null이어야 함
     }
-
-//    @Test
-//    @DisplayName("subscribe - 성공 테스트")
-//    void subscribeSuccess() {
-//        // given
-//        List<Long> userIds = List.of(TEST_USER_ID);
-//        when(userService.getAllApprovedUserIds()).thenReturn(userIds);
-//        doNothing().when(emitterRepository).save(anyLong(), any(SseEmitter.class));
-//        doNothing().when(userNotificationService).createUserNotification(anyLong(), anyLong());
-//        // when
-//        ApiResponse<Long> response = notificationService.subscribe(TEST_REQUEST_ID);
-//        // then
-//        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK);
-//        assertThat(response.getMessage()).isEqualTo("알림을 성공적으로 구독하였습니다.");
-//        verify(emitterRepository, times(userIds.size())).save(anyLong(), any(SseEmitter.class));
-//    }
+    @Test
+    @DisplayName("알림 구독 성공 테스트")
+    void subscribeSuccess() {
+        // given
+        List<Long> userIds = List.of(1L);
+        SseEmitter mockEmitter = mock(SseEmitter.class);
+        when(userService.getAllApprovedUserIds()).thenReturn(userIds); // 승인된 유저 목록 반환
+        doReturn(mockEmitter).when(notificationService).createEmitter(anyLong()); // Spy로 createEmitter Mock
+        // when
+        ApiResponse<Long> response = notificationService.subscribe(1L);
+        // then
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatus());
+        assertEquals("알림을 성공적으로 구독하였습니다.", response.getMessage());
+        // 호출 검증
+        verify(userService, times(1)).getAllApprovedUserIds();
+        verify(emitterRepository, times(userIds.size())).save(anyLong(), any(SseEmitter.class));
+    }
 
 //    @Test
 //    @DisplayName("subscribe - 실패 테스트 (Emitter 생성 실패)")
@@ -216,6 +202,7 @@ class NotificationServiceTest {
 //        assertThat(response.getStatus()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
 //        assertThat(response.getMessage()).isEqualTo("Emitter creation failed");
 //    }
+
 //    @Test
 //    @DisplayName("createEmitter - 성공 테스트")
 //    void createEmitterSuccess() {
@@ -279,7 +266,5 @@ class NotificationServiceTest {
                 ErrorCode.INVALID_INPUT_VALUE.getMessage()
         );
     }
-
-
 
 }
