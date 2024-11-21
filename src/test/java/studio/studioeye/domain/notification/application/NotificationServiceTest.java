@@ -320,4 +320,29 @@ class NotificationServiceTest {
         // then
         verify(emitterRepository, times(1)).deleteById(emitterId); // deleteById 호출 확인
     }
+
+    @Test
+    @DisplayName("subscribe - 타임아웃 발생 테스트")
+    void subscribe_Timeout_WithMock() {
+        // given
+        List<Long> userIds = List.of(TEST_USER_ID);
+        SseEmitter mockEmitter = mock(SseEmitter.class);
+        // Mock 반환 설정
+        when(userService.getAllApprovedUserIds()).thenReturn(userIds);
+        doReturn(mockEmitter).when(notificationService).createEmitter(anyLong());
+        // onTimeout 콜백 실행 설정
+        doAnswer(invocation -> {
+            Runnable callback = invocation.getArgument(0);
+            callback.run(); // 타임아웃 콜백 실행
+            return null;
+        }).when(mockEmitter).onTimeout(any(Runnable.class));
+        // deleteById 호출을 목업 처리
+        doNothing().when(emitterRepository).deleteById(TEST_USER_ID);
+        // when
+        notificationService.subscribe(TEST_REQUEST_ID);
+        // then
+        verify(emitterRepository, times(1)).deleteById(TEST_USER_ID); // 타임아웃 발생 시 deleteById 호출 확인
+    }
+
+
 }
