@@ -82,7 +82,8 @@ public class NotificationService {
         return ApiResponse.ok("모든 알림 목록을 성공적으로 조회했습니다.", notificationList);
     }
 
-    private SseEmitter createEmitter(Long id) {
+    // 접근 제한 private -> protected
+    protected SseEmitter createEmitter(Long id) {
         SseEmitter emitter = new SseEmitter(DEFAULT_TIMEOUT);
         emitterRepository.save(id, emitter);
         // Emitter가 완료될 때(모든 데이터가 성공적으로 전송되었을 때) Emitter를 삭제한다.
