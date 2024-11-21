@@ -233,5 +233,18 @@ public class RequestServiceTest {
 		assertEquals(1L, response.getData().getId()); // 데이터의 id 확인
 		verify(requestRepository, times(1)).findById(1L); // findById 호출 횟수 검증
 	}
+	@Test
+	@DisplayName("retrieveRequestCountByCategoryAndState - 잘못된 기간")
+	void retrieveRequestCount_InvalidPeriod() {
+		// when
+		ApiResponse<List<Map<String, Object>>> response = requestService.retrieveRequestCountByCategoryAndState(
+				"Category", "APPROVED", 2023, 12, 2023, 10 // 잘못된 기간
+		);
+
+		// then
+		assertNotNull(response);
+		assertEquals(HttpStatus.BAD_REQUEST, response.getStatus());
+		assertEquals(ErrorCode.INVALID_PERIOD_FORMAT.getMessage(), response.getMessage());
+	}
 
 }
