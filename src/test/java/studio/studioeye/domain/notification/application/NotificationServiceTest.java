@@ -359,4 +359,24 @@ class NotificationServiceTest {
         assertEquals(HttpStatus.OK, response.getStatus()); // 상태 코드 확인
         assertEquals("알림이 존재하지 않습니다.", response.getMessage()); // 예상 메시지 확인
     }
+
+    @Test
+    @DisplayName("createNotification - send 호출 시 예외 처리 테스트")
+    void createNotification_SendException_WithMock() throws IOException {
+        // given
+        Notification notification = Notification.builder().build();
+        SseEmitter failingEmitter = mock(SseEmitter.class);
+        // Mock 설정: 정확한 인자 전달
+        doThrow(new IOException("Send failed"))
+                .when(failingEmitter)
+                .send(any(Notification.class)); // 정확한 인자를 명시
+        when(notificationRepository.save(any())).thenReturn(notification);
+        when(emitterRepository.getAllEmitters()).thenReturn(List.of(failingEmitter));
+        // when
+        ApiResponse<Notification> response = notificationService.createNotification(TEST_USER_ID, notification);
+        // then
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatus()); // 상태 코드 확인
+        assertEquals(ErrorCode.INVALID_SSE_ID.getMessage(), response.getMessage()); // 예상 메시지 확인
+        verify(failingEmitter, times(1)).completeWithError(any()); // completeWithError 호출 확인
+    }
 }
