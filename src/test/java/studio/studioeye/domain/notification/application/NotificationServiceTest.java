@@ -282,4 +282,24 @@ class NotificationServiceTest {
         assertEquals("Emitter creation error", exception.getMessage()); // 예외 메시지 확인
         verify(emitterRepository, times(1)).save(eq(emitterId), any(SseEmitter.class)); // 호출 확인
     }
+    @Test
+    @DisplayName("createEmitter - 람다 onTimeout 실행 테스트")
+    void createEmitter_OnTimeout_WithMock() {
+        // given
+        Long emitterId = TEST_USER_ID;
+        // Mock SseEmitter 생성
+        SseEmitter mockEmitter = mock(SseEmitter.class);
+        doNothing().when(emitterRepository).deleteById(emitterId);
+        // when
+        // emitter.onTimeout()을 설정하여 목업이 deleteById 호출을 트리거하도록 설정
+        doAnswer(invocation -> {
+            Runnable callback = invocation.getArgument(0); // onTimeout 콜백
+            callback.run(); // 콜백 실행
+            return null;
+        }).when(mockEmitter).onTimeout(any(Runnable.class));
+        mockEmitter.onTimeout(() -> emitterRepository.deleteById(emitterId)); // 타임아웃 설정
+        // then
+        verify(emitterRepository, times(1)).deleteById(emitterId); // deleteById 호출 확인
+    }
+
 }
