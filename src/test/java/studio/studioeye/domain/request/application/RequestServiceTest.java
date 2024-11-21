@@ -166,21 +166,21 @@ class RequestServiceTest {
 		verify(requestRepository, times(0)).save(any());
 	}
 
-//	@Test
-//	@DisplayName("문의 삭제 성공 테스트")
-//	void deleteRequestSuccess() {
-//		// given
-//		Long requestId = 1L;
-//		when(requestRepository.findById(requestId)).thenReturn(Optional.of(request));
-//		doNothing().when(requestRepository).delete(request);
-//		// when
-//		ApiResponse<String> response = requestService.deleteRequest(requestId);
-//		// then
-//		assertEquals(200, response.getStatus().value());
-//		assertEquals("문의를 성공적으로 삭제했습니다.", response.getMassage());
-//		verify(requestRepository, times(1)).findById(requestId);
-//		verify(requestRepository, times(1)).delete(request);
-//	}
+	@Test
+	@DisplayName("문의 삭제 성공 테스트")
+	void deleteRequestSuccess() {
+		// given
+		Long requestId = 1L;
+		when(requestRepository.findById(requestId)).thenReturn(Optional.of(request));
+		doNothing().when(requestRepository).delete(request);
+		// when
+		ApiResponse<String> response = requestService.deleteRequest(requestId);
+		// then
+		assertEquals(200, response.getStatus().value());
+		assertEquals("문의를 성공적으로 삭제했습니다.", response.getMessage());
+		verify(requestRepository, times(1)).findById(requestId);
+		verify(requestRepository, times(1)).delete(request);
+	}
 
 	@Test
 	@DisplayName("문의 삭제 실패 테스트 - 잘못된 ID")
