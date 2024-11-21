@@ -134,24 +134,22 @@ class RequestServiceTest {
 		verify(requestRepository, times(1)).count();
 	}
 
-//	@Test
-//	@DisplayName("문의 상태 업데이트 성공 테스트")
-//	void updateRequestStateSuccess() {
-//		// given
-//		Long requestId = 1L;
-//		UpdateRequestStateServiceDto dto = new UpdateRequestStateServiceDto(State.APPROVED);
-//		when(requestRepository.findById(requestId)).thenReturn(Optional.of(request));
-//		when(requestRepository.save(any(Request.class))).thenReturn(request); // 추가 설정
-//		// when
-//		ApiResponse<String> response = requestService.updateRequestState(requestId, dto);
-//		// then
-//		assertEquals(200, response.getStatus().value());
-//		assertEquals("상태를 성공적으로 수정했습니다.", response.getData());
-//		verify(requestRepository, times(1)).findById(requestId);
-//		verify(requestRepository, times(1)).save(request);
-//	}
-	// updateRequestState 도 괜찮은 것 같은데 왜 안될까,,,
-
+	@Test
+	@DisplayName("문의 상태 업데이트 성공 테스트")
+	void updateRequestStateSuccess() {
+		// given
+		Long requestId = 1L;
+		UpdateRequestStateServiceDto dto = new UpdateRequestStateServiceDto(State.APPROVED);
+		when(requestRepository.findById(requestId)).thenReturn(Optional.of(request));
+		when(requestRepository.save(any(Request.class))).thenReturn(request); // 추가 설정
+		// when
+		ApiResponse<String> response = requestService.updateRequestState(requestId, dto);
+		// then
+		assertEquals(200, response.getStatus().value());
+		assertEquals("상태를 성공적으로 수정했습니다.", response.getMessage());
+		verify(requestRepository, times(1)).findById(requestId);
+		verify(requestRepository, times(1)).save(request);
+	}
 
 	@Test
 	@DisplayName("문의 상태 업데이트 실패 테스트 - 잘못된 ID")
@@ -179,7 +177,7 @@ class RequestServiceTest {
 //		ApiResponse<String> response = requestService.deleteRequest(requestId);
 //		// then
 //		assertEquals(200, response.getStatus().value());
-//		assertEquals("문의를 성공적으로 삭제했습니다.", response.getData());
+//		assertEquals("문의를 성공적으로 삭제했습니다.", response.getMassage());
 //		verify(requestRepository, times(1)).findById(requestId);
 //		verify(requestRepository, times(1)).delete(request);
 //	}
