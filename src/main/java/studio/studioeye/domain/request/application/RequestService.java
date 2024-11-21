@@ -108,7 +108,7 @@ public class RequestService {
 				+ "프로젝트명: " + savedRequest.getProjectName() + "\n"
 				+ "문의 내용: " + savedRequest.getDescription() + "\n";
 
-		emailService.sendEmail(savedRequest.getEmail(), subject, text);
+//		emailService.sendEmail(savedRequest.getEmail(), subject, text);
 		boolean isExceeded = emailService.sendEmail(savedRequest.getEmail(), subject, text);
 		if(!isExceeded) {
 			return ApiResponse.withError(ErrorCode.EMAIL_SIZE_EXCEEDED);
