@@ -12,6 +12,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 import studio.studioeye.domain.faq.dao.FaqQuestions;
 import studio.studioeye.domain.faq.dao.FaqRepository;
@@ -35,6 +36,8 @@ public class FaqServiceTest {
     private FaqService faqService;
     @Mock
     private FaqRepository faqRepository;
+    @Mock
+    private S3Adapter s3Adapter;
 
     @Test
     @DisplayName("FAQ 생성 성공")
@@ -312,22 +315,22 @@ public class FaqServiceTest {
             verify(faqRepository, times(1)).delete(faq);
         }
     }
-//    @Test
-//    @DisplayName("convertBase64ToImageUrl - 성공 테스트")
-//    void convertBase64ToImageUrlSuccess() throws IOException {
-//        // given
-//        String base64Image = "data:image/png;base64,iVBORw0KGgoAAAANS...";
-//        when(s3Adapter.uploadImage(any())).thenReturn(ApiResponse.ok("http://mock-url.com/image.png"));
-//
-//        // when
-//        ApiResponse<String> response = faqService.convertBase64ToImageUrl(base64Image);
-//
-//        // then
-//        assertEquals(HttpStatus.OK, response.getStatus());
-//        assertEquals("FAQ base64 이미지를 성공적으로 저장했습니다.", response.getMessage());
-//        assertEquals("http://mock-url.com/image.png", response.getData());
-//        verify(s3Adapter, times(1)).uploadImage(any());
-//    }
+    @Test
+    @DisplayName("convertBase64ToImageUrl - 실패 테스트")
+    void convertBase64ToImageUrlFail() throws IOException {
+        // given
+        String base64Image = "data:image/png;base64," + Base64.getEncoder().encodeToString("test".getBytes());
+        // Mock s3Adapter.uploadImage 메서드
+        when(s3Adapter.uploadImage(any(MultipartFile.class))).thenReturn(ApiResponse.ok(null)); // imageUrl을 null로 반환
+        // when
+        ApiResponse<String> response = faqService.convertBase64ToImageUrl(base64Image);
+        // then
+        assertNotNull(response); // 응답이 null이 아닌지 확인
+        assertEquals(ErrorCode.ERROR_S3_UPDATE_OBJECT.getStatus(), response.getStatus()); // 상태 코드 확인
+        assertEquals(ErrorCode.ERROR_S3_UPDATE_OBJECT.getMessage(), response.getMessage()); // 에러 메시지 확인
+        verify(s3Adapter, times(1)).uploadImage(any(MultipartFile.class)); // Mock 호출 확인
+    }
+
 
 //    @Test
 //    @DisplayName("convertBase64ToImageUrl - 실패 테스트")
@@ -344,7 +347,7 @@ public class FaqServiceTest {
 //        assertEquals(ErrorCode.ERROR_S3_UPDATE_OBJECT.getMessage(), response.getMessage());
 //        verify(s3Adapter, times(1)).uploadImage(any());
 //    }
-
+//
 //    @Test
 //    @DisplayName("convert - 성공 테스트")
 //    void convertSuccess() throws IOException {
@@ -387,6 +390,7 @@ public class FaqServiceTest {
         verify(faqRepository, times(1)).findById(2L);
         verify(faqRepository, times(1)).findById(999L);
     }
+
     @Test
     @DisplayName("retrieveFaqPage - 성공 테스트")
     void retrieveFaqPageSuccess() {
