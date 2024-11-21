@@ -240,11 +240,26 @@ public class RequestServiceTest {
 		ApiResponse<List<Map<String, Object>>> response = requestService.retrieveRequestCountByCategoryAndState(
 				"Category", "APPROVED", 2023, 12, 2023, 10 // 잘못된 기간
 		);
-
 		// then
 		assertNotNull(response);
 		assertEquals(HttpStatus.BAD_REQUEST, response.getStatus());
 		assertEquals(ErrorCode.INVALID_PERIOD_FORMAT.getMessage(), response.getMessage());
+	}
+	@Test
+	@DisplayName("retrieveRequestCountByCategoryAndState - 상태가 all")
+	void retrieveRequestCount_StateAll() {
+		// given
+		List<RequestCount> mockData = List.of(new RequestCountImpl(2023, 11, 5L, "Category", null));
+		when(requestRepository.findReqNumByYearAndMonthBetweenWithCategoryAndState(anyInt(), anyInt(), anyInt(), anyInt(), anyString(), any())).thenReturn(mockData);
+		// when
+		ApiResponse<List<Map<String, Object>>> response = requestService.retrieveRequestCountByCategoryAndState(
+				"Category", "all", 2023, 1, 2023, 12
+		);
+		// then
+		assertNotNull(response);
+		assertEquals(HttpStatus.OK, response.getStatus());
+		assertNotNull(response.getData());
+		verify(requestRepository, times(1)).findReqNumByYearAndMonthBetweenWithCategoryAndState(anyInt(), anyInt(), anyInt(), anyInt(), anyString(), isNull());
 	}
 
 }
