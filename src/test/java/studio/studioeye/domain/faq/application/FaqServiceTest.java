@@ -331,35 +331,20 @@ public class FaqServiceTest {
         verify(s3Adapter, times(1)).uploadImage(any(MultipartFile.class)); // Mock 호출 확인
     }
 
+    @Test
+    @DisplayName("convert - 성공 테스트")
+    void convertSuccess() throws IOException {
+        // given
+        // 유효한 Base64 문자열 생성
+        String validBase64Image = "data:image/png;base64," + Base64.getEncoder().encodeToString("valid image data".getBytes());
+        // when
+        MultipartFile result = faqService.convert(validBase64Image);
+        // then
+        assertNotNull(result); // 결과가 null이 아닌지 확인
+        assertEquals("image.png", result.getOriginalFilename()); // 파일 이름 확인
+        assertEquals("image/png", result.getContentType()); // MIME 타입 확인
+    }
 
-//    @Test
-//    @DisplayName("convertBase64ToImageUrl - 실패 테스트")
-//    void convertBase64ToImageUrlFail() throws IOException {
-//        // given
-//        String invalidBase64Image = "invalid_base64";
-//        when(s3Adapter.uploadImage(any())).thenReturn(ApiResponse.withError(ErrorCode.ERROR_S3_UPDATE_OBJECT));
-//
-//        // when
-//        ApiResponse<String> response = faqService.convertBase64ToImageUrl(invalidBase64Image);
-//
-//        // then
-//        assertEquals(ErrorCode.ERROR_S3_UPDATE_OBJECT.getStatus(), response.getStatus());
-//        assertEquals(ErrorCode.ERROR_S3_UPDATE_OBJECT.getMessage(), response.getMessage());
-//        verify(s3Adapter, times(1)).uploadImage(any());
-//    }
-//
-//    @Test
-//    @DisplayName("convert - 성공 테스트")
-//    void convertSuccess() throws IOException {
-//        // given
-//        String validBase64Image = "data:image/png;base64,iVBORw0KGgoAAAANS...";
-//        // when
-//        MultipartFile result = faqService.convert(validBase64Image);
-//        // then
-//        assertNotNull(result);
-//        assertEquals("image.png", result.getOriginalFilename());
-//        assertEquals("image/png", result.getContentType());
-//    }
 //    @Test
 //    @DisplayName("convert - 실패 테스트")
 //    void convertFail() {
