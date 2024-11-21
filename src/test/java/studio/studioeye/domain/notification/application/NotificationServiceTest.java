@@ -241,40 +241,25 @@ class NotificationServiceTest {
         verify(emitterRepository, times(1)).deleteById(emitterId); // 타임아웃 발생 시 deleteById 호출 확인
     }
 
-
-
-//    @Test
-//    @DisplayName("createEmitter - 완료 테스트")
-//    void createEmitter_OnCompletion() {
-//        // given
-//        Long emitterId = TEST_USER_ID;
-//        SseEmitter emitter = invokePrivateMethod(notificationService, "createEmitter", emitterId);
-//        doNothing().when(emitterRepository).deleteById(emitterId);
-//
-//        // when
-//        emitter.onCompletion(() -> emitterRepository.deleteById(emitterId));
-//        emitter.complete(); // 완료 발생
-//
-//        // then
-//        verify(emitterRepository, times(1)).deleteById(emitterId); // 완료 시 삭제 호출 확인
-//    }
-//
-//    @Test
-//    @DisplayName("createEmitter - 예외 발생 테스트")
-//    void createEmitter_ExceptionThrown() {
-//        // given
-//        Long emitterId = TEST_USER_ID;
-//        doThrow(new RuntimeException("Emitter creation error"))
-//                .when(emitterRepository).save(emitterId, any(SseEmitter.class));
-//
-//        // when
-//        RuntimeException exception = assertThrows(RuntimeException.class,
-//                () -> invokePrivateMethod(notificationService, "createEmitter", emitterId)
-//        );
-//
-//        // then
-//        assertEquals("Emitter creation error", exception.getMessage()); // 예외 메시지 확인
-//        verify(emitterRepository, times(1)).save(emitterId, any(SseEmitter.class)); // 호출 확인
-//    }
+    @Test
+    @DisplayName("createEmitter - 완료 테스트")
+    void createEmitter_OnCompletion() {
+        // given
+        Long emitterId = TEST_USER_ID;
+        // Mock SseEmitter 객체 생성
+        SseEmitter mockEmitter = mock(SseEmitter.class);
+        // SseEmitter의 onCompletion 메서드에 콜백 설정
+        doAnswer(invocation -> {
+            Runnable callback = invocation.getArgument(0);
+            callback.run(); // 완료 콜백 실행
+            return null;
+        }).when(mockEmitter).onCompletion(any());
+        // Emitter 저장 로직 Mock
+        doNothing().when(emitterRepository).deleteById(emitterId);
+        // when
+        mockEmitter.onCompletion(() -> emitterRepository.deleteById(emitterId));
+        // then
+        verify(emitterRepository, times(1)).deleteById(emitterId); // 완료 시 삭제 호출 확인
+    }
 
 }
