@@ -18,10 +18,7 @@ import studio.studioeye.global.common.response.ApiResponse;
 import studio.studioeye.global.exception.error.ErrorCode;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -179,29 +176,18 @@ class NotificationServiceTest {
     }
 
     @Test
-    @DisplayName("모든 알림 조회 실패 테스트 - null 반환")
-    void retrieveAllNotificationFail_NullReturn() {
+    @DisplayName("모든 알림 조회 실패 테스트 - 빈 리스트 반환")
+    void retrieveAllNotificationFail_EmptyList() {
         // given
-        when(notificationRepository.findAll()).thenReturn(null);
+        when(notificationRepository.findAll()).thenReturn(Collections.emptyList()); // 빈 리스트 반환
         // when
         ApiResponse<List<Notification>> response = notificationService.retrieveAllNotification();
         // then
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatus());
-        assertNull(response.getData());
-        assertEquals("알림 조회 중 오류가 발생했습니다.", response.getMessage());
-        verify(notificationRepository, times(1)).findAll();
+        assertNotNull(response); // 응답이 null이 아님을 확인
+        assertEquals(HttpStatus.OK, response.getStatus()); // 응답 상태 확인
+        assertEquals("알림이 존재하지 않습니다.", response.getMessage()); // 예상 메시지 확인
+        assertNull(response.getData()); // 데이터가 null이어야 함
     }
 
-//    @Test
-//    @DisplayName("subscribe 호출 시 Emitter가 생성된다")
-//    void testSubscribeCreatesEmitter() {
-//        // given
-//        List<Long> userIds = List.of(1L, 2L, 3L);
-//        when(userService.getAllApprovedUserIds()).thenReturn(userIds);
-//        // when
-//        ApiResponse<Long> response = notificationService.subscribe(1L);
-//        // then
-//        assertEquals(HttpStatus.OK, response.getStatus());
-//        verify(emitterRepository, times(userIds.size())).save(any(), any(SseEmitter.class)); // Emitter가 저장되었는지 확인
-//    }
+
 }
