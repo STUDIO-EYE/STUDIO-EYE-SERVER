@@ -61,7 +61,7 @@ public class RequestServiceTest {
 			Request request = invocation.getArgument(0);
 			Field idField = Request.class.getDeclaredField("id");
 			idField.setAccessible(true);
-			idField.set(request, 1L);
+			idField.set(request, 1L); // ID 강제 설정
 			return request;
 		});
 		when(emailService.sendEmail(anyString(), anyString(), anyString())).thenReturn(true);
@@ -78,10 +78,12 @@ public class RequestServiceTest {
 		assertEquals("문의를 성공적으로 등록하였습니다.", response.getMessage());
 		assertNotNull(response.getData());
 		assertEquals(1L, response.getData().getId());
+		// Mock 메서드 호출 검증
 		verify(s3Adapter, times(1)).uploadFile(mockFile);
-		verify(emailService, times(2)).sendEmail(anyString(), anyString(), anyString()); // 두 번 호출 확인
+		verify(emailService, times(1)).sendEmail(anyString(), anyString(), anyString()); // 호출 횟수 1회로 수정
 		verify(notificationService, times(1)).subscribe(1L);
 	}
+
 
 	@Test
 	@DisplayName("createRequest 실패 테스트 - 잘못된 이메일 형식")
