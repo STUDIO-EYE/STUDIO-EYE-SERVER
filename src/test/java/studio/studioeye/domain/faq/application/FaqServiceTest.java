@@ -40,7 +40,7 @@ public class FaqServiceTest {
     private S3Adapter s3Adapter;
 
     @Test
-    @DisplayName("FAQ 생성 성공")
+    @DisplayName("FAQ 생성 성공 테스트")
     public void createFaqSuccess() {
         // given
         String question = "test question";
@@ -59,7 +59,7 @@ public class FaqServiceTest {
     }
 
     @Test
-    @DisplayName("FAQ 생성 실패 - question이 비어 있는 경우")
+    @DisplayName("FAQ 생성 실패 테스트 - 질문이 비어 있는 경우")
     public void createFaqFail() {
         // given
         String question = "";
@@ -78,7 +78,24 @@ public class FaqServiceTest {
     }
 
     @Test
-    @DisplayName("FAQ 전체 조회 성공")
+    @DisplayName("FAQ 생성 실패 테스트 - 답변이 비어 있는 경우")
+    public void createFaqFail_EmptyAnswer() {
+        // given
+        String question = "test question";
+        String answer = ""; // 비어 있는 답변
+        Boolean visibility = true;
+        CreateFaqServiceRequestDto requestDto = new CreateFaqServiceRequestDto(question, answer, visibility);
+        // when
+        ApiResponse<Faq> response = faqService.createFaq(requestDto);
+        // then
+        assertNotNull(response);
+        assertEquals(ErrorCode.FAQ_IS_EMPTY.getStatus(), response.getStatus());
+        assertEquals(ErrorCode.FAQ_IS_EMPTY.getMessage(), response.getMessage());
+        Mockito.verify(faqRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("FAQ 전체 조회 성공 테스트")
     public void retrieveAllFaqSuccess() {
         // given
         List<Faq> faqList = new ArrayList<>();
@@ -101,7 +118,7 @@ public class FaqServiceTest {
     }
 
     @Test
-    @DisplayName("FAQ 전체 조회 실패")
+    @DisplayName("FAQ 전체 조회 실패 테스트 - FAQ가 없는 경우")
     public void retrieveAllFaqFail() {
         // given
         List<Faq> savedFaqList = new ArrayList<>();
@@ -119,7 +136,7 @@ public class FaqServiceTest {
     }
 
     @Test
-    @DisplayName("FAQ 단일 조회 성공")
+    @DisplayName("FAQ 단일 조회 성공 테스트")
     public void retrieveFaqByIdSuccess() {
         // given
         Long id = 1L;
@@ -141,7 +158,7 @@ public class FaqServiceTest {
     }
 
     @Test
-    @DisplayName("FAQ 단일 조회 실패")
+    @DisplayName("FAQ 단일 조회 실패 테스트 - 잘못된 ID")
     public void retrieveFaqByIdFail() {
         // given
         Long id = 2L;
@@ -160,7 +177,7 @@ public class FaqServiceTest {
     }
 
     @Test
-    @DisplayName("FAQ 수정 성공")
+    @DisplayName("FAQ 수정 성공 테스트")
     public void updateFaqSuccess() {
         // given
         Faq savedFaq = new Faq("Test Question1", "Test Answer1", true);
@@ -198,7 +215,7 @@ public class FaqServiceTest {
     }
 
     @Test
-    @DisplayName("FAQ 수정 실패")
+    @DisplayName("FAQ 수정 실패 테스트 - 잘못된 ID")
     public void updateFaqFail() {
         // given
         Faq savedFaq = new Faq("Test Question1", "Test Answer1", true);
@@ -224,7 +241,7 @@ public class FaqServiceTest {
     }
 
     @Test
-    @DisplayName("FAQ 삭제 성공")
+    @DisplayName("FAQ 삭제 성공 테스트")
     public void deleteFaqSuccess() {
         // given
         Long id = 1L;
@@ -241,7 +258,7 @@ public class FaqServiceTest {
     }
 
     @Test
-    @DisplayName("FAQ 삭제 실패")
+    @DisplayName("FAQ 삭제 실패 테스트 - 잘못된 ID")
     public void deleteFaqFail() {
         // given
         Long invalidId = 999L;
@@ -255,8 +272,50 @@ public class FaqServiceTest {
         Mockito.verify(faqRepository, times(1)).findById(invalidId);
         Mockito.verify(faqRepository, never()).delete(any());
     }
+
     @Test
-    @DisplayName("FAQ 제목 조회 성공")
+    @DisplayName("FAQ 다중 삭제 성공 테스트")
+    public void deleteFaqsSuccess() {
+        // given
+        List<Long> ids = List.of(1L, 2L, 3L);
+        List<Faq> faqs = ids.stream()
+                .map(id -> new Faq("Test Question " + id, "Test Answer " + id, true))
+                .toList();
+        for (int i = 0; i < ids.size(); i++) {
+            when(faqRepository.findById(ids.get(i))).thenReturn(Optional.of(faqs.get(i)));
+        }
+        // when
+        ApiResponse<String> response = faqService.deleteFaqs(ids);
+        // then
+        assertEquals(HttpStatus.OK, response.getStatus());
+        assertEquals("FAQ를 성공적으로 삭제했습니다.", response.getMessage());
+        for (Faq faq : faqs) {
+            verify(faqRepository, times(1)).delete(faq);
+        }
+    }
+
+    @Test
+    @DisplayName("FAQ 다중 삭제 실패 테스트 - 일부 잘못된 ID")
+    void deleteFaqsPartialFail() {
+        // given
+        List<Long> ids = List.of(1L, 2L, 999L);
+        Faq faq1 = new Faq("Question 1", "Answer 1", true);
+        Faq faq2 = new Faq("Question 2", "Answer 2", true);
+        when(faqRepository.findById(1L)).thenReturn(Optional.of(faq1));
+        when(faqRepository.findById(2L)).thenReturn(Optional.of(faq2));
+        when(faqRepository.findById(999L)).thenReturn(Optional.empty());
+        // when
+        ApiResponse<String> response = faqService.deleteFaqs(ids);
+        // then
+        assertEquals(ErrorCode.INVALID_FAQ_ID.getStatus(), response.getStatus());
+        assertEquals(ErrorCode.INVALID_FAQ_ID.getMessage(), response.getMessage());
+        verify(faqRepository, times(1)).findById(1L);
+        verify(faqRepository, times(1)).findById(2L);
+        verify(faqRepository, times(1)).findById(999L);
+    }
+
+    @Test
+    @DisplayName("FAQ 제목 조회 성공 테스트")
     public void retrieveAllFaqTitleSuccess() {
         // given
         List<FaqQuestions> faqTitles = List.of(
@@ -282,7 +341,7 @@ public class FaqServiceTest {
     }
 
     @Test
-    @DisplayName("FAQ 제목 조회 실패")
+    @DisplayName("FAQ 제목 조회 실패 테스트")
     public void retrieveAllFaqTitleFail() {
         // given
         when(faqRepository.findAllQuestions()).thenReturn(new ArrayList<>());
@@ -296,85 +355,7 @@ public class FaqServiceTest {
     }
 
     @Test
-    @DisplayName("FAQ 다중 삭제 성공")
-    public void deleteFaqsSuccess() {
-        // given
-        List<Long> ids = List.of(1L, 2L, 3L);
-        List<Faq> faqs = ids.stream()
-                .map(id -> new Faq("Test Question " + id, "Test Answer " + id, true))
-                .toList();
-        for (int i = 0; i < ids.size(); i++) {
-            when(faqRepository.findById(ids.get(i))).thenReturn(Optional.of(faqs.get(i)));
-        }
-        // when
-        ApiResponse<String> response = faqService.deleteFaqs(ids);
-        // then
-        assertEquals(HttpStatus.OK, response.getStatus());
-        assertEquals("FAQ를 성공적으로 삭제했습니다.", response.getMessage());
-        for (Faq faq : faqs) {
-            verify(faqRepository, times(1)).delete(faq);
-        }
-    }
-    @Test
-    @DisplayName("convertBase64ToImageUrl - 실패 테스트")
-    void convertBase64ToImageUrlFail() throws IOException {
-        // given
-        String base64Image = "data:image/png;base64," + Base64.getEncoder().encodeToString("test".getBytes());
-        // Mock s3Adapter.uploadImage 메서드
-        when(s3Adapter.uploadImage(any(MultipartFile.class))).thenReturn(ApiResponse.ok(null)); // imageUrl을 null로 반환
-        // when
-        ApiResponse<String> response = faqService.convertBase64ToImageUrl(base64Image);
-        // then
-        assertNotNull(response); // 응답이 null이 아닌지 확인
-        assertEquals(ErrorCode.ERROR_S3_UPDATE_OBJECT.getStatus(), response.getStatus()); // 상태 코드 확인
-        assertEquals(ErrorCode.ERROR_S3_UPDATE_OBJECT.getMessage(), response.getMessage()); // 에러 메시지 확인
-        verify(s3Adapter, times(1)).uploadImage(any(MultipartFile.class)); // Mock 호출 확인
-    }
-
-    @Test
-    @DisplayName("convert - 성공 테스트")
-    void convertSuccess() throws IOException {
-        // given
-        String validBase64Image = "data:image/png;base64," + Base64.getEncoder().encodeToString("valid image data".getBytes());
-        // when
-        MultipartFile result = faqService.convert(validBase64Image);
-        // then
-        assertNotNull(result); // 결과가 null이 아닌지 확인
-        assertEquals("image.png", result.getOriginalFilename()); // 파일 이름 확인
-        assertEquals("image/png", result.getContentType()); // MIME 타입 확인
-    }
-
-    @Test
-    @DisplayName("convert - 실패 테스트")
-    void convertFail() {
-        // given
-        String invalidBase64Image = "invalid_base64";
-        // when & then
-        assertThrows(IOException.class, () -> faqService.convert(invalidBase64Image));
-    }
-
-    @Test
-    @DisplayName("deleteFaqs - 일부 ID 실패 테스트")
-    void deleteFaqsPartialFail() {
-        // given
-        List<Long> ids = List.of(1L, 2L, 999L);
-        Faq faq1 = new Faq("Question 1", "Answer 1", true);
-        Faq faq2 = new Faq("Question 2", "Answer 2", true);
-        when(faqRepository.findById(1L)).thenReturn(Optional.of(faq1));
-        when(faqRepository.findById(2L)).thenReturn(Optional.of(faq2));
-        when(faqRepository.findById(999L)).thenReturn(Optional.empty());
-        // when
-        ApiResponse<String> response = faqService.deleteFaqs(ids);
-        // then
-        assertEquals(ErrorCode.INVALID_FAQ_ID.getStatus(), response.getStatus());
-        assertEquals(ErrorCode.INVALID_FAQ_ID.getMessage(), response.getMessage());
-        verify(faqRepository, times(1)).findById(1L);
-        verify(faqRepository, times(1)).findById(2L);
-        verify(faqRepository, times(1)).findById(999L);
-    }
-
-    @Test
-    @DisplayName("retrieveFaqPage - 성공 테스트")
+    @DisplayName("FAQ 페이지 조회 성공 테스트")
     void retrieveFaqPageSuccess() {
         // given
         Pageable pageable = PageRequest.of(0, 5);
@@ -394,77 +375,67 @@ public class FaqServiceTest {
     }
 
     @Test
-    @DisplayName("FAQ 생성 실패 - answer가 비어 있는 경우")
-    public void createFaqFail_EmptyAnswer() {
-        // given
-        String question = "test question";
-        String answer = ""; // 비어 있는 답변
-        Boolean visibility = true;
-        CreateFaqServiceRequestDto requestDto = new CreateFaqServiceRequestDto(question, answer, visibility);
-
-        // when
-        ApiResponse<Faq> response = faqService.createFaq(requestDto);
-
-        // then
-        assertNotNull(response);
-        assertEquals(ErrorCode.FAQ_IS_EMPTY.getStatus(), response.getStatus());
-        assertEquals(ErrorCode.FAQ_IS_EMPTY.getMessage(), response.getMessage());
-        Mockito.verify(faqRepository, never()).save(any());
-    }
-//
-//    @Test
-//    @DisplayName("convertBase64ToImageUrl - 빈 문자열 실패 테스트")
-//    void convertBase64ToImageUrl_EmptyString_Fail() throws IOException {
-//        // given
-//        String emptyBase64Image = "";
-//        // when
-//        ApiResponse<String> response = faqService.convertBase64ToImageUrl(emptyBase64Image);
-//        // then
-//        assertErrorResponse(response, ErrorCode.ERROR_S3_UPDATE_OBJECT);
-//        verify(s3Adapter, never()).uploadImage(any());
-//    }
-//    @Test
-//    @DisplayName("convertBase64ToImageUrl - 접두사 없는 Base64 실패 테스트")
-//    void convertBase64ToImageUrl_MissingPrefix_Fail() throws IOException {
-//        // given
-//        String invalidBase64Image = "invalid_base64_data";
-//        // when
-//        ApiResponse<String> response = faqService.convertBase64ToImageUrl(invalidBase64Image);
-//        // then
-//        assertErrorResponse(response, ErrorCode.ERROR_S3_UPDATE_OBJECT);
-//        verify(s3Adapter, never()).uploadImage(any());
-//    }
-//    @Test
-//    @DisplayName("updateFaq - 모든 필드 null 실패 테스트")
-//    void updateFaq_AllFieldsNull_Fail() {
-//        // given
-//        UpdateFaqServiceRequestDto invalidRequest = new UpdateFaqServiceRequestDto(1L, null, null, null);
-//        when(faqRepository.findById(1L)).thenReturn(Optional.empty());
-//        // when
-//        ApiResponse<Faq> response = faqService.updateFaq(invalidRequest);
-//        // then
-//        assertErrorResponse(response, ErrorCode.INVALID_FAQ_ID);
-//        verify(faqRepository, never()).save(any());
-//    }
-//    @Test
-//    @DisplayName("deleteFaqs - 빈 ID 리스트 실패 테스트")
-//    void deleteFaqs_EmptyList_Fail() {
-//        // given
-//        List<Long> emptyIds = Collections.emptyList();
-//        // when
-//        ApiResponse<String> response = faqService.deleteFaqs(emptyIds);
-//        // then
-//        assertErrorResponse(response, ErrorCode.INVALID_FAQ_ID);
-//        verify(faqRepository, never()).findById(any());
-//    }
-    @Test
-    @DisplayName("retrieveFaqPage - 잘못된 페이지 크기 테스트")
+    @DisplayName("FAQ 페이지 조회 실패 테스트 - 잘못된 페이지 크기")
     void retrieveFaqPage_InvalidPageSize_Fail() {
         // given
         int invalidPageSize = -1;
         // when
         assertThrows(IllegalArgumentException.class, () -> faqService.retrieveFaqPage(0, invalidPageSize));
         verify(faqRepository, never()).findAll(any(Pageable.class));
+    }
+
+    @Test
+    @DisplayName("convertBase64ToImageUrl 실패 테스트 - 접두사 없음")
+    void convertBase64ToImageUrlFail() throws IOException {
+        // given
+        String base64Image = "data:image/png;base64," + Base64.getEncoder().encodeToString("test".getBytes());
+        // Mock s3Adapter.uploadImage 메서드
+        when(s3Adapter.uploadImage(any(MultipartFile.class))).thenReturn(ApiResponse.ok(null)); // imageUrl을 null로 반환
+        // when
+        ApiResponse<String> response = faqService.convertBase64ToImageUrl(base64Image);
+        // then
+        assertNotNull(response); // 응답이 null이 아닌지 확인
+        assertEquals(ErrorCode.ERROR_S3_UPDATE_OBJECT.getStatus(), response.getStatus()); // 상태 코드 확인
+        assertEquals(ErrorCode.ERROR_S3_UPDATE_OBJECT.getMessage(), response.getMessage()); // 에러 메시지 확인
+        verify(s3Adapter, times(1)).uploadImage(any(MultipartFile.class)); // Mock 호출 확인
+    }
+
+    @Test
+    @DisplayName("convert 성공 테스트")
+    void convertSuccess() throws IOException {
+        // given
+        String validBase64Image = "data:image/png;base64," + Base64.getEncoder().encodeToString("valid image data".getBytes());
+        // when
+        MultipartFile result = faqService.convert(validBase64Image);
+        // then
+        assertNotNull(result); // 결과가 null이 아닌지 확인
+        assertEquals("image.png", result.getOriginalFilename()); // 파일 이름 확인
+        assertEquals("image/png", result.getContentType()); // MIME 타입 확인
+    }
+
+    @Test
+    @DisplayName("convert 실패 테스트 - 잘못된 Base64")
+    void convertFail() {
+        // given
+        String invalidBase64Image = "invalid_base64";
+        // when & then
+        assertThrows(IOException.class, () -> faqService.convert(invalidBase64Image));
+    }
+    @Test
+    @DisplayName("createFaq 실패 테스트 - visibility가 null인 경우")
+    void createFaqFail_NullVisibility() {
+        // given
+        String question = "test question";
+        String answer = "test answer";
+        Boolean visibility = null; // visibility가 null
+        CreateFaqServiceRequestDto requestDto = new CreateFaqServiceRequestDto(question, answer, visibility);
+        // when
+        ApiResponse<Faq> response = faqService.createFaq(requestDto);
+        // then
+        assertNotNull(response);
+        assertEquals(ErrorCode.FAQ_IS_EMPTY.getStatus(), response.getStatus());
+        assertEquals(ErrorCode.FAQ_IS_EMPTY.getMessage(), response.getMessage());
+        Mockito.verify(faqRepository, never()).save(any());
     }
 
 }
