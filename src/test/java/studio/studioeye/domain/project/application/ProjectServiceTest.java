@@ -659,7 +659,7 @@ public class ProjectServiceTest {
     @DisplayName("프로젝트 타입 수정 성공 테스트 - 기존 타입이 main인 경우")
     void UpdateProjectTypeSuccess_mainType() {
         Long projectId = 1L;
-        String newType = "main"; // 변경할 타입
+        String newType = "top"; // 변경할 타입
         UpdateProjectTypeDto dto = new UpdateProjectTypeDto(projectId, newType);
         Project mockProject = Project.builder()
                 .name("Test Name")
