@@ -630,8 +630,8 @@ public class ProjectServiceTest {
     }
 
     @Test
-    @DisplayName("프로젝트 타입 수정 성공 테스트 - 기존 타입이 top인 경우")
-    void UpdateProjectTypeSuccess_topType() {
+    @DisplayName("프로젝트 타입 수정 성공 테스트 - top에서 main으로 수정하는 경우")
+    void UpdateProjectTypeSuccess_topToMain() {
         Long projectId = 1L;
         String newType = "main"; // 변경할 타입
         UpdateProjectTypeDto dto = new UpdateProjectTypeDto(projectId, newType);
@@ -656,8 +656,8 @@ public class ProjectServiceTest {
     }
 
     @Test
-    @DisplayName("프로젝트 타입 수정 성공 테스트 - 기존 타입이 main인 경우")
-    void UpdateProjectTypeSuccess_mainType() {
+    @DisplayName("프로젝트 타입 수정 성공 테스트 - main에서 top으로 수정하는 경우")
+    void UpdateProjectTypeSuccess_mainToTop() {
         Long projectId = 1L;
         String newType = "top"; // 변경할 타입
         UpdateProjectTypeDto dto = new UpdateProjectTypeDto(projectId, newType);
@@ -681,8 +681,8 @@ public class ProjectServiceTest {
     }
 
     @Test
-    @DisplayName("프로젝트 타입 수정 성공 테스트 - 기존 타입이 others인 경우")
-    void UpdateProjectTypeSuccess_otherType() {
+    @DisplayName("프로젝트 타입 수정 성공 테스트 - others에서 main으로 수정하는 경우")
+    void UpdateProjectTypeSuccess_otherToMain() {
         Long projectId = 1L;
         String newType = "main"; // 변경할 타입
         UpdateProjectTypeDto dto = new UpdateProjectTypeDto(projectId, newType);
