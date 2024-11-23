@@ -521,6 +521,56 @@ public class ProjectServiceTest {
     }
 
     @Test
+    @DisplayName("Project 수정 성공 테스트 - others으로 수정하는 경우")
+    void updateProjectSuccess_toOthersType() throws IOException {
+        // given
+        Long id = 1L;
+        UpdateProjectServiceRequestDto requestDto = new UpdateProjectServiceRequestDto(
+                id, "Updated Department", "Entertainment", "Updated Name", "Updated Client", "2024-01-02", "Updated Link", "Updated Overview", "others", true);
+
+        // Mock existing images as MultipartFile
+        List<MultipartFile> existingImages = List.of(mockFile);
+
+        Project mockProject = Project.builder()
+                .name("Test Name")
+                .category("Entertainment")
+                .department("Test Department")
+                .date("2024-01-01")
+                .link("Test Link")
+                .overView("Test Overview")
+                .isPosted(true)
+                .projectType("main")
+                .build();
+
+        List<ProjectImage> mockProjectImages = new ArrayList<>();
+        mockProjectImages.add(ProjectImage.builder()
+                .project(mockProject)
+                .fileName(mockProject.getName())
+                .imageUrlList(mockProject.getMainImg())
+                .build());
+
+        mockProject.setProjectImages(mockProjectImages);
+
+        // stub
+        when(projectRepository.findById(requestDto.projectId())).thenReturn(Optional.of(mockProject));
+        when(s3Adapter.deleteFile(any(String.class))).thenReturn(
+                ApiResponse.ok("S3 버킷에서 이미지를 성공적으로 삭제하였습니다.", "http://example.com/testImage.jpg"));
+        when(s3Adapter.uploadFile(any(MultipartFile.class)))
+                .thenReturn(ApiResponse.ok("S3 버킷에 이미지 업로드를 성공하였습니다.", "Updated Test ImageUrl"));
+        when(projectRepository.save(any(Project.class))).thenReturn(mockProject);
+
+        // when
+        ApiResponse<Project> response = projectService.updateProject(requestDto, mockFile, mockFile, existingImages);
+
+        // then
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatus());
+        assertEquals("프로젝트를 성공적으로 수정했습니다.", response.getMessage());
+        assertEquals("Updated Test ImageUrl", mockProject.getMainImg());
+        Mockito.verify(projectRepository, times(1)).save(any(Project.class));
+    }
+
+    @Test
     @DisplayName("Project 수정 실패 테스트 - 유효하지 않은 ID")
     void updateProjectFail_invalidID() throws IOException {
         // given
