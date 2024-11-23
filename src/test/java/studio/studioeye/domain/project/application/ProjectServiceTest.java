@@ -421,8 +421,8 @@ public class ProjectServiceTest {
     }
 
     @Test
-    @DisplayName("Project 수정 성공 테스트")
-    void updateProjectSuccess() throws IOException {
+    @DisplayName("Project 수정 성공 테스트 - main으로 수정하는 경우")
+    void updateProjectSuccess_toMainType() throws IOException {
         // given
         Long id = 1L;
         UpdateProjectServiceRequestDto requestDto = new UpdateProjectServiceRequestDto(
@@ -439,7 +439,7 @@ public class ProjectServiceTest {
                 .link("Test Link")
                 .overView("Test Overview")
                 .isPosted(true)
-                .projectType("main")
+                .projectType("top")
                 .build();
 
         List<ProjectImage> mockProjectImages = new ArrayList<>();
