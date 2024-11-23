@@ -698,7 +698,6 @@ public class ProjectServiceTest {
                 .build();
 
         when(projectRepository.findById(projectId)).thenReturn(Optional.of(mockProject));
-        when(projectRepository.findByProjectType(newType)).thenReturn(new ArrayList<>());
 
         ApiResponse<Project> response = projectService.updateProjectType(dto);
 
@@ -724,7 +723,6 @@ public class ProjectServiceTest {
                 .build();
 
         when(projectRepository.findById(projectId)).thenReturn(Optional.of(mockProject));
-        when(projectRepository.findByProjectType(newType)).thenReturn(new ArrayList<>());
 
         ApiResponse<Project> response = projectService.updateProjectType(dto);
 
