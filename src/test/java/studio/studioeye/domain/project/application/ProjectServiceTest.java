@@ -727,6 +727,36 @@ public class ProjectServiceTest {
         Mockito.verify(projectRepository, never()).save(any(Project.class));
     }
 
+    @Test
+    @DisplayName("Project 수정 실패 테스트 - 유효하지 projectType인 경우")
+    void updateProjectFail_invalidProjectType() throws IOException {
+        // given
+        Long id = 1L;
+        UpdateProjectServiceRequestDto requestDto = new UpdateProjectServiceRequestDto(
+                id, "Updated Department", "Entertainment", "Updated Name", "Updated Client", "2024-01-02", "Updated Link", "Updated Overview", "invalidValue", true);
+
+        Project mockProject = Project.builder()
+                .name("Test Name")
+                .category("Entertainment")
+                .department("Test Department")
+                .date("2024-01-01")
+                .link("Test Link")
+                .overView("Test Overview")
+                .isPosted(true)
+                .projectType("other")
+                .build();
+
+
+        // stub
+        when(projectRepository.findById(requestDto.projectId())).thenReturn(Optional.of(mockProject));
+
+        // when
+        ApiResponse<Project> response = projectService.updateProject(requestDto, mockFile, mockFile, List.of(mockFile));
+
+        assertEquals(ErrorCode.INVALID_PROJECT_TYPE.getStatus(), response.getStatus());
+        assertEquals(ErrorCode.INVALID_PROJECT_TYPE.getMessage(), response.getMessage());
+    }
+
 
     @Test
     @DisplayName("프로젝트 게시 상태 수정 성공 테스트")
