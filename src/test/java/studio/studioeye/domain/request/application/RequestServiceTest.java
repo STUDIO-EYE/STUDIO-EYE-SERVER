@@ -1,204 +1,286 @@
 package studio.studioeye.domain.request.application;
 
-import studio.studioeye.domain.request.api.RequestController;
-import studio.studioeye.domain.request.domain.Request;
-import studio.studioeye.domain.request.dto.request.CreateRequestDto;
-import studio.studioeye.domain.request.dto.request.UpdateRequestCommentDto;
-import studio.studioeye.global.common.response.ApiResponse;
-import studio.studioeye.global.exception.error.ErrorCode;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
+import studio.studioeye.domain.request.dao.AnswerRepository;
+import studio.studioeye.domain.request.dao.RequestCount;
+import studio.studioeye.domain.request.dao.RequestCountImpl;
+import studio.studioeye.domain.request.dao.RequestRepository;
+import studio.studioeye.domain.request.domain.Answer;
+import studio.studioeye.domain.request.domain.Request;
+import studio.studioeye.domain.request.domain.State;
+import studio.studioeye.domain.request.dto.request.CreateRequestServiceDto;
+import studio.studioeye.domain.request.dto.request.UpdateRequestCommentServiceDto;
+import studio.studioeye.global.common.response.ApiResponse;
+import studio.studioeye.global.exception.error.ErrorCode;
+import studio.studioeye.infrastructure.s3.S3Adapter;
+import studio.studioeye.domain.email.service.EmailService;
+import studio.studioeye.domain.notification.application.NotificationService;
 
 import java.io.IOException;
-import java.util.Collections;
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class RequestServiceTest {
-
 	@InjectMocks
-	private RequestController requestController;
-	@Mock
 	private RequestService requestService;
-	private CreateRequestDto createRequestDto;
-	private UpdateRequestCommentDto updateRequestCommentDto;
-	private Request request;
+	@Mock
+	private RequestRepository requestRepository;
+	@Mock
+	private S3Adapter s3Adapter;
+	@Mock
+	private EmailService emailService;
+	@Mock
+	private NotificationService notificationService;
+	@Mock
+	private AnswerRepository answerRepository;
 
-	@BeforeEach
-	void setUp() {
-		createRequestDto = new CreateRequestDto(
-				"category",
-				"projectName",
-				"clientName",
-				"organization",
-				"010-1234-5678",
-				"test@example.com",
-				"Developer",
-				"description"
+	MockMultipartFile mockFile = new MockMultipartFile(
+			"file",
+			"testImage.jpg",
+			"image/jpeg",
+			"Test Image Content".getBytes()
+	);
+
+	@Test
+	@DisplayName("createRequest 성공 테스트 - 이메일과 파일 업로드 성공")
+	public void createRequestSuccess() throws IOException {
+		// given
+		CreateRequestServiceDto dto = new CreateRequestServiceDto(
+				"Category", "ProjectName", "ClientName",
+				"Organization", "010-1234-5678",
+				"test@example.com", "Position", "Description"
 		);
-		updateRequestCommentDto = new UpdateRequestCommentDto(
-				"This is a comment",
-				studio.studioeye.domain.request.domain.State.APPROVED
+		when(s3Adapter.uploadFile(mockFile))
+				.thenReturn(ApiResponse.ok("파일 업로드 성공", "http://example.com/file.jpg"));
+		when(requestRepository.saveAndFlush(any(Request.class))).thenAnswer(invocation -> {
+			Request request = invocation.getArgument(0);
+			Field idField = Request.class.getDeclaredField("id");
+			idField.setAccessible(true);
+			idField.set(request, 1L); // ID 강제 설정
+			return request;
+		});
+		when(emailService.sendEmail(anyString(), anyString(), anyString())).thenReturn(true);
+		doAnswer(invocation -> {
+			Long requestId = invocation.getArgument(0);
+			System.out.println("Notification sent for request ID: " + requestId); // 테스트용 출력
+			return null;
+		}).when(notificationService).subscribe(anyLong());
+		// when
+		ApiResponse<Request> response = requestService.createRequest(dto, List.of(mockFile));
+		// then
+		assertNotNull(response);
+		assertEquals(HttpStatus.OK, response.getStatus());
+		assertEquals("문의를 성공적으로 등록하였습니다.", response.getMessage());
+		assertNotNull(response.getData());
+		assertEquals(1L, response.getData().getId());
+		// Mock 메서드 호출 검증
+		verify(s3Adapter, times(1)).uploadFile(mockFile);
+		verify(emailService, times(1)).sendEmail(anyString(), anyString(), anyString());
+		verify(notificationService, times(1)).subscribe(1L);
+	}
+
+	@Test
+	@DisplayName("createRequest 실패 테스트 - 잘못된 이메일 형식")
+	public void createRequestFail_InvalidEmail() throws IOException {
+		// given
+		CreateRequestServiceDto dto = new CreateRequestServiceDto(
+				"Category", "ProjectName", "ClientName",
+				"Organization", "010-1234-5678",
+				"invalid-email", "Position", "Description"
 		);
-		request = Request.builder()
-				.category("category")
-				.projectName("projectName")
-				.clientName("clientName")
-				.organization("organization")
-				.contact("010-1234-5678")
-				.email("test@example.com")
-				.position("Developer")
-				.description("description")
-				.build();
-	}
-	@Test
-	@DisplayName("문의 등록 성공 테스트")
-	void createRequestSuccess() throws IOException {
-		// given
-		List<MultipartFile> files = Collections.emptyList();
-		when(requestService.createRequest(any(), any())).thenReturn(ApiResponse.ok(request));
 		// when
-		ApiResponse<Request> response = requestController.createRequest(createRequestDto, files);
+		ApiResponse<Request> response = requestService.createRequest(dto, null);
 		// then
-		assertEquals(HttpStatus.OK, response.getStatus());
-		assertNotNull(response.getData());
-		verify(requestService, times(1)).createRequest(any(), any());
+		assertNotNull(response);
+		assertEquals(ErrorCode.INVALID_EMAIL_FORMAT.getStatus(), response.getStatus());
+		assertEquals(ErrorCode.INVALID_EMAIL_FORMAT.getMessage(), response.getMessage());
+		verify(s3Adapter, never()).uploadFile(any(MultipartFile.class));
+		verify(emailService, never()).sendEmail(anyString(), anyString(), anyString());
+		verify(notificationService, never()).subscribe(anyLong());
 	}
 
 	@Test
-	@DisplayName("문의 등록 실패 테스트 - 잘못된 입력")
-	void createRequestFailDueToInvalidInput() throws IOException {
+	@DisplayName("createRequest 실패 테스트 - 파일 업로드 실패")
+	public void createRequestFail_FileUploadError() throws IOException {
 		// given
-		CreateRequestDto invalidDto = new CreateRequestDto(
-				"", // 잘못된 category 입력
-				"projectName",
-				"clientName",
-				"organization",
-				"010-1234-5678",
-				"test@example.com",
-				"Developer",
-				"description"
+		CreateRequestServiceDto dto = new CreateRequestServiceDto(
+				"Category", "ProjectName", "ClientName",
+				"Organization", "010-1234-5678",
+				"test@example.com", "Position", "Description"
 		);
-		when(requestService.createRequest(any(), any())).thenReturn(ApiResponse.withError(ErrorCode.INVALID_INPUT_VALUE));
+		when(s3Adapter.uploadFile(mockFile))
+				.thenReturn(ApiResponse.withError(ErrorCode.ERROR_S3_UPDATE_OBJECT));
 		// when
-		ApiResponse<Request> response = requestController.createRequest(invalidDto, Collections.emptyList());
+		ApiResponse<Request> response = requestService.createRequest(dto, List.of(mockFile));
 		// then
-		assertEquals(ErrorCode.INVALID_INPUT_VALUE.getStatus(), response.getStatus());
-		verify(requestService, times(1)).createRequest(any(), any());
+		assertNotNull(response);
+		assertEquals(ErrorCode.ERROR_S3_UPDATE_OBJECT.getStatus(), response.getStatus());
+		assertEquals(ErrorCode.ERROR_S3_UPDATE_OBJECT.getMessage(), response.getMessage());
+		verify(s3Adapter, times(1)).uploadFile(mockFile);
+		verify(emailService, never()).sendEmail(anyString(), anyString(), anyString());
+		verify(notificationService, never()).subscribe(anyLong());
 	}
 
 	@Test
-	@DisplayName("문의 전체 조회 성공 테스트")
-	void retrieveAllRequestSuccess() {
+	@DisplayName("createRequest 실패 테스트 - 이메일 전송 실패")
+	public void createRequestFail_EmailSendError() throws IOException {
 		// given
-		when(requestService.retrieveAllRequest()).thenReturn(ApiResponse.ok(List.of(request)));
+		CreateRequestServiceDto dto = new CreateRequestServiceDto(
+				"Category", "ProjectName", "ClientName",
+				"Organization", "010-1234-5678",
+				"test@example.com", "Position", "Description"
+		);
+		when(s3Adapter.uploadFile(mockFile))
+				.thenReturn(ApiResponse.ok("파일 업로드 성공", "http://example.com/file.jpg"));
+		when(requestRepository.saveAndFlush(any(Request.class))).thenAnswer(invocation -> {
+			Request request = invocation.getArgument(0);
+			Field idField = Request.class.getDeclaredField("id");
+			idField.setAccessible(true);
+			idField.set(request, 1L);
+			return request;
+		});
+		when(emailService.sendEmail(anyString(), anyString(), anyString())).thenReturn(false);
 		// when
-		ApiResponse<List<Request>> response = requestController.retrieveAllRequest();
+		ApiResponse<Request> response = requestService.createRequest(dto, List.of(mockFile));
 		// then
-		assertEquals(HttpStatus.OK, response.getStatus());
-		assertNotNull(response.getData());
-		verify(requestService, times(1)).retrieveAllRequest();
+		assertNotNull(response);
+		assertEquals(ErrorCode.EMAIL_SIZE_EXCEEDED.getStatus(), response.getStatus());
+		assertEquals(ErrorCode.EMAIL_SIZE_EXCEEDED.getMessage(), response.getMessage());
+		verify(s3Adapter, times(1)).uploadFile(mockFile);
+		verify(emailService, times(1)).sendEmail(anyString(), anyString(), anyString());
+		verify(notificationService, never()).subscribe(anyLong());
 	}
 
 	@Test
-	@DisplayName("문의 전체 조회 실패 테스트 - 데이터 없음")
-	void retrieveAllRequestFailDueToNoData() {
-		// given
-		when(requestService.retrieveAllRequest()).thenReturn(ApiResponse.ok("문의가 존재하지 않습니다."));
-		// when
-		ApiResponse<List<Request>> response = requestController.retrieveAllRequest();
-		// then
-		assertEquals(HttpStatus.OK, response.getStatus());
-		assertNull(response.getData());
-		verify(requestService, times(1)).retrieveAllRequest();
-	}
-
-	@Test
-	@DisplayName("문의 상세 조회 성공 테스트")
-	void retrieveRequestSuccess() {
-		// given
-		Long requestId = 1L;
-		when(requestService.retrieveRequest(requestId)).thenReturn(ApiResponse.ok(request));
-		// when
-		ApiResponse<Request> response = requestController.retrieveRequest(requestId);
-		// then
-		assertEquals(HttpStatus.OK, response.getStatus());
-		assertNotNull(response.getData());
-		verify(requestService, times(1)).retrieveRequest(requestId);
-	}
-
-	@Test
-	@DisplayName("문의 상세 조회 실패 테스트 - 유효하지 않은 ID")
-	void retrieveRequestFailDueToInvalidId() {
-		// given
-		Long requestId = 1L;
-		when(requestService.retrieveRequest(requestId)).thenReturn(ApiResponse.withError(ErrorCode.INVALID_REQUEST_ID));
-		// when
-		ApiResponse<Request> response = requestController.retrieveRequest(requestId);
-		// then
-		assertEquals(ErrorCode.INVALID_REQUEST_ID.getStatus(), response.getStatus());
-		verify(requestService, times(1)).retrieveRequest(requestId);
-	}
-
-	@Test
-	@DisplayName("기간 및 상태에 따른 문의 수 조회 성공 테스트")
+	@DisplayName("retrieveRequestCountByCategoryAndState 성공 테스트 - 카테고리와 상태로 요청 수 조회")
 	void retrieveRequestCountByCategoryAndStateSuccess() {
 		// given
-		String category = "category";
-		String state = "APPROVED";
-		Integer startYear = 2023;
-		Integer startMonth = 1;
-		Integer endYear = 2023;
-		Integer endMonth = 12;
-		when(requestService.retrieveRequestCountByCategoryAndState(category, state, startYear, startMonth, endYear, endMonth))
-				.thenReturn(ApiResponse.ok(List.of(Map.of("year", 2023, "month", 1, "RequestCount", 10L))));
+		List<RequestCount> mockResult = List.of(
+				new RequestCountImpl(2024, 11, 5L, "CategoryA", State.WAITING),
+				new RequestCountImpl(2024, 12, 10L, "CategoryB", State.APPROVED)
+		);
+		when(requestRepository.findReqNumByYearAndMonthBetweenWithCategoryAndState(
+				2024, 11, 2024, 12, "CategoryA", State.WAITING
+		)).thenReturn(mockResult);
 		// when
-		ApiResponse<List<Map<String, Object>>> response = requestController.retrieveStateRequestCountByPeriod(
-				category, state, startYear, startMonth, endYear, endMonth);
+		ApiResponse<List<Map<String, Object>>> response = requestService.retrieveRequestCountByCategoryAndState(
+				"CategoryA", "WAITING", 2024, 11, 2024, 12
+		);
 		// then
+		assertNotNull(response);
 		assertEquals(HttpStatus.OK, response.getStatus());
 		assertNotNull(response.getData());
-		verify(requestService, times(1)).retrieveRequestCountByCategoryAndState(category, state, startYear, startMonth, endYear, endMonth);
+		assertEquals(2, response.getData().size());
+		verify(requestRepository, times(1)).findReqNumByYearAndMonthBetweenWithCategoryAndState(
+				2024, 11, 2024, 12, "CategoryA", State.WAITING
+		);
 	}
 
-	// 테스트 실패...
-//	@Test
-//	@DisplayName("문의 답변 등록 성공 테스트")
-//	void updateRequestCommentSuccess() {
-//		// given
-//		Long requestId = 1L;
-//		when(requestService.updateRequestComment(eq(requestId), any())).thenReturn(ApiResponse.ok("답변을 성공적으로 작성했습니다."));
-//		// when
-//		ApiResponse<String> response = requestController.updateRequestComment(requestId, updateRequestCommentDto);
-//		// then
-//		assertEquals(HttpStatus.OK, response.getStatus());
-//		assertEquals("답변을 성공적으로 작성했습니다.", response.getData());
-//		verify(requestService, times(1)).updateRequestComment(eq(requestId), any());
-//	}
 	@Test
-	@DisplayName("문의 답변 등록 실패 테스트 - 유효하지 않은 ID")
-	void updateRequestCommentFailDueToInvalidId() {
-		// given
-		Long requestId = 1L;
-		when(requestService.updateRequestComment(requestId, updateRequestCommentDto.toServiceRequest()))
-				.thenReturn(ApiResponse.withError(ErrorCode.INVALID_REQUEST_ID));
+	@DisplayName("retrieveRequestCountByCategoryAndState 실패 테스트 - 잘못된 기간")
+	void retrieveRequestCount_InvalidPeriod() {
 		// when
-		ApiResponse<String> response = requestController.updateRequestComment(requestId, updateRequestCommentDto);
+		ApiResponse<List<Map<String, Object>>> response = requestService.retrieveRequestCountByCategoryAndState(
+				"Category", "APPROVED", 2023, 12, 2023, 10
+		);
 		// then
-		assertEquals(ErrorCode.INVALID_REQUEST_ID.getStatus(), response.getStatus());
-		verify(requestService, times(1)).updateRequestComment(requestId, updateRequestCommentDto.toServiceRequest());
+		assertNotNull(response);
+		assertEquals(HttpStatus.BAD_REQUEST, response.getStatus());
+		assertEquals(ErrorCode.INVALID_PERIOD_FORMAT.getMessage(), response.getMessage());
+	}
+
+	@Test
+	@DisplayName("retrieveRequestCountByCategoryAndState 성공 테스트 - 상태가 all")
+	void retrieveRequestCount_StateAll() {
+		// given
+		List<RequestCount> mockData = List.of(new RequestCountImpl(2023, 11, 5L, "Category", null));
+		when(requestRepository.findReqNumByYearAndMonthBetweenWithCategoryAndState(anyInt(), anyInt(), anyInt(), anyInt(), anyString(), any())).thenReturn(mockData);
+		// when
+		ApiResponse<List<Map<String, Object>>> response = requestService.retrieveRequestCountByCategoryAndState(
+				"Category", "all", 2023, 1, 2023, 12
+		);
+		// then
+		assertNotNull(response);
+		assertEquals(HttpStatus.OK, response.getStatus());
+		assertNotNull(response.getData());
+		verify(requestRepository, times(1)).findReqNumByYearAndMonthBetweenWithCategoryAndState(anyInt(), anyInt(), anyInt(), anyInt(), anyString(), isNull());
+	}
+
+	@Test
+	@DisplayName("retrieveRequest 성공 테스트 - 요청 단일 조회")
+	void retrieveRequestSuccess() {
+		// given
+		Request mockRequest = mock(Request.class);
+		when(mockRequest.getId()).thenReturn(1L);
+		when(requestRepository.findById(1L)).thenReturn(Optional.of(mockRequest));
+		// when
+		ApiResponse<Request> response = requestService.retrieveRequest(1L);
+		// then
+		assertNotNull(response);
+		assertEquals(HttpStatus.OK, response.getStatus());
+		assertNotNull(response.getData());
+		assertEquals(1L, response.getData().getId());
+		verify(requestRepository, times(1)).findById(1L);
+	}
+
+	@Test
+	@DisplayName("updateRequestComment 성공 테스트 - 댓글과 상태 업데이트 성공")
+	void updateRequestCommentSuccess() {
+		// given
+		Request mockRequest = mock(Request.class);
+		lenient().when(mockRequest.getId()).thenReturn(1L);
+		lenient().when(mockRequest.getClientName()).thenReturn("ClientName");
+		lenient().when(mockRequest.getCategory()).thenReturn("Category");
+		UpdateRequestCommentServiceDto dto = new UpdateRequestCommentServiceDto("AnswerText", State.APPROVED);
+		when(requestRepository.findById(1L)).thenReturn(Optional.of(mockRequest));
+		when(requestRepository.save(any(Request.class))).thenAnswer(invocation -> invocation.getArgument(0));
+		// when
+		ApiResponse<String> response = requestService.updateRequestComment(1L, dto);
+		// then
+		assertNotNull(response);
+		assertEquals(HttpStatus.OK, response.getStatus());
+		assertEquals("답변을 성공적으로 작성했습니다.", response.getMessage());
+		verify(answerRepository, times(1)).save(any(Answer.class));
+		verify(requestRepository, times(1)).save(any(Request.class));
+	}
+
+	@Test
+	@DisplayName("updateRequestComment 실패 테스트 - 빈 답변")
+	void updateRequestComment_EmptyAnswer() {
+		// given
+		UpdateRequestCommentServiceDto dto = new UpdateRequestCommentServiceDto("", State.APPROVED);
+		// when
+		ApiResponse<String> response = requestService.updateRequestComment(1L, dto);
+		// then
+		assertNotNull(response);
+		assertEquals(HttpStatus.BAD_REQUEST, response.getStatus());
+		assertEquals(ErrorCode.INVALID_INPUT_VALUE.getMessage(), response.getMessage());
+	}
+
+	@Test
+	@DisplayName("updateRequestComment 실패 테스트 - 상태가 null")
+	void updateRequestComment_NullState() {
+		// given
+		UpdateRequestCommentServiceDto dto = new UpdateRequestCommentServiceDto("AnswerText", null);
+		// when
+		ApiResponse<String> response = requestService.updateRequestComment(1L, dto);
+		// then
+		assertNotNull(response);
+		assertEquals(HttpStatus.BAD_REQUEST, response.getStatus());
+		assertEquals(ErrorCode.INVALID_INPUT_VALUE.getMessage(), response.getMessage());
 	}
 }
