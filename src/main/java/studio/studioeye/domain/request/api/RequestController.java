@@ -33,16 +33,16 @@ public class RequestController {
 		return requestService.createRequest(dto.toServiceRequest(), files);
 	}
 
-	@Operation(summary = "문의 삭제 API")
-	@DeleteMapping("/requests/{requestId}")
-	public ApiResponse<String> deleteRequest(@PathVariable Long requestId){
-		return requestService.deleteRequest(requestId);
-	}
+//	@Operation(summary = "문의 삭제 API")
+//	@DeleteMapping("/requests/{requestId}")
+//	public ApiResponse<String> deleteRequest(@PathVariable Long requestId){
+//		return requestService.deleteRequest(requestId);
+//	}
 
 	@Operation(summary = "문의 전체 조회 API")
 	@GetMapping("/requests")
 	public ApiResponse<List<Request>> retrieveAllRequest(){
-		return requestService.retrieveAllRequest();
+		return requestService.retlrieveAllRequest();
 	}
 
 	@Operation(summary = "문의 상세 조회 API")
@@ -51,11 +51,11 @@ public class RequestController {
 		return requestService.retrieveRequest(requestId);
 	}
 
-	@Operation(summary = "전체 문의 수 조회 API")
-	@GetMapping("/requests/count")
-	public ApiResponse<Long> retrieveRequestCount() {
-		return requestService.retrieveRequestCount();
-	}
+//	@Operation(summary = "전체 문의 수 조회 API")
+//	@GetMapping("/requests/count")
+//	public ApiResponse<Long> retrieveRequestCount() {
+//		return requestService.retrieveRequestCount();
+//	}
 	
 	@Operation(summary = "기간(시작점(연도, 월)~종료점(연도, 월))으로 완료여부(상태), 카테고리에 따른 문의 수 조회 API")
 	@GetMapping("/requests/{category}/{state}/{startYear}/{startMonth}/{endYear}/{endMonth}")
@@ -68,11 +68,11 @@ public class RequestController {
 		return requestService.retrieveRequestCountByCategoryAndState(
 				category, state, startYear, startMonth, endYear, endMonth);
 	}
-	@Operation(summary = "접수 대기 중인 문의 수 조회 API")
-	@GetMapping("/requests/waiting/count")
-	public ApiResponse<Long> retrieveWaitingRequestCount() {
-		return requestService.retrieveWaitingRequestCount();
-	}
+//	@Operation(summary = "접수 대기 중인 문의 수 조회 API")
+//	@GetMapping("/requests/waiting/count")
+//	public ApiResponse<Long> retrieveWaitingRequestCount() {
+//		return requestService.retrieveWaitingRequestCount();
+//	}
 
 	@Operation(summary = "접수 대기 중인 문의 목록 조회 API")
 	@GetMapping("/requests/waiting")
@@ -80,12 +80,12 @@ public class RequestController {
 		return requestService.retrieveWaitingRequest();
 	}
 
-	@Operation(summary = "문의 목록 페이지네이션 조회 API")
-	@GetMapping("/requests/page")
-	public Page<Request> retrieveRequestPage(@RequestParam(defaultValue = "0") int page,
-											 @RequestParam(defaultValue = "10") int size) {
-		return requestService.retrieveRequestPage(page, size);
-	}
+//	@Operation(summary = "문의 목록 페이지네이션 조회 API")
+//	@GetMapping("/requests/page")
+//	public Page<Request> retrieveRequestPage(@RequestParam(defaultValue = "0") int page,
+//											 @RequestParam(defaultValue = "10") int size) {
+//		return requestService.retrieveRequestPage(page, size);
+//	}
 
 	@Operation(summary = "문의 답변 등록 API")
 	@PutMapping("/requests/{requestId}/comment")
@@ -93,9 +93,9 @@ public class RequestController {
 		return requestService.updateRequestComment(requestId, dto.toServiceRequest());
 	}
 
-	@Operation(summary = "문의 상태 변경 API")
-	@PutMapping("/requests/{requestId}/state")
-	public ApiResponse<String> updateRequestComment(@PathVariable Long requestId, @Valid @RequestBody UpdateRequestStateDto dto) {
-		return requestService.updateRequestState(requestId, dto.toServiceRequest());
-	}
+//	@Operation(summary = "문의 상태 변경 API")
+//	@PutMapping("/requests/{requestId}/state")
+//	public ApiResponse<String> updateRequestComment(@PathVariable Long requestId, @Valid @RequestBody UpdateRequestStateDto dto) {
+//		return requestService.updateRequestState(requestId, dto.toServiceRequest());
+//	}
 }
