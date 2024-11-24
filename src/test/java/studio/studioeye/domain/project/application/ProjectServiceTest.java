@@ -1192,7 +1192,9 @@ public class ProjectServiceTest {
                 .link("Test Link")
                 .overView("Test Overview")
                 .isPosted(true)
-                .projectType("top")
+                .projectType("main")
+                .mainSequence(0)
+                .sequence(0)
                 .build();
 
         List<ProjectImage> mockProjectImages = new ArrayList<>();
@@ -1204,7 +1206,78 @@ public class ProjectServiceTest {
 
         project.setProjectImages(mockProjectImages);
 
+        List<Project> mockProjectList = new ArrayList<>();
+        mockProjectList.add(Project.builder()
+                .name("Test Name")
+                .category("Entertainment")
+                .department("Test Department")
+                .date("2024-01-01")
+                .link("Test Link")
+                .overView("Test Overview")
+                .isPosted(true)
+                .projectType("main")
+                .mainImg("test url")
+                .mainImgFileName(mockFile.getName())
+                .responsiveMainImg("test url")
+                .responsiveMainImgFileName(mockFile.getName())
+                .mainSequence(1)
+                .sequence(1)
+                .build());
+        mockProjectList.add(Project.builder()
+                .name("Test Name")
+                .category("Entertainment")
+                .department("Test Department")
+                .date("2024-01-01")
+                .link("Test Link")
+                .overView("Test Overview")
+                .isPosted(true)
+                .projectType("main")
+                .mainImg("test url")
+                .mainImgFileName(mockFile.getName())
+                .responsiveMainImg("test url")
+                .responsiveMainImgFileName(mockFile.getName())
+                .mainSequence(2)
+                .sequence(2)
+                .build());
+        mockProjectList.add(Project.builder()
+                .name("Test Name")
+                .category("Entertainment")
+                .department("Test Department")
+                .date("2024-01-01")
+                .link("Test Link")
+                .overView("Test Overview")
+                .isPosted(true)
+                .projectType("main")
+                .mainImg("test url")
+                .mainImgFileName(mockFile.getName())
+                .responsiveMainImg("test url")
+                .responsiveMainImgFileName(mockFile.getName())
+                .mainSequence(3)
+                .sequence(3)
+                .build());
+        mockProjectList.add(Project.builder()
+                .name("Test Name")
+                .category("Entertainment")
+                .department("Test Department")
+                .date("2024-01-01")
+                .link("Test Link")
+                .overView("Test Overview")
+                .isPosted(true)
+                .projectType("main")
+                .mainImg("test url")
+                .mainImgFileName(mockFile.getName())
+                .responsiveMainImg("test url")
+                .responsiveMainImgFileName(mockFile.getName())
+                .mainSequence(4)
+                .sequence(4)
+                .build());
+
+        // stub
         when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
+        when(projectRepository.findAllBySequenceGreaterThan(0))
+                .thenReturn(mockProjectList);
+        when(projectRepository.findAllByMainSequenceGreaterThanAndMainSequenceNot(project.getMainSequence(), 999))
+                .thenReturn(mockProjectList);
 
         ApiResponse<String> response = projectService.deleteProject(projectId);
 
