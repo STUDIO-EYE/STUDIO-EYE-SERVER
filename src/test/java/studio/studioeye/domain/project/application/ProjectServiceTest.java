@@ -1547,7 +1547,7 @@ public class ProjectServiceTest {
 
     @Test
     @DisplayName("프로젝트 삭제 실패 테스트 - 유효하지 않은 ID")
-    void DeleteProjectFail() {
+    void DeleteProjectFail_invalidId() {
         Long projectId = 999L; // 유효하지 않은 ID
 
         when(projectRepository.findById(projectId)).thenReturn(Optional.empty());
