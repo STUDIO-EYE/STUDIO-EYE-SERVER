@@ -793,6 +793,54 @@ public class ProjectServiceTest {
         assertEquals(ErrorCode.INVALID_PROJECT_TYPE.getMessage(), response.getMessage());
     }
 
+    @Test
+    @DisplayName("Project 수정 실패 테스트 - 이미 top이 존재하는 경우")
+    void updateProjectFail_alreadyTopExisted() throws IOException {
+        // given
+        Long id = 1L;
+        UpdateProjectServiceRequestDto requestDto = new UpdateProjectServiceRequestDto(
+                id, "Updated Department", "Entertainment", "Updated Name", "Updated Client", "2024-01-02", "Updated Link", "Updated Overview", "top", true);
+
+        Project mockProject = Project.builder()
+                .name("Test Name")
+                .category("Entertainment")
+                .department("Test Department")
+                .date("2024-01-01")
+                .link("Test Link")
+                .overView("Test Overview")
+                .isPosted(true)
+                .projectType("top")
+                .build();
+
+        // 리플렉션으로 ID 설정
+        ReflectionTestUtils.setField(mockProject, "id", 0L);
+
+        Project mockProject2 = Project.builder()
+                .name("Test Name")
+                .category("Entertainment")
+                .department("Test Department")
+                .date("2024-01-01")
+                .link("Test Link")
+                .overView("Test Overview")
+                .isPosted(true)
+                .projectType("top")
+                .build();
+
+        // 리플렉션으로 ID 설정
+        ReflectionTestUtils.setField(mockProject2, "id", 1L);
+
+
+        // stub
+        when(projectRepository.findById(requestDto.projectId())).thenReturn(Optional.of(mockProject2));
+        when(projectRepository.findByProjectType(requestDto.projectType())).thenReturn(List.of(mockProject));
+
+        // when
+        ApiResponse<Project> response = projectService.updateProject(requestDto, mockFile, mockFile, List.of(mockFile));
+
+        assertEquals(ErrorCode.TOP_PROJECT_ALREADY_EXISTS.getStatus(), response.getStatus());
+        assertEquals(ErrorCode.TOP_PROJECT_ALREADY_EXISTS.getMessage(), response.getMessage());
+    }
+
 
     @Test
     @DisplayName("프로젝트 게시 상태 수정 성공 테스트")
