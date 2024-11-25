@@ -53,28 +53,28 @@ public class ViewsController {
         return viewsService.retrieveViewsByYearMonth(year, month);
     }
 
-    @Operation(summary = "기간(시작점(연도,월), 종료점(연도,월))으로 전체 조회수 조회 API")
-    @GetMapping("/views/{startYear}/{startMonth}/{endYear}/{endMonth}")
-    public ApiResponse<List<ViewsSummary>> retrieveAllViewsByPeriod(@PathVariable Integer startYear, @PathVariable Integer startMonth,
-                                                                 @PathVariable Integer endYear, @PathVariable Integer endMonth){
-        return viewsService.retrieveAllViewsByPeriod(startYear, startMonth, endYear, endMonth);
-    }
-
-    @Operation(summary = "기간(시작점(연도,월), 종료점(연도,월))으로 메뉴별 전체 조회수 조회 API")
-    @GetMapping("/views/{startYear}/{startMonth}/{endYear}/{endMonth}/{menu}")
-    public ApiResponse<List<ViewsSummary>> retrieveAllMenuViewsByPeriod(@PathVariable Integer startYear, @PathVariable Integer startMonth,
-                                                                 @PathVariable Integer endYear, @PathVariable Integer endMonth,
-                                                                 @PathVariable MenuTitle menu){
-        return viewsService.retrieveAllMenuViewsByPeriod(startYear, startMonth, endYear, endMonth, menu);
-    }
-
-    @Operation(summary = "메뉴가 아트워크일 경우, 기간(시작점(연도,월), 종료점(연도,월))으로 카테고리별 전체 조회수 조회 API")
-    @GetMapping("/views/{startYear}/{startMonth}/{endYear}/{endMonth}/ARTWORK/{category}")
-    public ApiResponse<List<ViewsSummary>> retrieveAllCategoryViewsByPeriod(@PathVariable Integer startYear, @PathVariable Integer startMonth,
-                                                                                @PathVariable Integer endYear, @PathVariable Integer endMonth,
-                                                                                @PathVariable ArtworkCategory category){
-        return viewsService.retrieveAllCategoryViewsByPeriod(startYear, startMonth, endYear, endMonth, category);
-    }
+//    @Operation(summary = "기간(시작점(연도,월), 종료점(연도,월))으로 전체 조회수 조회 API")
+//    @GetMapping("/views/{startYear}/{startMonth}/{endYear}/{endMonth}")
+//    public ApiResponse<List<ViewsSummary>> retrieveAllViewsByPeriod(@PathVariable Integer startYear, @PathVariable Integer startMonth,
+//                                                                 @PathVariable Integer endYear, @PathVariable Integer endMonth){
+//        return viewsService.retrieveAllViewsByPeriod(startYear, startMonth, endYear, endMonth);
+//    }
+//
+//    @Operation(summary = "기간(시작점(연도,월), 종료점(연도,월))으로 메뉴별 전체 조회수 조회 API")
+//    @GetMapping("/views/{startYear}/{startMonth}/{endYear}/{endMonth}/{menu}")
+//    public ApiResponse<List<ViewsSummary>> retrieveAllMenuViewsByPeriod(@PathVariable Integer startYear, @PathVariable Integer startMonth,
+//                                                                 @PathVariable Integer endYear, @PathVariable Integer endMonth,
+//                                                                 @PathVariable MenuTitle menu){
+//        return viewsService.retrieveAllMenuViewsByPeriod(startYear, startMonth, endYear, endMonth, menu);
+//    }
+//
+//    @Operation(summary = "메뉴가 아트워크일 경우, 기간(시작점(연도,월), 종료점(연도,월))으로 카테고리별 전체 조회수 조회 API")
+//    @GetMapping("/views/{startYear}/{startMonth}/{endYear}/{endMonth}/ARTWORK/{category}")
+//    public ApiResponse<List<ViewsSummary>> retrieveAllCategoryViewsByPeriod(@PathVariable Integer startYear, @PathVariable Integer startMonth,
+//                                                                                @PathVariable Integer endYear, @PathVariable Integer endMonth,
+//                                                                                @PathVariable ArtworkCategory category){
+//        return viewsService.retrieveAllCategoryViewsByPeriod(startYear, startMonth, endYear, endMonth, category);
+//    }
 
     @Operation(summary = "기간(시작점(연도,월), 종료점(연도,월))으로 카테고리별, 메뉴별 전체 조회수 조회 API")
     @GetMapping("/views/{startYear}/{startMonth}/{endYear}/{endMonth}/{menu}/{category}")
@@ -84,18 +84,18 @@ public class ViewsController {
         return viewsService.retrieveAllMenuCategoryViewsByPeriod(startYear, startMonth, endYear, endMonth, menu, category);
     }
 
-    @Operation(summary = "id로 특정 월 조회수 1 상승 API")
-    @PutMapping("/views/increase/{viewsId}")
-    public ApiResponse<Views> updateViewsById(@PathVariable Long viewsId){
-        return viewsService.updateViewsById(viewsId);
-    }
+//    @Operation(summary = "id로 특정 월 조회수 1 상승 API")
+//    @PutMapping("/views/increase/{viewsId}")
+//    public ApiResponse<Views> updateViewsById(@PathVariable Long viewsId){
+//        return viewsService.updateViewsById(viewsId);
+//    }
 
-    @Operation(summary = "연도, 월, 메뉴, 카테고리로 특정 월 조회수 1 상승 API")
-    @PutMapping("/views/increase/{year}/{month}")
-    public ApiResponse<Views> updateViewsByYearMonth(@PathVariable Integer year, @PathVariable Integer month,
-                                                     @RequestBody UpdateViewsRequestDto dto){
-        return viewsService.updateViewsByYearMonth(year, month, dto.toServiceRequest());
-    }
+//    @Operation(summary = "연도, 월, 메뉴, 카테고리로 특정 월 조회수 1 상승 API")
+//    @PutMapping("/views/increase/{year}/{month}")
+//    public ApiResponse<Views> updateViewsByYearMonth(@PathVariable Integer year, @PathVariable Integer month,
+//                                                     @RequestBody UpdateViewsRequestDto dto){
+//        return viewsService.updateViewsByYearMonth(year, month, dto.toServiceRequest());
+//    }
 
     @Operation(summary = "이번 월 조회수 1 상승 API (해당 월이 존재하지 않을 경우에는 생성)")
     @PutMapping("/views/increase")
