@@ -369,7 +369,7 @@ public class ViewsServiceTest {
     public void retrieveAllMenuCategoryViewsByPeriodSuccess() {
         // given
         Integer startYear = 2024;
-        Integer startMonth = 9;
+        Integer startMonth = 7;
         Integer endYear = 2024;
         Integer endMonth = 11;
         MenuTitle menu = MenuTitle.ABOUT;
@@ -384,7 +384,7 @@ public class ViewsServiceTest {
 
             @Override
             public Integer getMonth() {
-                return 9;
+                return 7;
             }
 
             @Override
@@ -400,7 +400,7 @@ public class ViewsServiceTest {
 
             @Override
             public Integer getMonth() {
-                return 10;
+                return 8;
             }
 
             @Override
