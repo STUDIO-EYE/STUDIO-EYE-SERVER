@@ -421,8 +421,176 @@ public class ProjectServiceTest {
     }
 
     @Test
-    @DisplayName("Project 수정 성공 테스트")
-    void updateProjectSuccess() throws IOException {
+    @DisplayName("Project 수정 성공 테스트 - top으로 수정하는 경우")
+    void updateProjectSuccess_toTopType() throws IOException {
+        // given
+        Long id = 1L;
+        UpdateProjectServiceRequestDto requestDto = new UpdateProjectServiceRequestDto(
+                id, "Updated Department", "Entertainment", "Updated Name", "Updated Client", "2024-01-02", "Updated Link", "Updated Overview", "top", true);
+
+        // Mock existing images as MultipartFile
+        List<MultipartFile> existingImages = List.of(mockFile);
+
+        Project mockProject = Project.builder()
+                .name("Test Name")
+                .category("Entertainment")
+                .department("Test Department")
+                .date("2024-01-01")
+                .link("Test Link")
+                .overView("Test Overview")
+                .isPosted(true)
+                .projectType("main")
+                .build();
+
+        List<ProjectImage> mockProjectImages = new ArrayList<>();
+        mockProjectImages.add(ProjectImage.builder()
+                .project(mockProject)
+                .fileName(mockProject.getName())
+                .imageUrlList(mockProject.getMainImg())
+                .build());
+
+        mockProject.setProjectImages(mockProjectImages);
+
+        List<Project> mockProjectList = new ArrayList<>();
+        mockProjectList.add(Project.builder()
+                .name("Test Name")
+                .category("Entertainment")
+                .department("Test Department")
+                .date("2024-01-01")
+                .link("Test Link")
+                .overView("Test Overview")
+                .isPosted(true)
+                .projectType("main")
+                .mainImg("test url")
+                .mainImgFileName(mockFile.getName())
+                .responsiveMainImg("test url")
+                .responsiveMainImgFileName(mockFile.getName())
+                .mainSequence(1)
+                .sequence(0)
+                .build());
+        mockProjectList.add(Project.builder()
+                .name("Test Name")
+                .category("Entertainment")
+                .department("Test Department")
+                .date("2024-01-01")
+                .link("Test Link")
+                .overView("Test Overview")
+                .isPosted(true)
+                .projectType("main")
+                .mainImg("test url")
+                .mainImgFileName(mockFile.getName())
+                .responsiveMainImg("test url")
+                .responsiveMainImgFileName(mockFile.getName())
+                .mainSequence(2)
+                .sequence(0)
+                .build());
+        mockProjectList.add(Project.builder()
+                .name("Test Name")
+                .category("Entertainment")
+                .department("Test Department")
+                .date("2024-01-01")
+                .link("Test Link")
+                .overView("Test Overview")
+                .isPosted(true)
+                .projectType("main")
+                .mainImg("test url")
+                .mainImgFileName(mockFile.getName())
+                .responsiveMainImg("test url")
+                .responsiveMainImgFileName(mockFile.getName())
+                .mainSequence(3)
+                .sequence(0)
+                .build());
+        mockProjectList.add(Project.builder()
+                .name("Test Name")
+                .category("Entertainment")
+                .department("Test Department")
+                .date("2024-01-01")
+                .link("Test Link")
+                .overView("Test Overview")
+                .isPosted(true)
+                .projectType("main")
+                .mainImg("test url")
+                .mainImgFileName(mockFile.getName())
+                .responsiveMainImg("test url")
+                .responsiveMainImgFileName(mockFile.getName())
+                .mainSequence(4)
+                .sequence(0)
+                .build());
+
+        // stub
+        when(projectRepository.findById(requestDto.projectId())).thenReturn(Optional.of(mockProject));
+        when(projectRepository.findAllByMainSequenceGreaterThanAndMainSequenceNot(mockProject.getMainSequence(), 999))
+                .thenReturn(mockProjectList);
+        when(s3Adapter.deleteFile(any(String.class))).thenReturn(
+                ApiResponse.ok("S3 버킷에서 이미지를 성공적으로 삭제하였습니다.", "http://example.com/testImage.jpg"));
+        when(s3Adapter.uploadFile(any(MultipartFile.class)))
+                .thenReturn(ApiResponse.ok("S3 버킷에 이미지 업로드를 성공하였습니다.", "Updated Test ImageUrl"));
+        when(projectRepository.save(any(Project.class))).thenReturn(mockProject);
+
+        // when
+        ApiResponse<Project> response = projectService.updateProject(requestDto, mockFile, mockFile, existingImages);
+
+        // then
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatus());
+        assertEquals("프로젝트를 성공적으로 수정했습니다.", response.getMessage());
+        assertEquals("Updated Test ImageUrl", mockProject.getMainImg());
+        Mockito.verify(projectRepository, times(1)).save(any(Project.class));
+    }
+
+    @Test
+    @DisplayName("Project 수정 성공 테스트 - main으로 수정하는 경우")
+    void updateProjectSuccess_toMainType() throws IOException {
+        // given
+        Long id = 1L;
+        UpdateProjectServiceRequestDto requestDto = new UpdateProjectServiceRequestDto(
+                id, "Updated Department", "Entertainment", "Updated Name", "Updated Client", "2024-01-02", "Updated Link", "Updated Overview", "main", true);
+
+        // Mock existing images as MultipartFile
+        List<MultipartFile> existingImages = List.of(mockFile);
+
+        Project mockProject = Project.builder()
+                .name("Test Name")
+                .category("Entertainment")
+                .department("Test Department")
+                .date("2024-01-01")
+                .link("Test Link")
+                .overView("Test Overview")
+                .isPosted(true)
+                .projectType("top")
+                .build();
+
+        List<ProjectImage> mockProjectImages = new ArrayList<>();
+        mockProjectImages.add(ProjectImage.builder()
+                .project(mockProject)
+                .fileName(mockProject.getName())
+                .imageUrlList(mockProject.getMainImg())
+                .build());
+
+        mockProject.setProjectImages(mockProjectImages);
+
+        // stub
+        when(projectRepository.findById(requestDto.projectId())).thenReturn(Optional.of(mockProject));
+        when(s3Adapter.deleteFile(any(String.class))).thenReturn(
+                ApiResponse.ok("S3 버킷에서 이미지를 성공적으로 삭제하였습니다.", "http://example.com/testImage.jpg"));
+        when(s3Adapter.uploadFile(any(MultipartFile.class)))
+                .thenReturn(ApiResponse.ok("S3 버킷에 이미지 업로드를 성공하였습니다.", "Updated Test ImageUrl"));
+        when(projectRepository.save(any(Project.class))).thenReturn(mockProject);
+
+        // when
+        ApiResponse<Project> response = projectService.updateProject(requestDto, mockFile, mockFile, existingImages);
+
+        // then
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatus());
+        assertEquals("프로젝트를 성공적으로 수정했습니다.", response.getMessage());
+        assertEquals("Updated Test ImageUrl", mockProject.getMainImg());
+        Mockito.verify(projectRepository, times(1)).save(any(Project.class));
+    }
+
+    @Test
+    @DisplayName("Project 수정 성공 테스트 - main에서 main으로 수정하는 경우")
+    void updateProjectSuccess_mainToMainType() throws IOException {
         // given
         Long id = 1L;
         UpdateProjectServiceRequestDto requestDto = new UpdateProjectServiceRequestDto(
@@ -471,6 +639,160 @@ public class ProjectServiceTest {
     }
 
     @Test
+    @DisplayName("Project 수정 성공 테스트 - others으로 수정하는 경우")
+    void updateProjectSuccess_toOthersType() throws IOException {
+        // given
+        Long id = 1L;
+        UpdateProjectServiceRequestDto requestDto = new UpdateProjectServiceRequestDto(
+                id, "Updated Department", "Entertainment", "Updated Name", "Updated Client", "2024-01-02", "Updated Link", "Updated Overview", "others", true);
+
+        // Mock existing images as MultipartFile
+        List<MultipartFile> existingImages = List.of(mockFile);
+
+        Project mockProject = Project.builder()
+                .name("Test Name")
+                .category("Entertainment")
+                .department("Test Department")
+                .date("2024-01-01")
+                .link("Test Link")
+                .overView("Test Overview")
+                .isPosted(true)
+                .projectType("main")
+                .build();
+
+        List<ProjectImage> mockProjectImages = new ArrayList<>();
+        mockProjectImages.add(ProjectImage.builder()
+                .project(mockProject)
+                .fileName(mockProject.getName())
+                .imageUrlList(mockProject.getMainImg())
+                .build());
+
+        mockProject.setProjectImages(mockProjectImages);
+
+        List<Project> mockProjectList = new ArrayList<>();
+        mockProjectList.add(Project.builder()
+                .name("Test Name")
+                .category("Entertainment")
+                .department("Test Department")
+                .date("2024-01-01")
+                .link("Test Link")
+                .overView("Test Overview")
+                .isPosted(true)
+                .projectType("main")
+                .mainImg("test url")
+                .mainImgFileName(mockFile.getName())
+                .responsiveMainImg("test url")
+                .responsiveMainImgFileName(mockFile.getName())
+                .mainSequence(1)
+                .sequence(0)
+                .build());
+        mockProjectList.add(Project.builder()
+                .name("Test Name")
+                .category("Entertainment")
+                .department("Test Department")
+                .date("2024-01-01")
+                .link("Test Link")
+                .overView("Test Overview")
+                .isPosted(true)
+                .projectType("main")
+                .mainImg("test url")
+                .mainImgFileName(mockFile.getName())
+                .responsiveMainImg("test url")
+                .responsiveMainImgFileName(mockFile.getName())
+                .mainSequence(2)
+                .sequence(0)
+                .build());
+        mockProjectList.add(Project.builder()
+                .name("Test Name")
+                .category("Entertainment")
+                .department("Test Department")
+                .date("2024-01-01")
+                .link("Test Link")
+                .overView("Test Overview")
+                .isPosted(true)
+                .projectType("main")
+                .mainImg("test url")
+                .mainImgFileName(mockFile.getName())
+                .responsiveMainImg("test url")
+                .responsiveMainImgFileName(mockFile.getName())
+                .mainSequence(3)
+                .sequence(0)
+                .build());
+        mockProjectList.add(Project.builder()
+                .name("Test Name")
+                .category("Entertainment")
+                .department("Test Department")
+                .date("2024-01-01")
+                .link("Test Link")
+                .overView("Test Overview")
+                .isPosted(true)
+                .projectType("main")
+                .mainImg("test url")
+                .mainImgFileName(mockFile.getName())
+                .responsiveMainImg("test url")
+                .responsiveMainImgFileName(mockFile.getName())
+                .mainSequence(4)
+                .sequence(0)
+                .build());
+
+        // stub
+        when(projectRepository.findById(requestDto.projectId())).thenReturn(Optional.of(mockProject));
+        when(projectRepository.findAllByMainSequenceGreaterThanAndMainSequenceNot(mockProject.getMainSequence(), 999))
+                .thenReturn(mockProjectList);
+        when(s3Adapter.deleteFile(any(String.class))).thenReturn(
+                ApiResponse.ok("S3 버킷에서 이미지를 성공적으로 삭제하였습니다.", "http://example.com/testImage.jpg"));
+        when(s3Adapter.uploadFile(any(MultipartFile.class)))
+                .thenReturn(ApiResponse.ok("S3 버킷에 이미지 업로드를 성공하였습니다.", "Updated Test ImageUrl"));
+        when(projectRepository.save(any(Project.class))).thenReturn(mockProject);
+
+        // when
+        ApiResponse<Project> response = projectService.updateProject(requestDto, mockFile, mockFile, existingImages);
+
+        // then
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatus());
+        assertEquals("프로젝트를 성공적으로 수정했습니다.", response.getMessage());
+        assertEquals("Updated Test ImageUrl", mockProject.getMainImg());
+        Mockito.verify(projectRepository, times(1)).save(any(Project.class));
+    }
+
+    @Test
+    @DisplayName("Project 수정 실패 테스트 - mainImgFile이 비어있는 경우")
+    void updateProjectFail_emptyMainImgFile() throws IOException {
+        // given
+        Long id = 1L;
+        UpdateProjectServiceRequestDto requestDto = new UpdateProjectServiceRequestDto(
+                id, "Updated Department", "Entertainment", "Updated Name", "Updated Client", "2024-01-02", "Updated Link", "Updated Overview", "main", true);
+
+        // when
+        ApiResponse<Project> response = projectService.updateProject(requestDto, null, mockFile, List.of(mockFile));
+
+        // then
+        assertNotNull(response);
+        assertEquals(ErrorCode.NOT_EXIST_IMAGE_FILE.getStatus(), response.getStatus());
+        assertEquals(ErrorCode.NOT_EXIST_IMAGE_FILE.getMessage(), response.getMessage());
+        Mockito.verify(projectRepository, never()).save(any(Project.class));
+    }
+
+    @Test
+    @DisplayName("Project 수정 실패 테스트 - responsiveMainImgFile이 비어있는 경우")
+    void updateProjectFail_emptyResponsiveMainImgFile() throws IOException {
+        // given
+        Long id = 1L;
+        UpdateProjectServiceRequestDto requestDto = new UpdateProjectServiceRequestDto(
+                id, "Updated Department", "Entertainment", "Updated Name", "Updated Client", "2024-01-02", "Updated Link", "Updated Overview", "main", true);
+
+        // when
+        ApiResponse<Project> response = projectService.updateProject(requestDto, mockFile, null, List.of(mockFile));
+
+        // then
+        assertNotNull(response);
+        assertEquals(ErrorCode.NOT_EXIST_IMAGE_FILE.getStatus(), response.getStatus());
+        assertEquals(ErrorCode.NOT_EXIST_IMAGE_FILE.getMessage(), response.getMessage());
+        Mockito.verify(projectRepository, never()).save(any(Project.class));
+    }
+
+    @Test
     @DisplayName("Project 수정 실패 테스트 - 유효하지 않은 ID")
     void updateProjectFail_invalidID() throws IOException {
         // given
@@ -491,6 +813,210 @@ public class ProjectServiceTest {
         Mockito.verify(projectRepository, never()).save(any(Project.class));
     }
 
+    @Test
+    @DisplayName("Project 수정 실패 테스트 - 유효하지 projectType인 경우")
+    void updateProjectFail_invalidProjectType() throws IOException {
+        // given
+        Long id = 1L;
+        UpdateProjectServiceRequestDto requestDto = new UpdateProjectServiceRequestDto(
+                id, "Updated Department", "Entertainment", "Updated Name", "Updated Client", "2024-01-02", "Updated Link", "Updated Overview", "invalidValue", true);
+
+        Project mockProject = Project.builder()
+                .name("Test Name")
+                .category("Entertainment")
+                .department("Test Department")
+                .date("2024-01-01")
+                .link("Test Link")
+                .overView("Test Overview")
+                .isPosted(true)
+                .projectType("other")
+                .build();
+
+
+        // stub
+        when(projectRepository.findById(requestDto.projectId())).thenReturn(Optional.of(mockProject));
+
+        // when
+        ApiResponse<Project> response = projectService.updateProject(requestDto, mockFile, mockFile, List.of(mockFile));
+
+        assertEquals(ErrorCode.INVALID_PROJECT_TYPE.getStatus(), response.getStatus());
+        assertEquals(ErrorCode.INVALID_PROJECT_TYPE.getMessage(), response.getMessage());
+    }
+
+    @Test
+    @DisplayName("Project 수정 실패 테스트 - 이미 top이 존재하는 경우")
+    void updateProjectFail_alreadyTopExisted() throws IOException {
+        // given
+        Long id = 1L;
+        UpdateProjectServiceRequestDto requestDto = new UpdateProjectServiceRequestDto(
+                id, "Updated Department", "Entertainment", "Updated Name", "Updated Client", "2024-01-02", "Updated Link", "Updated Overview", "top", true);
+
+        Project mockProject = Project.builder()
+                .name("Test Name")
+                .category("Entertainment")
+                .department("Test Department")
+                .date("2024-01-01")
+                .link("Test Link")
+                .overView("Test Overview")
+                .isPosted(true)
+                .projectType("top")
+                .build();
+
+        // 리플렉션으로 ID 설정
+        ReflectionTestUtils.setField(mockProject, "id", 0L);
+
+        Project mockProject2 = Project.builder()
+                .name("Test Name")
+                .category("Entertainment")
+                .department("Test Department")
+                .date("2024-01-01")
+                .link("Test Link")
+                .overView("Test Overview")
+                .isPosted(true)
+                .projectType("top")
+                .build();
+
+        // 리플렉션으로 ID 설정
+        ReflectionTestUtils.setField(mockProject2, "id", 1L);
+
+
+        // stub
+        when(projectRepository.findById(requestDto.projectId())).thenReturn(Optional.of(mockProject2));
+        when(projectRepository.findByProjectType(requestDto.projectType())).thenReturn(List.of(mockProject));
+
+        // when
+        ApiResponse<Project> response = projectService.updateProject(requestDto, mockFile, mockFile, List.of(mockFile));
+
+        assertEquals(ErrorCode.TOP_PROJECT_ALREADY_EXISTS.getStatus(), response.getStatus());
+        assertEquals(ErrorCode.TOP_PROJECT_ALREADY_EXISTS.getMessage(), response.getMessage());
+    }
+
+    @Test
+    @DisplayName("Project 수정 실패 테스트 - 이미 main이 5개 이상인 경우")
+    void updateProjectFail_alreadyMainMaxium() throws IOException {
+        // given
+        Long id = 1L;
+        UpdateProjectServiceRequestDto requestDto = new UpdateProjectServiceRequestDto(
+                id, "Updated Department", "Entertainment", "Updated Name", "Updated Client", "2024-01-02", "Updated Link", "Updated Overview", "main", true);
+
+        // Mock existing images as MultipartFile
+        List<MultipartFile> existingImages = List.of(mockFile);
+
+        Project mockProject = Project.builder()
+                .name("Test Name")
+                .category("Entertainment")
+                .department("Test Department")
+                .date("2024-01-01")
+                .link("Test Link")
+                .overView("Test Overview")
+                .isPosted(true)
+                .projectType("top")
+                .build();
+
+        List<ProjectImage> mockProjectImages = new ArrayList<>();
+        mockProjectImages.add(ProjectImage.builder()
+                .project(mockProject)
+                .fileName(mockProject.getName())
+                .imageUrlList(mockProject.getMainImg())
+                .build());
+
+        mockProject.setProjectImages(mockProjectImages);
+
+        List<Project> mockProjectList = new ArrayList<>();
+        mockProjectList.add(Project.builder()
+                .name("Test Name")
+                .category("Entertainment")
+                .department("Test Department")
+                .date("2024-01-01")
+                .link("Test Link")
+                .overView("Test Overview")
+                .isPosted(true)
+                .projectType("main")
+                .mainImg("test url")
+                .mainImgFileName(mockFile.getName())
+                .responsiveMainImg("test url")
+                .responsiveMainImgFileName(mockFile.getName())
+                .mainSequence(1)
+                .sequence(0)
+                .build());
+        mockProjectList.add(Project.builder()
+                .name("Test Name")
+                .category("Entertainment")
+                .department("Test Department")
+                .date("2024-01-01")
+                .link("Test Link")
+                .overView("Test Overview")
+                .isPosted(true)
+                .projectType("main")
+                .mainImg("test url")
+                .mainImgFileName(mockFile.getName())
+                .responsiveMainImg("test url")
+                .responsiveMainImgFileName(mockFile.getName())
+                .mainSequence(2)
+                .sequence(0)
+                .build());
+        mockProjectList.add(Project.builder()
+                .name("Test Name")
+                .category("Entertainment")
+                .department("Test Department")
+                .date("2024-01-01")
+                .link("Test Link")
+                .overView("Test Overview")
+                .isPosted(true)
+                .projectType("main")
+                .mainImg("test url")
+                .mainImgFileName(mockFile.getName())
+                .responsiveMainImg("test url")
+                .responsiveMainImgFileName(mockFile.getName())
+                .mainSequence(3)
+                .sequence(0)
+                .build());
+        mockProjectList.add(Project.builder()
+                .name("Test Name")
+                .category("Entertainment")
+                .department("Test Department")
+                .date("2024-01-01")
+                .link("Test Link")
+                .overView("Test Overview")
+                .isPosted(true)
+                .projectType("main")
+                .mainImg("test url")
+                .mainImgFileName(mockFile.getName())
+                .responsiveMainImg("test url")
+                .responsiveMainImgFileName(mockFile.getName())
+                .mainSequence(4)
+                .sequence(0)
+                .build());
+        mockProjectList.add(Project.builder()
+                .name("Test Name")
+                .category("Entertainment")
+                .department("Test Department")
+                .date("2024-01-01")
+                .link("Test Link")
+                .overView("Test Overview")
+                .isPosted(true)
+                .projectType("main")
+                .mainImg("test url")
+                .mainImgFileName(mockFile.getName())
+                .responsiveMainImg("test url")
+                .responsiveMainImgFileName(mockFile.getName())
+                .mainSequence(5)
+                .sequence(0)
+                .build());
+
+        // stub
+        when(projectRepository.findById(requestDto.projectId())).thenReturn(Optional.of(mockProject));
+        when(projectRepository.findByProjectType(requestDto.projectType())).thenReturn(mockProjectList);
+
+        // when
+        ApiResponse<Project> response = projectService.updateProject(requestDto, mockFile, mockFile, existingImages);
+
+        // then
+        assertNotNull(response);
+        assertEquals(ErrorCode.MAIN_PROJECT_LIMIT_EXCEEDED.getStatus(), response.getStatus());
+        assertEquals(ErrorCode.MAIN_PROJECT_LIMIT_EXCEEDED.getMessage(), response.getMessage());
+        Mockito.verify(projectRepository, never()).save(any(Project.class));
+    }
 
     @Test
     @DisplayName("프로젝트 게시 상태 수정 성공 테스트")
@@ -530,8 +1056,8 @@ public class ProjectServiceTest {
     }
 
     @Test
-    @DisplayName("프로젝트 타입 수정 성공 테스트 - 기존 타입이 top인 경우")
-    void UpdateProjectTypeSuccess_topType() {
+    @DisplayName("프로젝트 타입 수정 성공 테스트 - top에서 main으로 수정하는 경우")
+    void UpdateProjectTypeSuccess_topToMain() {
         Long projectId = 1L;
         String newType = "main"; // 변경할 타입
         UpdateProjectTypeDto dto = new UpdateProjectTypeDto(projectId, newType);
@@ -556,8 +1082,196 @@ public class ProjectServiceTest {
     }
 
     @Test
-    @DisplayName("프로젝트 타입 수정 성공 테스트 - 기존 타입이 main인 경우")
-    void UpdateProjectTypeSuccess_mainType() {
+    @DisplayName("프로젝트 타입 수정 성공 테스트 - main에서 top으로 수정하는 경우")
+    void UpdateProjectTypeSuccess_mainToTop() {
+        Long projectId = 1L;
+        String newType = "top"; // 변경할 타입
+        UpdateProjectTypeDto dto = new UpdateProjectTypeDto(projectId, newType);
+        Project mockProject = Project.builder()
+                .name("Test Name")
+                .category("Entertainment")
+                .department("Test Department")
+                .date("2024-01-01")
+                .link("Test Link")
+                .overView("Test Overview")
+                .isPosted(true)
+                .projectType("main")
+                .mainSequence(0)
+                .build();
+
+        List<Project> mockProjectList = new ArrayList<>();
+        mockProjectList.add(Project.builder()
+                .name("Test Name")
+                .category("Entertainment")
+                .department("Test Department")
+                .date("2024-01-01")
+                .link("Test Link")
+                .overView("Test Overview")
+                .isPosted(true)
+                .projectType("main")
+                .mainImg("test url")
+                .mainImgFileName(mockFile.getName())
+                .responsiveMainImg("test url")
+                .responsiveMainImgFileName(mockFile.getName())
+                .mainSequence(1)
+                .sequence(0)
+                .build());
+        mockProjectList.add(Project.builder()
+                .name("Test Name")
+                .category("Entertainment")
+                .department("Test Department")
+                .date("2024-01-01")
+                .link("Test Link")
+                .overView("Test Overview")
+                .isPosted(true)
+                .projectType("main")
+                .mainImg("test url")
+                .mainImgFileName(mockFile.getName())
+                .responsiveMainImg("test url")
+                .responsiveMainImgFileName(mockFile.getName())
+                .mainSequence(2)
+                .sequence(0)
+                .build());
+        mockProjectList.add(Project.builder()
+                .name("Test Name")
+                .category("Entertainment")
+                .department("Test Department")
+                .date("2024-01-01")
+                .link("Test Link")
+                .overView("Test Overview")
+                .isPosted(true)
+                .projectType("main")
+                .mainImg("test url")
+                .mainImgFileName(mockFile.getName())
+                .responsiveMainImg("test url")
+                .responsiveMainImgFileName(mockFile.getName())
+                .mainSequence(3)
+                .sequence(0)
+                .build());
+        mockProjectList.add(Project.builder()
+                .name("Test Name")
+                .category("Entertainment")
+                .department("Test Department")
+                .date("2024-01-01")
+                .link("Test Link")
+                .overView("Test Overview")
+                .isPosted(true)
+                .projectType("main")
+                .mainImg("test url")
+                .mainImgFileName(mockFile.getName())
+                .responsiveMainImg("test url")
+                .responsiveMainImgFileName(mockFile.getName())
+                .mainSequence(4)
+                .sequence(0)
+                .build());
+
+        when(projectRepository.findById(projectId)).thenReturn(Optional.of(mockProject));
+        when(projectRepository.findAllByMainSequenceGreaterThanAndMainSequenceNot(mockProject.getMainSequence(), 999))
+                .thenReturn(mockProjectList);
+
+        ApiResponse<Project> response = projectService.updateProjectType(dto);
+
+        assertEquals("프로젝트 타입을 성공적으로 변경하였습니다.", response.getMessage());
+        assertEquals(newType, mockProject.getProjectType()); // 타입이 변경되었는지 확인
+    }
+
+    @Test
+    @DisplayName("프로젝트 타입 수정 성공 테스트 - main에서 others으로 수정하는 경우")
+    void UpdateProjectTypeSuccess_MainToOthers() {
+        Long projectId = 1L;
+        String newType = "others"; // 변경할 타입
+        UpdateProjectTypeDto dto = new UpdateProjectTypeDto(projectId, newType);
+        Project mockProject = Project.builder()
+                .name("Test Name")
+                .category("Entertainment")
+                .department("Test Department")
+                .date("2024-01-01")
+                .link("Test Link")
+                .overView("Test Overview")
+                .isPosted(true)
+                .projectType("main")
+                .mainSequence(0)
+                .build();
+
+        List<Project> mockProjectList = new ArrayList<>();
+        mockProjectList.add(Project.builder()
+                .name("Test Name")
+                .category("Entertainment")
+                .department("Test Department")
+                .date("2024-01-01")
+                .link("Test Link")
+                .overView("Test Overview")
+                .isPosted(true)
+                .projectType("main")
+                .mainImg("test url")
+                .mainImgFileName(mockFile.getName())
+                .responsiveMainImg("test url")
+                .responsiveMainImgFileName(mockFile.getName())
+                .mainSequence(1)
+                .sequence(0)
+                .build());
+        mockProjectList.add(Project.builder()
+                .name("Test Name")
+                .category("Entertainment")
+                .department("Test Department")
+                .date("2024-01-01")
+                .link("Test Link")
+                .overView("Test Overview")
+                .isPosted(true)
+                .projectType("main")
+                .mainImg("test url")
+                .mainImgFileName(mockFile.getName())
+                .responsiveMainImg("test url")
+                .responsiveMainImgFileName(mockFile.getName())
+                .mainSequence(2)
+                .sequence(0)
+                .build());
+        mockProjectList.add(Project.builder()
+                .name("Test Name")
+                .category("Entertainment")
+                .department("Test Department")
+                .date("2024-01-01")
+                .link("Test Link")
+                .overView("Test Overview")
+                .isPosted(true)
+                .projectType("main")
+                .mainImg("test url")
+                .mainImgFileName(mockFile.getName())
+                .responsiveMainImg("test url")
+                .responsiveMainImgFileName(mockFile.getName())
+                .mainSequence(3)
+                .sequence(0)
+                .build());
+        mockProjectList.add(Project.builder()
+                .name("Test Name")
+                .category("Entertainment")
+                .department("Test Department")
+                .date("2024-01-01")
+                .link("Test Link")
+                .overView("Test Overview")
+                .isPosted(true)
+                .projectType("main")
+                .mainImg("test url")
+                .mainImgFileName(mockFile.getName())
+                .responsiveMainImg("test url")
+                .responsiveMainImgFileName(mockFile.getName())
+                .mainSequence(4)
+                .sequence(0)
+                .build());
+
+        when(projectRepository.findById(projectId)).thenReturn(Optional.of(mockProject));
+        when(projectRepository.findAllByMainSequenceGreaterThanAndMainSequenceNot(mockProject.getMainSequence(), 999))
+                .thenReturn(mockProjectList);
+
+        ApiResponse<Project> response = projectService.updateProjectType(dto);
+
+        assertEquals("프로젝트 타입을 성공적으로 변경하였습니다.", response.getMessage());
+        assertEquals(newType, mockProject.getProjectType()); // 타입이 변경되었는지 확인
+    }
+
+    @Test
+    @DisplayName("프로젝트 타입 수정 성공 테스트 - main에서 main으로 수정하는 경우")
+    void UpdateProjectTypeSuccess_MainToMain() {
         Long projectId = 1L;
         String newType = "main"; // 변경할 타입
         UpdateProjectTypeDto dto = new UpdateProjectTypeDto(projectId, newType);
@@ -581,8 +1295,8 @@ public class ProjectServiceTest {
     }
 
     @Test
-    @DisplayName("프로젝트 타입 수정 성공 테스트 - 기존 타입이 others인 경우")
-    void UpdateProjectTypeSuccess_otherType() {
+    @DisplayName("프로젝트 타입 수정 성공 테스트 - others에서 main으로 수정하는 경우")
+    void UpdateProjectTypeSuccess_otherToMain() {
         Long projectId = 1L;
         String newType = "main"; // 변경할 타입
         UpdateProjectTypeDto dto = new UpdateProjectTypeDto(projectId, newType);
@@ -738,7 +1452,9 @@ public class ProjectServiceTest {
                 .link("Test Link")
                 .overView("Test Overview")
                 .isPosted(true)
-                .projectType("top")
+                .projectType("main")
+                .mainSequence(0)
+                .sequence(0)
                 .build();
 
         List<ProjectImage> mockProjectImages = new ArrayList<>();
@@ -750,7 +1466,78 @@ public class ProjectServiceTest {
 
         project.setProjectImages(mockProjectImages);
 
+        List<Project> mockProjectList = new ArrayList<>();
+        mockProjectList.add(Project.builder()
+                .name("Test Name")
+                .category("Entertainment")
+                .department("Test Department")
+                .date("2024-01-01")
+                .link("Test Link")
+                .overView("Test Overview")
+                .isPosted(true)
+                .projectType("main")
+                .mainImg("test url")
+                .mainImgFileName(mockFile.getName())
+                .responsiveMainImg("test url")
+                .responsiveMainImgFileName(mockFile.getName())
+                .mainSequence(1)
+                .sequence(1)
+                .build());
+        mockProjectList.add(Project.builder()
+                .name("Test Name")
+                .category("Entertainment")
+                .department("Test Department")
+                .date("2024-01-01")
+                .link("Test Link")
+                .overView("Test Overview")
+                .isPosted(true)
+                .projectType("main")
+                .mainImg("test url")
+                .mainImgFileName(mockFile.getName())
+                .responsiveMainImg("test url")
+                .responsiveMainImgFileName(mockFile.getName())
+                .mainSequence(2)
+                .sequence(2)
+                .build());
+        mockProjectList.add(Project.builder()
+                .name("Test Name")
+                .category("Entertainment")
+                .department("Test Department")
+                .date("2024-01-01")
+                .link("Test Link")
+                .overView("Test Overview")
+                .isPosted(true)
+                .projectType("main")
+                .mainImg("test url")
+                .mainImgFileName(mockFile.getName())
+                .responsiveMainImg("test url")
+                .responsiveMainImgFileName(mockFile.getName())
+                .mainSequence(3)
+                .sequence(3)
+                .build());
+        mockProjectList.add(Project.builder()
+                .name("Test Name")
+                .category("Entertainment")
+                .department("Test Department")
+                .date("2024-01-01")
+                .link("Test Link")
+                .overView("Test Overview")
+                .isPosted(true)
+                .projectType("main")
+                .mainImg("test url")
+                .mainImgFileName(mockFile.getName())
+                .responsiveMainImg("test url")
+                .responsiveMainImgFileName(mockFile.getName())
+                .mainSequence(4)
+                .sequence(4)
+                .build());
+
+        // stub
         when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
+        when(projectRepository.findAllBySequenceGreaterThan(0))
+                .thenReturn(mockProjectList);
+        when(projectRepository.findAllByMainSequenceGreaterThanAndMainSequenceNot(project.getMainSequence(), 999))
+                .thenReturn(mockProjectList);
 
         ApiResponse<String> response = projectService.deleteProject(projectId);
 
@@ -760,7 +1547,7 @@ public class ProjectServiceTest {
 
     @Test
     @DisplayName("프로젝트 삭제 실패 테스트 - 유효하지 않은 ID")
-    void DeleteProjectFail() {
+    void DeleteProjectFail_invalidId() {
         Long projectId = 999L; // 유효하지 않은 ID
 
         when(projectRepository.findById(projectId)).thenReturn(Optional.empty());
