@@ -19,15 +19,11 @@ public class Answer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String text;
-
     @Enumerated(EnumType.STRING)
     private State state;
-
     @CreatedDate
     private LocalDateTime createdAt;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "request_id")
     @JsonIgnore

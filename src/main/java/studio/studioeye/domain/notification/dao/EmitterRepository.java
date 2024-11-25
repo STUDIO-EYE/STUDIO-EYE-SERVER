@@ -14,6 +14,5 @@ public interface EmitterRepository {
     void deleteAllEventCacheStartWithId(Long memberId);
 
     SseEmitter get(Long id);
-
     Collection<SseEmitter> getAllEmitters();
 }

@@ -164,13 +164,13 @@ public class ProjectService {
 	public ApiResponse<Project> updateProject(UpdateProjectServiceRequestDto dto,
 											  MultipartFile mainImgFile, MultipartFile responsiveMainImgFile,
 											  List<MultipartFile> files) throws IOException {
-		if(mainImgFile == null && mainImgFile.isEmpty()) {
+		if(mainImgFile == null || mainImgFile.isEmpty()) {
 			return ApiResponse.withError(ErrorCode.NOT_EXIST_IMAGE_FILE);
 		}
-		// TODO 임시 코드
-//		if(responsiveMainImgFile == null && responsiveMainImgFile.isEmpty()) {
-//			return ApiResponse.withError(ErrorCode.NOT_EXIST_IMAGE_FILE);
-//		}
+		// 임시 주석 해제
+		if(responsiveMainImgFile == null || responsiveMainImgFile.isEmpty()) {
+			return ApiResponse.withError(ErrorCode.NOT_EXIST_IMAGE_FILE);
+		}
 		Optional<Project> optionalProject = projectRepository.findById(dto.projectId());
 		if(optionalProject.isEmpty()){
 			return ApiResponse.withError(ErrorCode.INVALID_PROJECT_ID);

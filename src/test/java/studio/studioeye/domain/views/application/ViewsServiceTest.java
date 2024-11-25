@@ -369,7 +369,7 @@ public class ViewsServiceTest {
     public void retrieveAllMenuCategoryViewsByPeriodSuccess() {
         // given
         Integer startYear = 2024;
-        Integer startMonth = 9;
+        Integer startMonth = 7;
         Integer endYear = 2024;
         Integer endMonth = 11;
         MenuTitle menu = MenuTitle.ABOUT;
@@ -384,7 +384,7 @@ public class ViewsServiceTest {
 
             @Override
             public Integer getMonth() {
-                return 9;
+                return 7;
             }
 
             @Override
@@ -400,7 +400,7 @@ public class ViewsServiceTest {
 
             @Override
             public Integer getMonth() {
-                return 10;
+                return 8;
             }
 
             @Override
@@ -489,8 +489,8 @@ public class ViewsServiceTest {
     }
 
     @Test
-    @DisplayName("이번 월 조회수 1 상승 성공 테스트")
-    public void updateThisMonthViewsSuccess() {
+    @DisplayName("이번 월 조회수 1 상승 성공 테스트 - 이번 월 조회수 데이터가 없는 경우")
+    public void updateThisMonthViewsSuccess_viewsNotExisted() {
         // given
         MenuTitle menu = MenuTitle.ABOUT;
         ArtworkCategory category = ArtworkCategory.ALL;
@@ -513,8 +513,46 @@ public class ViewsServiceTest {
     }
 
     @Test
-    @DisplayName("이번 월 조회수 1 상승 실패 테스트")
-    public void updateThisMonthViewsFail() {
+    @DisplayName("이번 월 조회수 1 상승 성공 테스트 - 이번 월 조회수 데이터가 이미 존재하는 경우")
+    public void updateThisMonthViewsSuccess_alreadyViewsExisted() {
+        // given
+        MenuTitle menu = MenuTitle.ABOUT;
+        ArtworkCategory category = ArtworkCategory.ALL;
+
+        UpdateViewsServiceRequestDto requestDto = new UpdateViewsServiceRequestDto(menu, category);
+        Views mockViews = Views.builder()
+                .year(2024)
+                .month(11)
+                .views(1L)
+                .menu(MenuTitle.ABOUT)
+                .category(category)
+                .createdAt(new Date())
+                .build();
+
+        // stub
+        when(viewsRepository.findByYearAndMonthAndMenuAndCategory(Integer.parseInt(
+                new SimpleDateFormat("yyyy").format(new Date().getTime())),
+                Integer.parseInt(new SimpleDateFormat("MM").format(new Date().getTime())),
+                requestDto.menu(), requestDto.category())).thenReturn(Optional.of(mockViews));
+
+        // when
+        ApiResponse<Views> response = viewsService.updateThisMonthViews(requestDto);
+        Views findViews = response.getData();
+
+        // then
+        assertNotNull(response);
+        assertNull(findViews);
+        assertEquals(HttpStatus.OK, response.getStatus());
+        assertTrue(
+                response.getMessage().equals("조회수를 성공적으로 수정했습니다.") ||
+                        response.getMessage().equals("조회 수 등록을 완료했습니다.")
+        );
+        Mockito.verify(viewsRepository, times(1)).save(any(Views.class));
+    }
+
+    @Test
+    @DisplayName("이번 월 조회수 1 상승 실패 테스트 - 잘못된 메뉴와 카테고리 조합인 경우")
+    public void updateThisMonthViewsFail_invalidMenuAndCategory() {
         // given
         MenuTitle menu = MenuTitle.ABOUT;
         ArtworkCategory category = ArtworkCategory.ENTERTAINMENT;

@@ -6,5 +6,4 @@ public record UpdateRequestCommentServiceDto(
         String answer,
         State state
 ) {
-
 }

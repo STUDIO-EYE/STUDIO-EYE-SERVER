@@ -10,7 +10,7 @@ public record CreatePartnerInfoRequestDto(
 	String name,
 
 	@NotNull(message = "is_main은 필수 값입니다.")
-	@NotBlank(message = "is_main은 필수 값입니다.")
+//	@NotBlank(message = "is_main은 필수 값입니다.")
 	Boolean is_main,
 
 	@Schema(description = "협력사 링크 URL, null / 빈 값 / 공백 허용 x")

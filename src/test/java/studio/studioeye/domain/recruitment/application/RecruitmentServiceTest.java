@@ -22,6 +22,7 @@ import studio.studioeye.domain.recruitment.dto.request.UpdateRecruitmentServiceR
 import studio.studioeye.global.common.response.ApiResponse;
 import studio.studioeye.global.exception.error.ErrorCode;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -442,5 +443,56 @@ public class RecruitmentServiceTest {
         // method call verify
         Mockito.verify(recruitmentRepository, times(1)).findById(id);
         Mockito.verify(recruitmentRepository, Mockito.never()).delete(any());
+    }
+
+    @Test
+    @DisplayName("채용공고 모집 상태 자동 업데이트 성공 테스트")
+    void autoUpdate_updatesStatusCorrectly() {
+        // Given
+        Recruitment recruitment1 = Recruitment.builder()
+                .title("title")
+                .startDate(Date.from(LocalDate.of(2024, 11, 1)
+                        .atStartOfDay(ZoneId.systemDefault()).toInstant()))
+                .deadline(Date.from(LocalDate.of(2024, 11, 30)
+                        .atStartOfDay(ZoneId.systemDefault()).toInstant()))
+                .link("link")
+                .createdAt(new Date())
+                .status(Status.OPEN)
+                .build();
+
+        Recruitment recruitment2 = Recruitment.builder()
+                .title("title")
+                .startDate(Date.from(LocalDate.of(2024, 10, 1)
+                        .atStartOfDay(ZoneId.systemDefault()).toInstant()))
+                .deadline(Date.from(LocalDate.of(2024, 10, 30)
+                        .atStartOfDay(ZoneId.systemDefault()).toInstant()))
+                .link("link")
+                .createdAt(new Date())
+                .status(Status.OPEN)
+                .build();
+
+        Recruitment recruitment3 = Recruitment.builder()
+                .title("title")
+                .startDate(Date.from(LocalDate.of(2024, 11, 1)
+                        .atStartOfDay(ZoneId.systemDefault()).toInstant()))
+                .deadline(Date.from(LocalDate.of(2024, 11, 30)
+                        .atStartOfDay(ZoneId.systemDefault()).toInstant()))
+                .link("link")
+                .createdAt(new Date())
+                .status(Status.PREPARING)
+                .build();
+
+        List<Recruitment> recruitmentList = List.of(recruitment1, recruitment2, recruitment3);
+
+        Mockito.when(recruitmentRepository.findByStatusNotClose()).thenReturn(recruitmentList);
+
+        // When
+        recruitmentService.autoUpdate();
+
+        // Then
+        assertEquals(Status.OPEN, recruitment1.getStatus());
+        assertEquals(Status.CLOSE, recruitment2.getStatus());
+        assertEquals(Status.OPEN, recruitment3.getStatus());
+        Mockito.verify(recruitmentRepository, Mockito.times(3)).save(Mockito.any(Recruitment.class));
     }
 }

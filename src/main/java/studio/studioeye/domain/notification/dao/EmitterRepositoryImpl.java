@@ -19,17 +19,14 @@ public class EmitterRepositoryImpl implements EmitterRepository {
         emitters.put(emitterId, sseEmitter);
         return null;
     }
-
     @Override
     public void saveEventCache(Long eventCacheId, Object event) {
         eventCache.put(eventCacheId, event);
     }
-
     @Override
     public void deleteById(Long id) {
         emitters.remove(id);
     }
-
     @Override
     public void deleteAllEmitterStartWithId(Long memberId) {
         emitters.forEach(
@@ -56,7 +53,6 @@ public class EmitterRepositoryImpl implements EmitterRepository {
     public SseEmitter get(Long id) {
         return emitters.get(id);
     }
-
     public Collection<SseEmitter> getAllEmitters() {
         return emitters.values();
     }

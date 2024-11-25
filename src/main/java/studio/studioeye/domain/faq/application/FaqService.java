@@ -75,13 +75,12 @@ public class FaqService {
         base64Code = base64Code.replaceAll("\"", ""); // requestBody에서 문자열 앞뒤에 "" 추가되는 현상 처리
         MultipartFile file = this.convert(base64Code);
         ApiResponse<String> updateFileResponse = s3Adapter.uploadImage(file);
-        String imageUrl = null;
-        if (updateFileResponse.getStatus().is5xxServerError()) {
+        // imageUrl이 null인 경우 처리 추가
+        String imageUrl = updateFileResponse.getData();
+        if (imageUrl == null || imageUrl.isEmpty()) {
             return ApiResponse.withError(ErrorCode.ERROR_S3_UPDATE_OBJECT);
         }
-        imageUrl = updateFileResponse.getData();
-        if(imageUrl.isEmpty()) return ApiResponse.withError(ErrorCode.ERROR_S3_UPDATE_OBJECT);
-        return ApiResponse.ok("FAQ base64 이미지를 성공적으로 저장했습니다.",imageUrl);
+        return ApiResponse.ok("FAQ base64 이미지를 성공적으로 저장했습니다.", imageUrl);
     }
 
     public ApiResponse<Faq> updateFaq(UpdateFaqServiceRequestDto dto) {
@@ -131,6 +130,10 @@ public class FaqService {
     public MultipartFile convert(String base64Image) throws IOException {
         // "data:image/png;base64,"와 같은 접두사 제거
         String[] parts = base64Image.split(",");
+        // 배열 길이 확인
+        if (parts.length < 2) {
+            throw new IOException("Invalid Base64 format. Missing data or metadata.");
+        }
         String imageString = parts[1];
         byte[] decodedBytes = Base64.getDecoder().decode(imageString);
 

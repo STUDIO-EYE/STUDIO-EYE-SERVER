@@ -19,46 +19,31 @@ public class Request {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-
 	private String projectName;
-
 	private String category;
-
 	private String clientName;
-
 	private String organization;
-
 	private String contact;
-
 	private String email;
-
 	private String position;
 
 	@Column(columnDefinition = "TEXT")
 	private String description;
-
 	@OneToMany(mappedBy = "request", cascade = CascadeType.REMOVE)
 	private List<Answer> answers = new ArrayList<>();
-
 	@Column(name = "year_value")
 	private Integer year;
-
 	@Column(name = "month_value")
 	private Integer month;
-
 	@Enumerated(EnumType.STRING)
 	private State state;
-
 	@ElementCollection
 	private List<String> fileUrlList = new LinkedList<>();
-
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date createdAt;
-
 	@Builder
-	public Request(String category, String projectName, String clientName, String organization, String contact, String email,
-				   String position,
-				   List<String> fileUrlList, String description, List<Answer> answers,
+	public Request(String category, String projectName, String clientName, String organization, String contact,
+				   String email, String position, List<String> fileUrlList, String description, List<Answer> answers,
 				   Integer year, Integer month, State state, Date createdAt) {
 		this.category = category;
 		this.projectName = projectName;
