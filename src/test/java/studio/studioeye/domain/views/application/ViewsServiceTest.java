@@ -489,8 +489,8 @@ public class ViewsServiceTest {
     }
 
     @Test
-    @DisplayName("이번 월 조회수 1 상승 성공 테스트")
-    public void updateThisMonthViewsSuccess() {
+    @DisplayName("이번 월 조회수 1 상승 성공 테스트 - 이번 월 조회수 데이터가 없는 경우")
+    public void updateThisMonthViewsSuccess_viewsNotExisted() {
         // given
         MenuTitle menu = MenuTitle.ABOUT;
         ArtworkCategory category = ArtworkCategory.ALL;
