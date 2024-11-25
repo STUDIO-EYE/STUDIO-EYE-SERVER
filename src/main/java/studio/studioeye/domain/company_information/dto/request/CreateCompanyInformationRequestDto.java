@@ -31,7 +31,6 @@ public record CreateCompanyInformationRequestDto(
         String introduction,
 
         @Schema(description = "회사 상세 정보, 빈 값/공백/null 을 허용하지 않습니다.")
-        @NotBlank(message = "회사 상세 정보는 필수 값입니다.")
         List<DetailInformationDTO> detailInformation
 
 ) {
