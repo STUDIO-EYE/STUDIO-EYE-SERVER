@@ -326,17 +326,17 @@ public class RequestService {
 		return ApiResponse.ok("답변을 성공적으로 작성했습니다.");
 	}
 
-//	public ApiResponse<String> deleteRequest(Long requestId) {
-//		Optional<Request> optionalRequest = requestRepository.findById(requestId);
-//		if(optionalRequest.isEmpty()){
-//			return ApiResponse.withError(ErrorCode.INVALID_REQUEST_ID);
-//		}
-//
-//		Request request = optionalRequest.get();
-//		requestRepository.delete(request);
-//
-//		return ApiResponse.ok("문의를 성공적으로 삭제했습니다.");
-//	}
+	public ApiResponse<String> deleteRequest(Long requestId) {
+		Optional<Request> optionalRequest = requestRepository.findById(requestId);
+		if(optionalRequest.isEmpty()){
+			return ApiResponse.withError(ErrorCode.INVALID_REQUEST_ID);
+		}
+
+		Request request = optionalRequest.get();
+		requestRepository.delete(request);
+
+		return ApiResponse.ok("문의를 성공적으로 삭제했습니다.");
+	}
 
 //	private boolean checkMonth(int month) {
 //		return (month>=1 && month<=12);

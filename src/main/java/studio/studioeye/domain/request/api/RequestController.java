@@ -33,11 +33,11 @@ public class RequestController {
 		return requestService.createRequest(dto.toServiceRequest(), files);
 	}
 
-//	@Operation(summary = "문의 삭제 API")
-//	@DeleteMapping("/requests/{requestId}")
-//	public ApiResponse<String> deleteRequest(@PathVariable Long requestId){
-//		return requestService.deleteRequest(requestId);
-//	}
+	@Operation(summary = "문의 삭제 API")
+	@DeleteMapping("/requests/{requestId}")
+	public ApiResponse<String> deleteRequest(@PathVariable Long requestId){
+		return requestService.deleteRequest(requestId);
+	}
 
 	@Operation(summary = "문의 전체 조회 API")
 	@GetMapping("/requests")
