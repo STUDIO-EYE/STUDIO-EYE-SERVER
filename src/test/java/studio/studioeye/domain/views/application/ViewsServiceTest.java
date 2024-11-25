@@ -551,8 +551,8 @@ public class ViewsServiceTest {
     }
 
     @Test
-    @DisplayName("이번 월 조회수 1 상승 실패 테스트")
-    public void updateThisMonthViewsFail() {
+    @DisplayName("이번 월 조회수 1 상승 실패 테스트 - 잘못된 메뉴와 카테고리 조합인 경우")
+    public void updateThisMonthViewsFail_invalidMenuAndCategory() {
         // given
         MenuTitle menu = MenuTitle.ABOUT;
         ArtworkCategory category = ArtworkCategory.ENTERTAINMENT;
