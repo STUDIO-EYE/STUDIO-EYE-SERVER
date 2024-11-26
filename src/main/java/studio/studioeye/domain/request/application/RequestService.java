@@ -10,13 +10,9 @@ import studio.studioeye.domain.request.domain.Request;
 import studio.studioeye.domain.request.domain.State;
 import studio.studioeye.domain.request.dto.request.CreateRequestServiceDto;
 import studio.studioeye.domain.request.dto.request.UpdateRequestCommentServiceDto;
-import studio.studioeye.domain.request.dto.request.UpdateRequestStateServiceDto;
 import studio.studioeye.global.common.response.ApiResponse;
 import studio.studioeye.global.exception.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -117,7 +113,7 @@ public class RequestService {
 		return ApiResponse.ok("문의를 성공적으로 등록하였습니다.", savedRequest);
 	}
 
-	public ApiResponse<List<Request>> retlrieveAllRequest() {
+	public ApiResponse<List<Request>> retrieveAllRequest() {
 		List<Request> requestList = requestRepository.findAll();
 
 		if (requestList.isEmpty()){
