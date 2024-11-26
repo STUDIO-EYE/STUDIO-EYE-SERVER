@@ -1,5 +1,6 @@
 package studio.studioeye.domain.request.application;
 
+import org.springframework.http.HttpStatus;
 import studio.studioeye.domain.email.service.EmailService;
 import studio.studioeye.domain.notification.application.NotificationService;
 import studio.studioeye.domain.request.dao.AnswerRepository;
@@ -329,6 +330,7 @@ public class RequestService {
 		}
 
 		Request request = optionalRequest.get();
+		notificationService.deleteNotification(request.getId());
 		requestRepository.delete(request);
 
 		return ApiResponse.ok("문의를 성공적으로 삭제했습니다.");
