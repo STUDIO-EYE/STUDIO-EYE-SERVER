@@ -100,7 +100,7 @@ public class NotificationService {
             return ApiResponse.ok("해당 문의의 존재하는 알림이 없습니다.");
         }
         Notification notification = optionalNotification.get();
-        // user notification 삭제 자리
+        userNotificationService.deleteUserNotificationByNotificationId(notification.getId());
         notificationRepository.delete(notification);
         return ApiResponse.ok("성공적으로 알림을 삭제했습니다.");
     }
