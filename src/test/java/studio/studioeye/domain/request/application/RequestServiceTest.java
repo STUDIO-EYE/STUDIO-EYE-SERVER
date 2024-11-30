@@ -316,4 +316,23 @@ public class RequestServiceTest {
 		Mockito.verify(requestRepository, times(1)).findById(id);
 		Mockito.verify(requestRepository, times(1)).delete(savedRequest);
 	}
+
+	@Test
+	@DisplayName("문의 삭제 실패 테스트")
+	public void deleteRequestFail() {
+		// given
+		Long id = 1L;
+
+		// stub
+		when(requestRepository.findById(id)).thenReturn(Optional.empty());
+
+		// when
+		ApiResponse<String> response = requestService.deleteRequest(id);
+
+		// then
+		assertEquals(ErrorCode.INVALID_REQUEST_ID.getStatus(), response.getStatus());
+		assertEquals(ErrorCode.INVALID_REQUEST_ID.getMessage(), response.getMessage());
+		Mockito.verify(requestRepository, times(1)).findById(id);
+		Mockito.verify(requestRepository, Mockito.never()).delete(any());
+	}
 }
