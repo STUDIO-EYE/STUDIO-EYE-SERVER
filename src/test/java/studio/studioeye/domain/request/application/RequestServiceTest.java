@@ -1,14 +1,18 @@
 package studio.studioeye.domain.request.application;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
+import studio.studioeye.domain.recruitment.domain.Recruitment;
+import studio.studioeye.domain.recruitment.domain.Status;
 import studio.studioeye.domain.request.dao.AnswerRepository;
 import studio.studioeye.domain.request.dao.RequestCount;
 import studio.studioeye.domain.request.dao.RequestCountImpl;
@@ -26,11 +30,13 @@ import studio.studioeye.domain.notification.application.NotificationService;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -283,4 +289,70 @@ public class RequestServiceTest {
 		assertEquals(HttpStatus.BAD_REQUEST, response.getStatus());
 		assertEquals(ErrorCode.INVALID_INPUT_VALUE.getMessage(), response.getMessage());
 	}
+
+	@Test
+	@DisplayName("문의 삭제 성공 테스트")
+	void deleteRequestSuccess() {
+		// given
+		Long id = 1L;
+		Request savedRequest = Request.builder()
+				.projectName("Test name")
+				.category("Test category")
+				.clientName("Test client name")
+				.organization("Test Organization")
+				.email("Test Email")
+				.position("Test position")
+				.description("Test description")
+				.year(2024)
+				.month(11)
+				.state(State.WAITING)
+				.build();
+
+		// stub
+		when(requestRepository.findById(id)).thenReturn(Optional.of(savedRequest));
+
+		// when
+		ApiResponse<String> response = requestService.deleteRequest(id);
+
+		assertEquals(HttpStatus.OK, response.getStatus());
+		assertEquals("문의를 성공적으로 삭제했습니다.", response.getMessage());
+		Mockito.verify(requestRepository, times(1)).findById(id);
+		Mockito.verify(requestRepository, times(1)).delete(savedRequest);
+	}
+
+//	@Test
+//	@DisplayName("채용공고 삭제 성공 테스트")
+//	public void deleteRecruitmentSuccess() {
+//		// given
+//		Long id = 1L;
+//		Recruitment savedRecruitment = new Recruitment("Test Title1", new Date(System.currentTimeMillis() - 100000), new Date(System.currentTimeMillis() + 100000), "Test URL1", new Date(), Status.OPEN);
+//		// stub
+//		when(recruitmentRepository.findById(id)).thenReturn(Optional.of(savedRecruitment));
+//
+//		// when
+//		ApiResponse<String> response = recruitmentService.deleteRecruitment(id);
+//
+//		// then
+//		Assertions.assertThat(response.getMessage()).isEqualTo("채용공고를 성공적으로 삭제하였습니다.");
+//		Mockito.verify(recruitmentRepository, times(1)).findById(id);
+//		Mockito.verify(recruitmentRepository, times(1)).delete(savedRecruitment);
+//	}
+//
+//	@Test
+//	@DisplayName("채용공고 삭제 실패 테스트")
+//	public void deleteRecruitmentFail() {
+//		// given
+//		Long id = 1L;
+//		// stub
+//		when(recruitmentRepository.findById(id)).thenReturn(Optional.empty());
+//
+//		// when
+//		ApiResponse<String> response = recruitmentService.deleteRecruitment(id);
+//
+//		// then
+//		Assertions.assertThat(response.getStatus()).isEqualTo(ErrorCode.INVALID_RECRUITMENT_ID.getStatus());
+//		// method call verify
+//		Mockito.verify(recruitmentRepository, times(1)).findById(id);
+//		Mockito.verify(recruitmentRepository, Mockito.never()).delete(any());
+//	}
 }
