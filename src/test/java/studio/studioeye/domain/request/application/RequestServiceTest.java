@@ -1,5 +1,6 @@
 package studio.studioeye.domain.request.application;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -315,5 +316,4 @@ public class RequestServiceTest {
 		Mockito.verify(requestRepository, times(1)).findById(id);
 		Mockito.verify(requestRepository, times(1)).delete(savedRequest);
 	}
-
 }
