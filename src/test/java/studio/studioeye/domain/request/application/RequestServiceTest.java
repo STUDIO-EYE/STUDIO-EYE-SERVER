@@ -2,13 +2,16 @@ package studio.studioeye.domain.request.application;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
+import studio.studioeye.domain.email.service.EmailService;
+import studio.studioeye.domain.notification.application.NotificationService;
 import studio.studioeye.domain.request.dao.AnswerRepository;
 import studio.studioeye.domain.request.dao.RequestCount;
 import studio.studioeye.domain.request.dao.RequestCountImpl;
@@ -21,8 +24,6 @@ import studio.studioeye.domain.request.dto.request.UpdateRequestCommentServiceDt
 import studio.studioeye.global.common.response.ApiResponse;
 import studio.studioeye.global.exception.error.ErrorCode;
 import studio.studioeye.infrastructure.s3.S3Adapter;
-import studio.studioeye.domain.email.service.EmailService;
-import studio.studioeye.domain.notification.application.NotificationService;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -30,7 +31,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -283,4 +285,35 @@ public class RequestServiceTest {
 		assertEquals(HttpStatus.BAD_REQUEST, response.getStatus());
 		assertEquals(ErrorCode.INVALID_INPUT_VALUE.getMessage(), response.getMessage());
 	}
+
+	@Test
+	@DisplayName("문의 삭제 성공 테스트")
+	void deleteRequestSuccess() {
+		// given
+		Long id = 1L;
+		Request savedRequest = Request.builder()
+				.projectName("Test name")
+				.category("Test category")
+				.clientName("Test client name")
+				.organization("Test Organization")
+				.email("Test Email")
+				.position("Test position")
+				.description("Test description")
+				.year(2024)
+				.month(11)
+				.state(State.WAITING)
+				.build();
+
+		// stub
+		when(requestRepository.findById(id)).thenReturn(Optional.of(savedRequest));
+
+		// when
+		ApiResponse<String> response = requestService.deleteRequest(id);
+
+		assertEquals(HttpStatus.OK, response.getStatus());
+		assertEquals("문의를 성공적으로 삭제했습니다.", response.getMessage());
+		Mockito.verify(requestRepository, times(1)).findById(id);
+		Mockito.verify(requestRepository, times(1)).delete(savedRequest);
+	}
+
 }
