@@ -77,9 +77,9 @@ public class UserController {
 
     //이메일 인증번호 검증
     @GetMapping("/emails/verifications")
-    public ResponseEntity verificationEmail(@RequestParam("email") @Valid @Email String email,
-                                            @RequestParam("code") String authCode) {
-
+    public ResponseEntity<EmailVerificationResult> verificationEmail( // 제네릭 타입 명시
+                                                                      @RequestParam("email") @Valid @Email String email,
+                                                                      @RequestParam("code") String authCode) {
         EmailVerificationResult response = userService.verifiedCode(email, authCode);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
