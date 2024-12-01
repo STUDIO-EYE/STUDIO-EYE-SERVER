@@ -84,11 +84,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public String register(RequestUser requestUser) {
 
-        // add check for email & phoneNumber exists in database
-        if(userRepository.existsByEmail(requestUser.getEmail())){
+        if (Boolean.TRUE.equals(userRepository.existsByEmail(requestUser.getEmail()))) {
             throw new BusinessLogicException(ExceptionCode.EMAIL_DUPLICATE);
         }
-        if (userRepository.existsByPhoneNumber(requestUser.getPhoneNumber())){
+        if (Boolean.TRUE.equals(userRepository.existsByPhoneNumber(requestUser.getPhoneNumber()))) {
             throw new BusinessLogicException(ExceptionCode.PHONE_NUMBER_DUPLICATE);
         }
 
