@@ -70,8 +70,7 @@ public class UserController {
 
     //이메일 인증번호 전송
     @PostMapping("/emails/verification-requests")
-    public ResponseEntity sendMessage(@RequestParam("email") @Valid String email) {
-
+    public ResponseEntity<Void> sendMessage(@RequestParam("email") @Valid String email) { // 제네릭 타입 명시
         userService.sendCodeToEmail(email);
         return new ResponseEntity<>(HttpStatus.OK);
     }
