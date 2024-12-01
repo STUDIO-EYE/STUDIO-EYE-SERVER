@@ -19,8 +19,6 @@ public interface UserService{
 
     UserResponse findUserResponseByEmail(String email);
 
-//    JWTAuthResponse reissueAccessToken(String encryptedRefreshToken);
-
     void sendCodeToEmail(String toEmail);
 
     EmailVerificationResult verifiedCode(String email, String authCode);
