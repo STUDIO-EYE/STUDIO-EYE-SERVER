@@ -93,7 +93,7 @@ public class UserController {
 
     //모든 회원 정보 반환
     @GetMapping("/users")
-    public ResponseEntity<List<UserResponse>> getAllUsers() {
+    public ResponseEntity<List<UserResponse>> getAllUsers() { // 제네릭 타입 명시
         List<UserResponse> users = userService.getAllUsers();
         return ResponseEntity.ok(users);
     }
