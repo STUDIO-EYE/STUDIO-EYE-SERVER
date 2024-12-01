@@ -100,8 +100,8 @@ public class UserController {
 
     //승인 여부 변경
     @PutMapping("/approve")
-    public ResponseEntity approveUser(@RequestParam("userId") @Valid Long userId,
-                                      @RequestParam("approved") boolean approved) {
+    public ResponseEntity<Boolean> approveUser(@RequestParam("userId") @Valid Long userId,
+                                               @RequestParam("approved") boolean approved) { // 제네릭 타입 명시
         boolean isApproved = userService.updateApproved(userId, approved);
         return ResponseEntity.ok().body(isApproved);
     }
