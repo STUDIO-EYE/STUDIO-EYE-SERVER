@@ -12,10 +12,6 @@ public class EmailService {
     private final JavaMailSender javaMailSender;
     private static final int MAX_EMAIL_SIZE = 25 * 1024 * 1024; // 25MB
 
-//    public EmailService(JavaMailSender javaMailSender) {
-//        this.javaMailSender = javaMailSender;
-//    }
-
     public boolean sendEmail(String to, String subject, String text) {
         if (to == null || to.isEmpty()) {
             throw new IllegalArgumentException("Invalid recipient address");
