@@ -1,7 +1,6 @@
 package studio.studioeye.domain.user.application;
 
 import org.springframework.http.ResponseEntity;
-import studio.studioeye.domain.user.domain.User;
 import studio.studioeye.domain.user.dto.request.RequestLogin;
 import studio.studioeye.domain.user.dto.request.RequestUser;
 import studio.studioeye.domain.user.dto.response.EmailVerificationResult;
@@ -9,7 +8,6 @@ import studio.studioeye.domain.user.dto.response.JWTAuthResponse;
 import studio.studioeye.domain.user.dto.response.UserResponse;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface UserService{
 
