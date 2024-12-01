@@ -75,7 +75,7 @@ public class NewsService {
         if(!source.isEmpty()) {
             news.updateSource(source);
         }
-        if(!(pubDate == null)) {
+        if (pubDate != null) {
             news.updatePubDate(pubDate);
         }
         if(!url.isEmpty()) {
