@@ -68,16 +68,6 @@ public class UserController {
         return ResponseEntity.ok(userIds);
     }
 
-    //토큰 재발급
-//    @PatchMapping("/reissue")
-//    public ResponseEntity<JWTAuthResponse> reissue(HttpServletRequest request,
-//                                                   HttpServletResponse response) {
-//
-//        String refreshToken = jwtTokenProvider.resolveRefreshToken(request);
-//        JWTAuthResponse newAccessToken = userService.reissueAccessToken(refreshToken);
-//        return ResponseEntity.ok(newAccessToken);
-//    }
-
     //이메일 인증번호 전송
     @PostMapping("/emails/verification-requests")
     public ResponseEntity sendMessage(@RequestParam("email") @Valid String email) {
