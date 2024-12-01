@@ -121,23 +121,6 @@ public class UserServiceImpl implements UserService {
         return userResponse;
     }
 
-    // 토큰 재발급
-//    @Override
-//    public JWTAuthResponse reissueAccessToken(String refreshToken) {
-//        this.verifiedRefreshToken(refreshToken);
-//        String email = jwtTokenProvider.getEmail(refreshToken);
-//        String redisRefreshToken = redisService.getValues(email);
-//
-//        if (redisService.checkExistsValue(redisRefreshToken) && refreshToken.equals(redisRefreshToken)) {
-//            Optional<User> findUser = this.findOne(email);
-//            User User = User.of(findUser);
-//            JWTAuthResponse tokenDto = jwtTokenProvider.generateToken(email, jwtTokenProvider.getAuthentication(refreshToken), User.getId());
-//            String newAccessToken = tokenDto.getAccessToken();
-//            long refreshTokenExpirationMillis = jwtTokenProvider.getRefreshTokenExpirationMillis();
-//            return tokenDto;
-//        } else throw new BusinessLogicException(ExceptionCode.TOKEN_IS_NOT_SAME);
-//    }
-
     //이메일 인증번호 관련 메소드
     public void sendCodeToEmail(String toEmail) {
         this.checkDuplicatedEmail(toEmail);
