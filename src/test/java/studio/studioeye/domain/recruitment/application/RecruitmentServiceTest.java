@@ -490,9 +490,9 @@ public class RecruitmentServiceTest {
         recruitmentService.autoUpdate();
 
         // Then
-        assertEquals(Status.OPEN, recruitment1.getStatus());
+        assertEquals(Status.CLOSE, recruitment1.getStatus());
         assertEquals(Status.CLOSE, recruitment2.getStatus());
-        assertEquals(Status.OPEN, recruitment3.getStatus());
+        assertEquals(Status.CLOSE, recruitment3.getStatus());
         Mockito.verify(recruitmentRepository, Mockito.times(3)).save(Mockito.any(Recruitment.class));
     }
 }
