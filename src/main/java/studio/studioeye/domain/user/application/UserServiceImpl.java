@@ -94,12 +94,11 @@ public class UserServiceImpl implements UserService {
 
         ModelMapper mapper = new ModelMapper();
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-        User User = mapper.map(requestUser, User.class);
-        User.setEncryptedPwd(passwordEncoder.encode(requestUser.getPwd()));
-        User.setApproved(false);
-        User.setCreatedAt(LocalDate.now());
-        userRepository.save(User);
-
+        User user = mapper.map(requestUser, User.class); // 변수명을 소문자로 수정
+        user.setEncryptedPwd(passwordEncoder.encode(requestUser.getPwd()));
+        user.setApproved(false);
+        user.setCreatedAt(LocalDate.now());
+        userRepository.save(user); // 수정된 변수명 사용
         return "User registered successfully!";
     }
 
@@ -143,8 +142,8 @@ public class UserServiceImpl implements UserService {
 
     //중복 이메일 체크
     private void checkDuplicatedEmail(String email) {
-        Optional<User> User = userRepository.findByEmail(email);
-        if (User.isPresent()) {
+        Optional<User> user = userRepository.findByEmail(email); // 변수명을 소문자로 수정
+        if (user.isPresent()) {
             log.debug("UserServiceImpl.checkDuplicatedEmail exception occur email: {}", email);
             throw new BusinessLogicException(ExceptionCode.EMAIL_DUPLICATE);
         }
