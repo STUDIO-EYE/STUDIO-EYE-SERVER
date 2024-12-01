@@ -31,7 +31,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class FaqServiceTest {
+class FaqServiceTest {
     @InjectMocks
     private FaqService faqService;
     @Mock
@@ -41,7 +41,7 @@ public class FaqServiceTest {
 
     @Test
     @DisplayName("FAQ 생성 성공 테스트")
-    public void createFaqSuccess() {
+    void createFaqSuccess() {
         // given
         String question = "test question";
         String answer = "test answer";
@@ -60,7 +60,7 @@ public class FaqServiceTest {
 
     @Test
     @DisplayName("FAQ 생성 실패 테스트 - 질문이 비어 있는 경우")
-    public void createFaqFail() {
+    void createFaqFail() {
         // given
         String question = "";
         String answer = "test answer";
@@ -79,7 +79,7 @@ public class FaqServiceTest {
 
     @Test
     @DisplayName("FAQ 생성 실패 테스트 - 답변이 비어 있는 경우")
-    public void createFaqFail_EmptyAnswer() {
+    void createFaqFail_EmptyAnswer() {
         // given
         String question = "test question";
         String answer = ""; // 비어 있는 답변
@@ -96,7 +96,7 @@ public class FaqServiceTest {
 
     @Test
     @DisplayName("FAQ 전체 조회 성공 테스트")
-    public void retrieveAllFaqSuccess() {
+    void retrieveAllFaqSuccess() {
         // given
         List<Faq> faqList = new ArrayList<>();
         faqList.add(new Faq("Test Question1", "Test Answer1", true));
@@ -119,7 +119,7 @@ public class FaqServiceTest {
 
     @Test
     @DisplayName("FAQ 전체 조회 실패 테스트 - FAQ가 없는 경우")
-    public void retrieveAllFaqFail() {
+    void retrieveAllFaqFail() {
         // given
         List<Faq> savedFaqList = new ArrayList<>();
         // stub
@@ -137,7 +137,7 @@ public class FaqServiceTest {
 
     @Test
     @DisplayName("FAQ 단일 조회 성공 테스트")
-    public void retrieveFaqByIdSuccess() {
+    void retrieveFaqByIdSuccess() {
         // given
         Long id = 1L;
         Faq savedFaq = new Faq("Test Question1", "Test Answer1", true);
@@ -159,7 +159,7 @@ public class FaqServiceTest {
 
     @Test
     @DisplayName("FAQ 단일 조회 실패 테스트 - 잘못된 ID")
-    public void retrieveFaqByIdFail() {
+    void retrieveFaqByIdFail() {
         // given
         Long id = 2L;
         Faq savedFaq = new Faq("Test Question1", "Test Answer1", true);
@@ -178,7 +178,7 @@ public class FaqServiceTest {
 
     @Test
     @DisplayName("FAQ 수정 성공 테스트")
-    public void updateFaqSuccess() {
+    void updateFaqSuccess() {
         // given
         Faq savedFaq = new Faq("Test Question1", "Test Answer1", true);
         String question = "Test Question2";
@@ -216,7 +216,7 @@ public class FaqServiceTest {
 
     @Test
     @DisplayName("FAQ 수정 실패 테스트 - 잘못된 ID")
-    public void updateFaqFail() {
+    void updateFaqFail() {
         // given
         Faq savedFaq = new Faq("Test Question1", "Test Answer1", true);
         Long invalidId = 999L;
@@ -242,7 +242,7 @@ public class FaqServiceTest {
 
     @Test
     @DisplayName("FAQ 삭제 성공 테스트")
-    public void deleteFaqSuccess() {
+    void deleteFaqSuccess() {
         // given
         Long id = 1L;
         Faq savedFaq = new Faq("Test Question1", "Test Answer1", true);
@@ -259,7 +259,7 @@ public class FaqServiceTest {
 
     @Test
     @DisplayName("FAQ 삭제 실패 테스트 - 잘못된 ID")
-    public void deleteFaqFail() {
+    void deleteFaqFail() {
         // given
         Long invalidId = 999L;
         // stub
@@ -275,7 +275,7 @@ public class FaqServiceTest {
 
     @Test
     @DisplayName("FAQ 다중 삭제 성공 테스트")
-    public void deleteFaqsSuccess() {
+    void deleteFaqsSuccess() {
         // given
         List<Long> ids = List.of(1L, 2L, 3L);
         List<Faq> faqs = ids.stream()
@@ -316,7 +316,7 @@ public class FaqServiceTest {
 
     @Test
     @DisplayName("FAQ 제목 조회 성공 테스트")
-    public void retrieveAllFaqTitleSuccess() {
+    void retrieveAllFaqTitleSuccess() {
         // given
         List<FaqQuestions> faqTitles = List.of(
                 new FaqQuestions() {
@@ -342,7 +342,7 @@ public class FaqServiceTest {
 
     @Test
     @DisplayName("FAQ 제목 조회 실패 테스트")
-    public void retrieveAllFaqTitleFail() {
+    void retrieveAllFaqTitleFail() {
         // given
         when(faqRepository.findAllQuestions()).thenReturn(new ArrayList<>());
         // when
