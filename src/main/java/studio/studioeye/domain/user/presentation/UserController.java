@@ -86,8 +86,9 @@ public class UserController {
 
     //회원 탈퇴
     @DeleteMapping("/unregister")
-    public ResponseEntity unregister(@RequestParam("userId") @Valid Long userId) {
-        return userService.unregister(userId);
+    public ResponseEntity<Void> unregister(@RequestParam("userId") @Valid Long userId) { // 제네릭 타입 명시
+        userService.unregister(userId); // 메서드 실행
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT); // HTTP 204 반환
     }
 
     //모든 회원 정보 반환
