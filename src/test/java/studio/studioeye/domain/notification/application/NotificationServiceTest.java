@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
@@ -399,6 +400,8 @@ class NotificationServiceTest {
         assertEquals(HttpStatus.OK, response.getStatus());
         assertEquals("성공적으로 알림을 삭제했습니다.", response.getMessage());
         assertNull(response.getData());
+        Mockito.verify(notificationRepository, times(1)).findByRequestId(any(Long.class));
+        Mockito.verify(notificationRepository, times(1)).delete(any(Notification.class));
     }
 
     @Test

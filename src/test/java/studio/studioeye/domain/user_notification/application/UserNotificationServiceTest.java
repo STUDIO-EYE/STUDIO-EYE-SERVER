@@ -1,10 +1,12 @@
 package studio.studioeye.domain.user_notification.application;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 import studio.studioeye.domain.notification.dao.NotificationRepository;
 import studio.studioeye.domain.notification.domain.Notification;
 import studio.studioeye.domain.user_notification.dao.UserNotificationRepository;
