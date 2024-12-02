@@ -74,7 +74,6 @@ public class RequestService {
 
 				+ "의뢰인 성명: " + savedRequest.getClientName() + "\n"
 				+ "기관 혹은 기업: " + savedRequest.getOrganization() + "\n"
-//				+ "이메일 주소: " + savedRequest.getEmail() + "\n"
 				+ "직책: " + savedRequest.getPosition() + "\n"
 				+ "연락처: " + savedRequest.getContact() + "\n\n"
 
