@@ -379,4 +379,25 @@ class NotificationServiceTest {
         assertEquals(ErrorCode.INVALID_SSE_ID.getMessage(), response.getMessage()); // 예상 메시지 확인
         verify(failingEmitter, times(1)).completeWithError(any()); // completeWithError 호출 확인
     }
+
+    @Test
+    @DisplayName("Notification 삭제 성공 테스트")
+    void deleteNotificationSuccess() {
+        // given
+        Long requestId = 1L;
+        Notification notification = Notification.builder()
+                .requestId(requestId)
+                .build();
+
+        // stub
+        when(notificationRepository.findByRequestId(requestId)).thenReturn(Optional.of(notification));
+
+        // when
+        ApiResponse<String> response = notificationService.deleteNotification(requestId);
+
+        // then
+        assertEquals(HttpStatus.OK, response.getStatus());
+        assertEquals("성공적으로 알림을 삭제했습니다.", response.getMessage());
+        assertNull(response.getData());
+    }
 }
