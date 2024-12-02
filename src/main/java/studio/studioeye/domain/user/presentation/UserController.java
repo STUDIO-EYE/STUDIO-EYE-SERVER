@@ -68,50 +68,40 @@ public class UserController {
         return ResponseEntity.ok(userIds);
     }
 
-    //토큰 재발급
-//    @PatchMapping("/reissue")
-//    public ResponseEntity<JWTAuthResponse> reissue(HttpServletRequest request,
-//                                                   HttpServletResponse response) {
-//
-//        String refreshToken = jwtTokenProvider.resolveRefreshToken(request);
-//        JWTAuthResponse newAccessToken = userService.reissueAccessToken(refreshToken);
-//        return ResponseEntity.ok(newAccessToken);
-//    }
-
     //이메일 인증번호 전송
     @PostMapping("/emails/verification-requests")
-    public ResponseEntity sendMessage(@RequestParam("email") @Valid String email) {
-
+    public ResponseEntity<Void> sendMessage(@RequestParam("email") @Valid String email) { // 제네릭 타입 명시
         userService.sendCodeToEmail(email);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     //이메일 인증번호 검증
     @GetMapping("/emails/verifications")
-    public ResponseEntity verificationEmail(@RequestParam("email") @Valid @Email String email,
-                                            @RequestParam("code") String authCode) {
-
+    public ResponseEntity<EmailVerificationResult> verificationEmail( // 제네릭 타입 명시
+                                                                      @RequestParam("email") @Valid @Email String email,
+                                                                      @RequestParam("code") String authCode) {
         EmailVerificationResult response = userService.verifiedCode(email, authCode);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     //회원 탈퇴
     @DeleteMapping("/unregister")
-    public ResponseEntity unregister(@RequestParam("userId") @Valid Long userId) {
-        return userService.unregister(userId);
+    public ResponseEntity<Void> unregister(@RequestParam("userId") @Valid Long userId) { // 제네릭 타입 명시
+        userService.unregister(userId); // 메서드 실행
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT); // HTTP 204 반환
     }
 
     //모든 회원 정보 반환
     @GetMapping("/users")
-    public ResponseEntity<List<UserResponse>> getAllUsers() {
+    public ResponseEntity<List<UserResponse>> getAllUsers() { // 제네릭 타입 명시
         List<UserResponse> users = userService.getAllUsers();
         return ResponseEntity.ok(users);
     }
 
     //승인 여부 변경
     @PutMapping("/approve")
-    public ResponseEntity approveUser(@RequestParam("userId") @Valid Long userId,
-                                      @RequestParam("approved") boolean approved) {
+    public ResponseEntity<Boolean> approveUser(@RequestParam("userId") @Valid Long userId,
+                                               @RequestParam("approved") boolean approved) { // 제네릭 타입 명시
         boolean isApproved = userService.updateApproved(userId, approved);
         return ResponseEntity.ok().body(isApproved);
     }

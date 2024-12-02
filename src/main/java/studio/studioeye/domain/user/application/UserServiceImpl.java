@@ -84,22 +84,20 @@ public class UserServiceImpl implements UserService {
     @Override
     public String register(RequestUser requestUser) {
 
-        // add check for email & phoneNumber exists in database
-        if(userRepository.existsByEmail(requestUser.getEmail())){
+        if (Boolean.TRUE.equals(userRepository.existsByEmail(requestUser.getEmail()))) {
             throw new BusinessLogicException(ExceptionCode.EMAIL_DUPLICATE);
         }
-        if (userRepository.existsByPhoneNumber(requestUser.getPhoneNumber())){
+        if (Boolean.TRUE.equals(userRepository.existsByPhoneNumber(requestUser.getPhoneNumber()))) {
             throw new BusinessLogicException(ExceptionCode.PHONE_NUMBER_DUPLICATE);
         }
 
         ModelMapper mapper = new ModelMapper();
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-        User User = mapper.map(requestUser, User.class);
-        User.setEncryptedPwd(passwordEncoder.encode(requestUser.getPwd()));
-        User.setApproved(false);
-        User.setCreatedAt(LocalDate.now());
-        userRepository.save(User);
-
+        User user = mapper.map(requestUser, User.class); // 변수명을 소문자로 수정
+        user.setEncryptedPwd(passwordEncoder.encode(requestUser.getPwd()));
+        user.setApproved(false);
+        user.setCreatedAt(LocalDate.now());
+        userRepository.save(user); // 수정된 변수명 사용
         return "User registered successfully!";
     }
 
@@ -120,23 +118,6 @@ public class UserServiceImpl implements UserService {
         }
         return userResponse;
     }
-
-    // 토큰 재발급
-//    @Override
-//    public JWTAuthResponse reissueAccessToken(String refreshToken) {
-//        this.verifiedRefreshToken(refreshToken);
-//        String email = jwtTokenProvider.getEmail(refreshToken);
-//        String redisRefreshToken = redisService.getValues(email);
-//
-//        if (redisService.checkExistsValue(redisRefreshToken) && refreshToken.equals(redisRefreshToken)) {
-//            Optional<User> findUser = this.findOne(email);
-//            User User = User.of(findUser);
-//            JWTAuthResponse tokenDto = jwtTokenProvider.generateToken(email, jwtTokenProvider.getAuthentication(refreshToken), User.getId());
-//            String newAccessToken = tokenDto.getAccessToken();
-//            long refreshTokenExpirationMillis = jwtTokenProvider.getRefreshTokenExpirationMillis();
-//            return tokenDto;
-//        } else throw new BusinessLogicException(ExceptionCode.TOKEN_IS_NOT_SAME);
-//    }
 
     //이메일 인증번호 관련 메소드
     public void sendCodeToEmail(String toEmail) {
@@ -160,8 +141,8 @@ public class UserServiceImpl implements UserService {
 
     //중복 이메일 체크
     private void checkDuplicatedEmail(String email) {
-        Optional<User> User = userRepository.findByEmail(email);
-        if (User.isPresent()) {
+        Optional<User> user = userRepository.findByEmail(email); // 변수명을 소문자로 수정
+        if (user.isPresent()) {
             log.debug("UserServiceImpl.checkDuplicatedEmail exception occur email: {}", email);
             throw new BusinessLogicException(ExceptionCode.EMAIL_DUPLICATE);
         }
