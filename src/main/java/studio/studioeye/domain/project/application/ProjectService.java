@@ -245,13 +245,10 @@ public class ProjectService {
 		project.setMainImgFileName(mainImgFile.getOriginalFilename());
 
 		// 새로운 반응형 메인이미지 저장
-		// TODO 임시 코드
-		if(responsiveMainImgFile != null) {
-			String responsiveMainImg = getImgUrl(responsiveMainImgFile);
-			if (responsiveMainImg.isEmpty()) return ApiResponse.withError(ErrorCode.ERROR_S3_UPDATE_OBJECT);
-			project.setResponsiveMainImg(responsiveMainImg);
-			project.setResponsiveMainImgFileName(responsiveMainImgFile.getOriginalFilename());
-		}
+		String responsiveMainImg = getImgUrl(responsiveMainImgFile);
+		if (responsiveMainImg.isEmpty()) return ApiResponse.withError(ErrorCode.ERROR_S3_UPDATE_OBJECT);
+		project.setResponsiveMainImg(responsiveMainImg);
+		project.setResponsiveMainImgFileName(responsiveMainImgFile.getOriginalFilename());
 
 		// 기존 이미지 + 새로운 이미지들 저장
 		List<ProjectImage> projectImages = new LinkedList<>();
