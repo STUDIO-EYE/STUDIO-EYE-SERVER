@@ -67,8 +67,6 @@ public class RequestService {
 		Request request = dto.toEntity(fileUrlList, new ArrayList<>(), year, month, State.WAITING, new Date());
 		Request savedRequest = requestRepository.saveAndFlush(request);
 
-//		String state = convertState(savedRequest.getState());
-
 		String subject = "[STUDIO EYE] 문의가 완료되었습니다."; // 이메일 제목
 		String text = "아래와 같이 작성하신 문의가 성공적으로 접수되었습니다.\n"
 				+ "추후 담당자 배정 후 해당 메일로 결과를 전송드리겠습니다.\n\n\n"
@@ -83,7 +81,6 @@ public class RequestService {
 				+ "프로젝트명: " + savedRequest.getProjectName() + "\n"
 				+ "문의 내용: " + savedRequest.getDescription() + "\n";
 
-//		emailService.sendEmail(savedRequest.getEmail(), subject, text);
 		boolean isExceeded = emailService.sendEmail(savedRequest.getEmail(), subject, text);
 		if(!isExceeded) {
 			return ApiResponse.withError(ErrorCode.EMAIL_SIZE_EXCEEDED);
