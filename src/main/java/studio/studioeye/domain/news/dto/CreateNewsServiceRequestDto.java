@@ -5,20 +5,13 @@ import studio.studioeye.domain.news.domain.News;
 import java.time.LocalDate;
 
 public record CreateNewsServiceRequestDto(
-    String title,
-    String source,
-    LocalDate pubDate,
-    String url,
-    Boolean visibility
+        String title,
+        String source,
+        LocalDate pubDate,
+        String url,
+        Boolean visibility
 ) {
-    public CreateNewsServiceRequestDto(String title, String source, LocalDate pubDate, String url,
-                                       Boolean visibility) {
-        this.title = title;
-        this.source = source;
-        this.pubDate = pubDate;
-        this.url = url;
-        this.visibility = visibility;
-    }
+    // 기본 생성자는 제거
     public News toEntity() {
         return News.builder()
                 .title(title)

@@ -15,7 +15,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class EmailServiceTest {
+class EmailServiceTest {
 
     @InjectMocks
     private EmailService emailService; // EmailService를 올바르게 주입
@@ -25,7 +25,7 @@ public class EmailServiceTest {
 
     @Test
     @DisplayName("이메일 전송 성공 테스트")
-    public void sendEmailSuccess() {
+    void sendEmailSuccess() {
         // given
         String to = "test@example.com";
         String subject = "Test Subject";
@@ -41,7 +41,7 @@ public class EmailServiceTest {
 
     @Test
     @DisplayName("이메일 전송 실패 테스트 - 크기 초과")
-    public void sendEmailFailDueToSize() {
+    void sendEmailFailDueToSize() {
         // given
         String to = "test@example.com";
         String subject = "This is a very long subject that will exceed the limit";
@@ -55,7 +55,7 @@ public class EmailServiceTest {
 
     @Test
     @DisplayName("이메일 전송 실패 테스트 - 수신자 없음")
-    public void sendEmailFailNoRecipient() {
+    void sendEmailFailNoRecipient() {
         // given
         String to = null;
         String subject = "Test Subject";

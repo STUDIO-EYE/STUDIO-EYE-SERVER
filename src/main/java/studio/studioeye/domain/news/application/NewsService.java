@@ -56,7 +56,7 @@ public class NewsService {
         return newsRepository.findAll(pageable);
     }
 
-    public ApiResponse<News> updateNews(UpdateNewsServiceRequestDto dto) throws IOException {
+    public ApiResponse<News> updateNews(UpdateNewsServiceRequestDto dto) {
         String title = dto.title().trim();
         String source = dto.source().trim();
         LocalDate pubDate = dto.pubDate();
@@ -75,7 +75,7 @@ public class NewsService {
         if(!source.isEmpty()) {
             news.updateSource(source);
         }
-        if(!(pubDate == null)) {
+        if (pubDate != null) {
             news.updatePubDate(pubDate);
         }
         if(!url.isEmpty()) {

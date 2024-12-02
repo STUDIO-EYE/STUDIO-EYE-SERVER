@@ -21,8 +21,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findById(Long userId);
 
     default UserResponse findUserResponseByUserId(Long userId) {
-        Optional<User> UserOptional = findById(userId);
-        User user = UserOptional.get();
+        Optional<User> userOptional = findById(userId);
+        User user = userOptional.get();
         return new UserResponse(
                 user.getId(),
                 user.getEmail(),
@@ -33,8 +33,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     }
 
     default UserResponse findUserResponseByEmail(String email) {
-        Optional<User> UserOptional = findByEmail(email);
-        User user = UserOptional.get();
+        Optional<User> userOptional = findByEmail(email);
+        User user = userOptional.get();
         return new UserResponse(
                 user.getId(),
                 user.getEmail(),
@@ -48,9 +48,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<Long> getAllApprovedUserIds();
 
     default List<UserResponse> findAllUsers(){
-        List<User> UserList = findAll();
+        List<User> userList = findAll();
         List<UserResponse> userResponseList = new ArrayList<>();
-        for(User user : UserList) {
+        for(User user : userList) {
             userResponseList.add (new UserResponse(
                     user.getId(),
                     user.getEmail(),

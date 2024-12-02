@@ -25,7 +25,7 @@ public class NewsController {
 
     @Operation(summary = "News 등록 API")
     @PostMapping("")
-    public ApiResponse<News> createNews(@Valid @RequestBody CreateNewsRequestDto dto) throws IOException {
+    public ApiResponse<News> createNews(@Valid @RequestBody CreateNewsRequestDto dto) {
         return newsService.createNews(dto.toServiceNews());
     }
 
@@ -50,7 +50,7 @@ public class NewsController {
 
     @Operation(summary = "News 수정 API")
     @PutMapping("")
-    public ApiResponse<News> updateNews(@Valid @RequestBody UpdateNewsRequestDto dto) throws IOException {
+    public ApiResponse<News> updateNews(@Valid @RequestBody UpdateNewsRequestDto dto) {
         return newsService.updateNews(dto.toServiceRequest());
     }
 

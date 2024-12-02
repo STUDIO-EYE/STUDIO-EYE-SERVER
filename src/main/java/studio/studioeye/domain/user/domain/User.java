@@ -18,7 +18,7 @@ public class User {
     private Long id;
 
     @Column(name = "product_id") // 외래 키 필드 추가
-    private Long product_id;
+    private Long productId;
 
     @Column(nullable = false, length = 50, unique = true)
     private String email;
@@ -41,7 +41,7 @@ public class User {
 
     @Builder
     public User(Long product_id, String email, String name, String phoneNumber, String encryptedPwd, boolean isApproved) {
-        this.product_id = product_id;
+        this.productId = productId;
         this.email = email;
         this.name = name;
         this.phoneNumber = phoneNumber;
