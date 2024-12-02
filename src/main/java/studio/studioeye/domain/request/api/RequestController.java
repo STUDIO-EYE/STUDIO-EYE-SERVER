@@ -40,7 +40,7 @@ public class RequestController {
 	@Operation(summary = "문의 전체 조회 API")
 	@GetMapping("/requests")
 	public ApiResponse<List<Request>> retrieveAllRequest(){
-		return requestService.retlrieveAllRequest();
+		return requestService.retrieveAllRequest();
 	}
 
 	@Operation(summary = "문의 상세 조회 API")

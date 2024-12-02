@@ -16,6 +16,7 @@ import studio.studioeye.domain.request.dto.request.CreateRequestServiceDto;
 import studio.studioeye.domain.request.dto.request.UpdateRequestCommentServiceDto;
 import studio.studioeye.global.common.response.ApiResponse;
 import studio.studioeye.global.exception.error.ErrorCode;
+
 import studio.studioeye.infrastructure.s3.S3Adapter;
 
 import java.io.IOException;
@@ -89,7 +90,7 @@ public class RequestService {
 		return ApiResponse.ok("문의를 성공적으로 등록하였습니다.", savedRequest);
 	}
 
-	public ApiResponse<List<Request>> retlrieveAllRequest() {
+	public ApiResponse<List<Request>> retrieveAllRequest() {
 		List<Request> requestList = requestRepository.findAll();
 
 		if (requestList.isEmpty()){
@@ -240,6 +241,7 @@ public class RequestService {
 		}
 
 		Request request = optionalRequest.get();
+		notificationService.deleteNotification(request.getId());
 		requestRepository.delete(request);
 
 		return ApiResponse.ok("문의를 성공적으로 삭제했습니다.");

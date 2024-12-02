@@ -79,4 +79,15 @@ public class UserNotificationService {
             return ApiResponse.withError(ErrorCode.FAILED_USER_NOTIFICATION_DELETE);
         }
     }
+
+    public ApiResponse<String> deleteUserNotificationByNotificationId(Long notificationId) {
+        List<UserNotification> userNotificationList = userNotificationRepository.findByNotificationId(notificationId);
+        if(userNotificationList.isEmpty()) {
+            return ApiResponse.ok("해당 알림의 사용자 알림이 없습니다.");
+        }
+        for(UserNotification userNotification : userNotificationList) {
+            userNotificationRepository.delete(userNotification);
+        }
+        return ApiResponse.ok("성공적으로 사용자 알림을 삭제했습니다.");
+    }
 }
