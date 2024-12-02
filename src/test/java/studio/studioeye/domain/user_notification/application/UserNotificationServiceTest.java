@@ -168,4 +168,24 @@ class UserNotificationServiceTest {
         Mockito.verify(userNotificationRepository, times(1)).findByNotificationId(any(Long.class));
         Mockito.verify(userNotificationRepository, times(3)).delete(any(UserNotification.class));
     }
+
+    @Test
+    @DisplayName("알림 id로 사용자 알림 삭제 실패 테스트")
+    void deleteUserNotificationByNotificationIdFail() {
+        // given
+        Long notificationId = 1L;
+
+        // stub
+        when(userNotificationRepository.findByNotificationId(notificationId)).thenReturn(List.of());
+
+        // when
+        ApiResponse<String> response = userNotificationService.deleteUserNotificationByNotificationId(notificationId);
+
+        // then
+        assertEquals(HttpStatus.OK, response.getStatus());
+        assertEquals("해당 알림의 사용자 알림이 없습니다.", response.getMessage());
+        assertNull(response.getData());
+        Mockito.verify(userNotificationRepository, times(1)).findByNotificationId(any(Long.class));
+        Mockito.verify(userNotificationRepository, never()).delete(any(UserNotification.class));
+    }
 }
