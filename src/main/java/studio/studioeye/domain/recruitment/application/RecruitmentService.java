@@ -100,7 +100,6 @@ public class RecruitmentService {
     private Status calculateStatus(Date startDate, Date deadline) {
         TimeZone.setDefault(TimeZone.getTimeZone("Asia/Seoul"));
         Date now = new Date();
-//        return now.compareTo(startDate) >= 0 && now.compareTo(deadline) <= 0;
         if(now.compareTo(startDate) < 0) return Status.PREPARING;
         if(now.compareTo(startDate) >= 0 && now.compareTo(deadline) <= 0) return Status.OPEN;
         return Status.CLOSE;

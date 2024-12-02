@@ -18,27 +18,18 @@ public class Recruitment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     @NotNull
     private String title;
-
     @NotNull
     @Temporal(TemporalType.TIMESTAMP)
     private Date startDate;
-
     @NotNull
     @Temporal(TemporalType.TIMESTAMP)
     private Date deadline;
-
-//    @NotNull
-//    private Boolean status;
-
     @Enumerated(EnumType.STRING)
     private Status status;
-
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
-
     @NotNull
     private String link;
 
