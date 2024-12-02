@@ -420,5 +420,7 @@ class NotificationServiceTest {
         assertEquals(HttpStatus.OK, response.getStatus());
         assertEquals("해당 문의의 존재하는 알림이 없습니다.", response.getMessage());
         assertNull(response.getData());
+        Mockito.verify(notificationRepository, times(1)).findByRequestId(any(Long.class));
+        Mockito.verify(notificationRepository, never()).delete(any(Notification.class));
     }
 }

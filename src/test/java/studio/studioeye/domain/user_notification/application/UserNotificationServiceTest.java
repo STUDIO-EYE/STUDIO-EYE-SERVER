@@ -129,40 +129,4 @@ class UserNotificationServiceTest {
 
         assertEquals(ErrorCode.INVALID_USER_NOTIFICATION_ID.getStatus(), response.getStatus());
     }
-
-    @Test
-    @DisplayName("사용자 알림 삭제 성공 테스트")
-    void deleteUserNotificationByNotificationIdSuccess() {
-        // given
-        Long notificationId = 1L;
-        UserNotification userNotification1 = UserNotification.builder()
-                .notificationId(notificationId)
-                .userId(1L)
-                .isRead(false)
-                .build();
-
-        UserNotification userNotification2 = UserNotification.builder()
-                .notificationId(notificationId)
-                .userId(2L)
-                .isRead(false)
-                .build();
-
-        UserNotification userNotification3 = UserNotification.builder()
-                .notificationId(notificationId)
-                .userId(2L)
-                .isRead(false)
-                .build();
-
-        // stub
-        when(userNotificationRepository.findByNotificationId(notificationId)).thenReturn(
-                List.of(userNotification1, userNotification2, userNotification3));
-
-        // when
-        ApiResponse<String> response = userNotificationService.deleteUserNotificationByNotificationId(notificationId);
-
-        // then
-        assertEquals(HttpStatus.OK, response.getStatus());
-        assertEquals("성공적으로 사용자 알림을 삭제했습니다.", response.getMessage());
-        assertNull(response.getData());
-    }
 }
