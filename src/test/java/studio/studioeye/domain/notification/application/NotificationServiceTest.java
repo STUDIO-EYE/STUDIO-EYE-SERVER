@@ -400,4 +400,22 @@ class NotificationServiceTest {
         assertEquals("성공적으로 알림을 삭제했습니다.", response.getMessage());
         assertNull(response.getData());
     }
+
+    @Test
+    @DisplayName("Notification 삭제 실패 테스트")
+    void deleteNotificationFail() {
+        // given
+        Long requestId = 1L;
+
+        // stub
+        when(notificationRepository.findByRequestId(requestId)).thenReturn(Optional.empty());
+
+        // when
+        ApiResponse<String> response = notificationService.deleteNotification(requestId);
+
+        // then
+        assertEquals(HttpStatus.OK, response.getStatus());
+        assertEquals("해당 문의의 존재하는 알림이 없습니다.", response.getMessage());
+        assertNull(response.getData());
+    }
 }
