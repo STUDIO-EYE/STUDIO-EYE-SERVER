@@ -42,15 +42,9 @@ public class ProjectService {
 		if (mainImg.isEmpty()) return ApiResponse.withError(ErrorCode.ERROR_S3_UPDATE_OBJECT);
 		String mainImgFileName = mainImgFile.getOriginalFilename();
 
-		// TODO 임시 코드
-		String responsiveMainImg = null;
-		String responsiveMainImgFileName = null;
-
-		if(responsiveMainImgFile != null) {
-			responsiveMainImg = getImgUrl(responsiveMainImgFile);
-			if (responsiveMainImg.isEmpty()) return ApiResponse.withError(ErrorCode.ERROR_S3_UPDATE_OBJECT);
-			responsiveMainImgFileName = responsiveMainImgFile.getOriginalFilename();
-		}
+		String responsiveMainImg = getImgUrl(responsiveMainImgFile);
+		if (responsiveMainImg.isEmpty()) return ApiResponse.withError(ErrorCode.ERROR_S3_UPDATE_OBJECT);
+		String responsiveMainImgFileName = responsiveMainImgFile.getOriginalFilename();
 
 		List<ProjectImage> projectImages = new LinkedList<>();
 		if (files != null) {
@@ -167,7 +161,6 @@ public class ProjectService {
 		if(mainImgFile == null || mainImgFile.isEmpty()) {
 			return ApiResponse.withError(ErrorCode.NOT_EXIST_IMAGE_FILE);
 		}
-		// 임시 주석 해제
 		if(responsiveMainImgFile == null || responsiveMainImgFile.isEmpty()) {
 			return ApiResponse.withError(ErrorCode.NOT_EXIST_IMAGE_FILE);
 		}
@@ -252,13 +245,10 @@ public class ProjectService {
 		project.setMainImgFileName(mainImgFile.getOriginalFilename());
 
 		// 새로운 반응형 메인이미지 저장
-		// TODO 임시 코드
-		if(responsiveMainImgFile != null) {
-			String responsiveMainImg = getImgUrl(responsiveMainImgFile);
-			if (responsiveMainImg.isEmpty()) return ApiResponse.withError(ErrorCode.ERROR_S3_UPDATE_OBJECT);
-			project.setResponsiveMainImg(responsiveMainImg);
-			project.setResponsiveMainImgFileName(responsiveMainImgFile.getOriginalFilename());
-		}
+		String responsiveMainImg = getImgUrl(responsiveMainImgFile);
+		if (responsiveMainImg.isEmpty()) return ApiResponse.withError(ErrorCode.ERROR_S3_UPDATE_OBJECT);
+		project.setResponsiveMainImg(responsiveMainImg);
+		project.setResponsiveMainImgFileName(responsiveMainImgFile.getOriginalFilename());
 
 		// 기존 이미지 + 새로운 이미지들 저장
 		List<ProjectImage> projectImages = new LinkedList<>();
