@@ -16,6 +16,7 @@ import studio.studioeye.global.exception.error.ErrorCode;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -91,5 +92,16 @@ public class NotificationService {
         // Emitter가 타임아웃 되었을 때(지정된 시간동안 어떠한 이벤트도 전송되지 않았을 때) Emitter를 삭제한다.
         emitter.onTimeout(() -> emitterRepository.deleteById(id));
         return emitter;
+    }
+
+    public ApiResponse<String> deleteNotification(Long requestId) {
+        Optional<Notification> optionalNotification = notificationRepository.findByRequestId(requestId);
+        if(optionalNotification.isEmpty()) {
+            return ApiResponse.ok("해당 문의의 존재하는 알림이 없습니다.");
+        }
+        Notification notification = optionalNotification.get();
+        userNotificationService.deleteUserNotificationByNotificationId(notification.getId());
+        notificationRepository.delete(notification);
+        return ApiResponse.ok("성공적으로 알림을 삭제했습니다.");
     }
 }

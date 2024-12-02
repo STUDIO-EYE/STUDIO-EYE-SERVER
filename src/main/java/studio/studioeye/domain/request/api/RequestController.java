@@ -4,13 +4,11 @@ import studio.studioeye.domain.request.application.RequestService;
 import studio.studioeye.domain.request.domain.Request;
 import studio.studioeye.domain.request.dto.request.CreateRequestDto;
 import studio.studioeye.domain.request.dto.request.UpdateRequestCommentDto;
-import studio.studioeye.domain.request.dto.request.UpdateRequestStateDto;
 import studio.studioeye.global.common.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -42,7 +40,7 @@ public class RequestController {
 	@Operation(summary = "문의 전체 조회 API")
 	@GetMapping("/requests")
 	public ApiResponse<List<Request>> retrieveAllRequest(){
-		return requestService.retlrieveAllRequest();
+		return requestService.retrieveAllRequest();
 	}
 
 	@Operation(summary = "문의 상세 조회 API")
