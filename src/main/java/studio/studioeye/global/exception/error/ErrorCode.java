@@ -84,13 +84,14 @@ public enum ErrorCode {
 
 	// news
 	NEWS_IS_EMPTY(HttpStatus.BAD_REQUEST, "입력된 내용이 없습니다" ),
-	INVALID_NEWS_ID(HttpStatus.BAD_REQUEST,"유효하지 않은 news 식별자입니다." ),
+	INVALID_NEWS_ID(HttpStatus.BAD_REQUEST,"유효하지 않은 news 식별자입니다."),
 
 	// benefit
 	INVALID_BENEFIT_ID(HttpStatus.BAD_REQUEST, "유효하지 않은 benefit 식별자입니다."),
 
 	// menu
 	INVALID_MENU_ID(HttpStatus.BAD_REQUEST, "유효하지 않은 menu 식별자입니다."),
+	MENU_IS_EMPTY(HttpStatus.BAD_REQUEST, "입력된 메뉴가 없습니다."),
 	ALREADY_EXISTED_MENU(HttpStatus.BAD_REQUEST, "이미 동일한 메뉴가 존재합니다.");
 
 	private final HttpStatus status;
