@@ -20,7 +20,13 @@ import java.util.List;
 public class MenuController {
     private final MenuService menuService;
 
-    @Operation(summary = "PA용 메뉴 생성 API", description = "menuTitle은 MAIN, ABOUT, ARTWORK, FAQ, CONTACT, NEWS, RECRUITMENT 중에서 입력")
+//    @Operation(summary = "PA용 메뉴 생성 API", description = "menuTitle은 MAIN, ABOUT, ARTWORK, FAQ, CONTACT, NEWS, RECRUITMENT 중에서 입력")
+//    @PostMapping("/menu")
+//    public ApiResponse<Menu> createMenu(@RequestBody CreateMenuRequestDto dto) {
+//        return menuService.createMenu(dto.toServiceRequest());
+//    }
+
+    @Operation(summary = "PA용 메뉴 다중 생성 API", description = "menuTitle은 MAIN, ABOUT, ARTWORK, FAQ, CONTACT, NEWS, RECRUITMENT 중에서 입력")
     @PostMapping("/menu")
     public ApiResponse<Menu> createMenu(@RequestBody CreateMenuRequestDto dto) {
         return menuService.createMenu(dto.toServiceRequest());
