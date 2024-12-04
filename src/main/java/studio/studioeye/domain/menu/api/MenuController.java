@@ -28,8 +28,10 @@ public class MenuController {
 
     @Operation(summary = "PA용 메뉴 다중 생성 API", description = "menuTitle은 MAIN, ABOUT, ARTWORK, FAQ, CONTACT, NEWS, RECRUITMENT 중에서 입력")
     @PostMapping("/menu")
-    public ApiResponse<Menu> createMenu(@RequestBody CreateMenuRequestDto dto) {
-        return menuService.createMenu(dto.toServiceRequest());
+    public ApiResponse<List<Menu>> createMenu(@RequestBody List<CreateMenuRequestDto> dtoList) {
+        return menuService.createMenu(dtoList.stream()
+                .map(CreateMenuRequestDto::toServiceRequest)
+                .toList());
     }
 
     @Operation(summary = "PA용 메뉴 전체 조회 API")

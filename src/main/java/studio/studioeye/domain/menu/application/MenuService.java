@@ -32,7 +32,26 @@ public class MenuService {
 //        Menu savedMenu = menuRepository.save(menu);
 //        return ApiResponse.ok("메뉴를 성공적으로 등록하였습니다.", savedMenu);
 //    }
+    public ApiResponse<List<Menu>> createMenu(List<CreateMenuServiceRequestDto> dtoList) {
+        if(dtoList.isEmpty()) {
+            return ApiResponse.withError(ErrorCode.MENU_IS_EMPTY);
+        }
+        List<Menu> savedMenus = new ArrayList<>();
+        for (CreateMenuServiceRequestDto dto : dtoList) {
+            if(dto.menuTitle() == null || dto.visibility() == null) {
+                return ApiResponse.withError(ErrorCode.MENU_IS_EMPTY);
+            }
+            // 중복 체크: 동일한 menuTitle이 이미 존재하는지 확인
+            if (menuRepository.existsByMenuTitle(dto.menuTitle())) {
+                return ApiResponse.withError(ErrorCode.ALREADY_EXISTED_MENU);
+            }
 
+            Long totalCount = menuRepository.count();
+            Menu menu = dto.toEntity(totalCount.intValue());
+            Menu savedMenu = menuRepository.save(menu);
+            savedMenus.add(savedMenu);
+        }
+        return ApiResponse.ok("메뉴를 성공적으로 등록하였습니다.", savedMenus);
     }
     public ApiResponse<List<Menu>> retrieveAllMenu() {
         List<Menu> menuList = menuRepository.findAll();
