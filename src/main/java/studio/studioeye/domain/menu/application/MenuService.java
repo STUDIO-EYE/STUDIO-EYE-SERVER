@@ -41,6 +41,9 @@ public class MenuService {
             if(dto.menuTitle() == null || dto.visibility() == null) {
                 return ApiResponse.withError(ErrorCode.MENU_IS_EMPTY);
             }
+            if(dto.menuTitle().equals(MenuTitle.ALL)) {
+                return ApiResponse.withError(ErrorCode.INVALID_MENU);
+            }
             // 중복 체크: 동일한 menuTitle이 이미 존재하는지 확인
             if (menuRepository.existsByMenuTitle(dto.menuTitle())) {
                 return ApiResponse.withError(ErrorCode.ALREADY_EXISTED_MENU);
