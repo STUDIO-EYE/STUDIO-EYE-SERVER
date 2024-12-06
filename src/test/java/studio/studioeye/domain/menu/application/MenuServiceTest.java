@@ -34,6 +34,54 @@ class MenuServiceTest {
     @Mock
     private MenuRepository menuRepository;
 
+    @Test
+    @DisplayName("메뉴 생성 성공 테스트")
+    void createMenuSuccess() {
+        // given
+        List<CreateMenuServiceRequestDto> dtoList = new ArrayList<>();
+        dtoList.add(new CreateMenuServiceRequestDto(MenuTitle.ABOUT, true));
+        dtoList.add(new CreateMenuServiceRequestDto(MenuTitle.ARTWORK, true));
+        dtoList.add(new CreateMenuServiceRequestDto(MenuTitle.CONTACT, true));
+        dtoList.add(new CreateMenuServiceRequestDto(MenuTitle.FAQ, true));
+        dtoList.add(new CreateMenuServiceRequestDto(MenuTitle.RECRUITMENT, true));
+        dtoList.add(new CreateMenuServiceRequestDto(MenuTitle.NEWS, true));
+
+        for(CreateMenuServiceRequestDto dto : dtoList) {
+            System.out.println(dto);
+        }
+
+        int totalCount = 0;
+
+        // stub
+        for (CreateMenuServiceRequestDto dto : dtoList) {
+            when(menuRepository.save(any(Menu.class))).thenReturn(dto.toEntity(totalCount));
+            totalCount ++;
+        }
+
+        // when
+        ApiResponse<List<Menu>> response = menuService.createMenu(dtoList);
+        List<Menu> menuList = response.getData();
+
+        for(Menu menu : menuList) {
+            System.out.println(menu);
+        }
+
+        // then
+        assertEquals(HttpStatus.OK, response.getStatus());
+        assertEquals("메뉴를 성공적으로 등록하였습니다.", response.getMessage());
+        assertNotNull(menuList);
+        assertEquals(dtoList.size(), menuList.size());
+        assertEquals(dtoList.isEmpty(), menuList.isEmpty());
+        for(int i=0; i<menuList.size(); i++) {
+            assertEquals(dtoList.get(i).menuTitle(), menuList.get(i).getMenuTitle());
+            assertEquals(dtoList.get(i).visibility(), menuList.get(i).getVisibility());
+        }
+
+        // verify
+        Mockito.verify(menuRepository, never()).existsByMenuTitle(any(MenuTitle.class));
+        Mockito.verify(menuRepository, times(dtoList.size())).save(any(Menu.class));
+    }
+
 //    @Test
 //    @DisplayName("메뉴 생성 성공 테스트")
 //    void createMenuSuccess() {
