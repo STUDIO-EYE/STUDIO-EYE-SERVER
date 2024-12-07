@@ -32,7 +32,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class CompanyInformationServiceTest {
+class CompanyInformationServiceTest {
 
     @InjectMocks
     private CompanyInformationService companyInformationService;
@@ -52,7 +52,7 @@ public class CompanyInformationServiceTest {
 
     @Test
     @DisplayName("회사 정보 등록 성공 테스트")
-    public void createCompanyInformationSuccess() throws IOException {
+    void createCompanyInformationSuccess() throws IOException {
         // given
         String mainOverview = "Test mainOverview";
         String commitment = "Test commitment";
@@ -101,7 +101,7 @@ public class CompanyInformationServiceTest {
 
     @Test
     @DisplayName("회사 정보 등록 실패 테스트")
-    public void createCompanyInformationFail() throws IOException {
+    void createCompanyInformationFail() throws IOException {
         // given
         String mainOverview = "Test mainOverview";
         String commitment = "Test commitment";
@@ -144,7 +144,7 @@ public class CompanyInformationServiceTest {
 
     @Test
     @DisplayName("회사 전체 정보 수정 성공 테스트")
-    public void updateAllCompanyInformationSuccess() throws IOException {
+    void updateAllCompanyInformationSuccess() throws IOException {
         // given
         String mainOverview = "Test mainOverview";
         String commitment = "Test commitment";
@@ -222,7 +222,7 @@ public class CompanyInformationServiceTest {
 
     @Test
     @DisplayName("회사 전체 정보 수정 실패 테스트")
-    public void updateAllCompanyInformationFail() throws IOException {
+    void updateAllCompanyInformationFail() throws IOException {
         // given
         String mainOverview = "Test mainOverview";
         String commitment = "Test commitment";
@@ -269,7 +269,7 @@ public class CompanyInformationServiceTest {
 
     @Test
     @DisplayName("회사 전체 텍스트 정보(이미지 제외) 수정 성공 테스트")
-    public void updateAllCompanyTextInformationSuccess() {
+    void updateAllCompanyTextInformationSuccess() {
         // given
         String mainOverview = "Test mainOverview";
         String commitment = "Test commitment";
@@ -343,7 +343,7 @@ public class CompanyInformationServiceTest {
 
     @Test
     @DisplayName("회사 전체 텍스트 정보(이미지 제외) 수정 실패 테스트")
-    public void updateAllCompanyTextInformationFail() {
+    void updateAllCompanyTextInformationFail() {
         // given
         String mainOverview = "Test mainOverview";
         String commitment = "Test commitment";
@@ -390,7 +390,7 @@ public class CompanyInformationServiceTest {
 
     @Test
     @DisplayName("회사 로고 이미지 수정 성공 테스트")
-    public void updateCompanyLogoImageSuccess() throws IOException {
+    void updateCompanyLogoImageSuccess() throws IOException {
         // given
         List<CompanyInformation> savedCompanyInformationList = new ArrayList<>();
 
@@ -438,7 +438,7 @@ public class CompanyInformationServiceTest {
 
     @Test
     @DisplayName("회사 로고 이미지 수정 실패 테스트 - 로고 이미지가 없는 경우")
-    public void updateCompanyLogoImageFail_invalidFile() throws IOException {
+    void updateCompanyLogoImageFail_invalidFile() throws IOException {
         // given
         List<CompanyInformation> savedCompanyInformationList = new ArrayList<>();
 
@@ -481,7 +481,7 @@ public class CompanyInformationServiceTest {
 
     @Test
     @DisplayName("회사 로고 이미지 수정 실패 테스트 - 회사 데이터가 없는 경우")
-    public void updateCompanyLogoImageFail_notFound() throws IOException {
+    void updateCompanyLogoImageFail_notFound() throws IOException {
         // given
         List<CompanyInformation> savedCompanyInformationList = new ArrayList<>();
 
@@ -527,7 +527,7 @@ public class CompanyInformationServiceTest {
 
     @Test
     @DisplayName("회사 슬로건 이미지 수정 성공 테스트")
-    public void updateCompanySloganImageSuccess() throws IOException {
+    void updateCompanySloganImageSuccess() throws IOException {
         // given
         List<CompanyInformation> savedCompanyInformationList = new ArrayList<>();
 
@@ -575,7 +575,7 @@ public class CompanyInformationServiceTest {
 
     @Test
     @DisplayName("회사 슬로건 이미지 수정 실패 테스트 - 슬로건 이미지가 없는 경우")
-    public void updateCompanySloganImageFail_invalidFile() throws IOException {
+    void updateCompanySloganImageFail_invalidFile() throws IOException {
         // given
         List<CompanyInformation> savedCompanyInformationList = new ArrayList<>();
 
@@ -618,7 +618,7 @@ public class CompanyInformationServiceTest {
 
     @Test
     @DisplayName("회사 슬로건 이미지 수정 실패 테스트 - 회사 데이터가 없는 경우")
-    public void updateCompanySloganImageFail_notFound() throws IOException {
+    void updateCompanySloganImageFail_notFound() throws IOException {
         // given
         List<CompanyInformation> savedCompanyInformationList = new ArrayList<>();
 
@@ -664,7 +664,7 @@ public class CompanyInformationServiceTest {
 
     @Test
     @DisplayName("회사 로고, 슬로건 이미지 수정 성공 테스트")
-    public void updateCompanyLogoAndSloganSuccess() throws IOException {
+    void updateCompanyLogoAndSloganSuccess() throws IOException {
         // given
         List<CompanyInformation> savedCompanyInformationList = new ArrayList<>();
 
@@ -712,7 +712,7 @@ public class CompanyInformationServiceTest {
 
     @Test
     @DisplayName("회사 로고, 슬로건 이미지 수정 실패 테스트 - 회사 데이터가 없는 경우")
-    public void updateCompanyLogoAndSloganFail_notFound() throws IOException {
+    void updateCompanyLogoAndSloganFail_notFound() throws IOException {
         // given
         List<CompanyInformation> savedCompanyInformationList = new ArrayList<>();
 
@@ -758,7 +758,7 @@ public class CompanyInformationServiceTest {
 
     @Test
     @DisplayName("회사 기본 정보(주소, 유선번호, 팩스번호) 수정 성공 테스트")
-    public void updateCompanyBasicInformationSuccess() {
+    void updateCompanyBasicInformationSuccess() {
         // given
         String address = "Test address";
         String addressEnglish = "Test addressEnglish";
@@ -812,7 +812,7 @@ public class CompanyInformationServiceTest {
 
     @Test
     @DisplayName("회사 기본 정보(주소, 유선번호, 팩스번호) 수정 실패 테스트")
-    public void updateCompanyBasicInformationFail() {
+    void updateCompanyBasicInformationFail() {
         // given
         String address = "Test address";
         String addressEnglish = "Test addressEnglish";
@@ -856,7 +856,7 @@ public class CompanyInformationServiceTest {
 
     @Test
     @DisplayName("회사 소개 정보(mainOverview, commitment, introduction) 수정 성공 테스트")
-    public void updateCompanyIntroductionInformationSuccess() {
+    void updateCompanyIntroductionInformationSuccess() {
         // given
         String mainOverview = "Test mainOverview";
         String commitment = "Test commitment";
@@ -926,7 +926,7 @@ public class CompanyInformationServiceTest {
 
     @Test
     @DisplayName("회사 소개 정보(mainOverview, commitment, introduction) 수정 실패 테스트")
-    public void updateCompanyIntroductionInformationFail() {
+    void updateCompanyIntroductionInformationFail() {
         // given
         String mainOverview = "Test mainOverview";
         String commitment = "Test commitment";
@@ -969,7 +969,7 @@ public class CompanyInformationServiceTest {
 
     @Test
     @DisplayName("회사 5가지 상세 정보 수정 성공 테스트")
-    public void updateCompanyDetailInformationSuccess() {
+    void updateCompanyDetailInformationSuccess() {
         // given
         List<DetailInformationDTO> detailInformation = new ArrayList<>();
 
@@ -1035,7 +1035,7 @@ public class CompanyInformationServiceTest {
 
     @Test
     @DisplayName("회사 5가지 상세 정보 수정 실패 테스트")
-    public void updateCompanyDetailInformationFail() {
+    void updateCompanyDetailInformationFail() {
         // given
         List<DetailInformationDTO> detailInformation = new ArrayList<>();
 
