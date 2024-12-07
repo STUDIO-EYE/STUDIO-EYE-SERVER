@@ -32,10 +32,8 @@ import static org.mockito.Mockito.*;
 class ViewsServiceTest {
     @InjectMocks
     private ViewsService viewsService;
-
     @Mock
     private ViewsRepository viewsRepository;
-
     @Test
     @DisplayName("조회수 생성 성공 테스트")
     void createViewsSuccess() {
@@ -45,15 +43,11 @@ class ViewsServiceTest {
         Long views = 1L;
         MenuTitle menu = MenuTitle.ABOUT;
         ArtworkCategory category = ArtworkCategory.ALL;
-
-
         CreateViewsServiceRequestDto requestDto = new CreateViewsServiceRequestDto(
                 year, month, views, menu, category
         );
-
         // when
         ApiResponse<Views> response = viewsService.createViews(requestDto);
-
         // then
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatus());
@@ -70,15 +64,11 @@ class ViewsServiceTest {
         Long views = 1L;
         MenuTitle menu = MenuTitle.ABOUT;
         ArtworkCategory category = ArtworkCategory.ALL;
-
-
         CreateViewsServiceRequestDto requestDto = new CreateViewsServiceRequestDto(
                 year, month, views, menu, category
         );
-
         // when
         ApiResponse<Views> response = viewsService.createViews(requestDto);
-
         // then
         assertNotNull(response);
         assertEquals(ErrorCode.INVALID_VIEWS_MONTH.getStatus(), response.getStatus());
@@ -95,7 +85,6 @@ class ViewsServiceTest {
         Long views = 1L;
         MenuTitle menu = MenuTitle.ABOUT;
         ArtworkCategory category = ArtworkCategory.ALL;
-
         Views savedViews = Views.builder()
                 .year(year)
                 .month(month)
@@ -104,17 +93,13 @@ class ViewsServiceTest {
                 .category(category)
                 .createdAt(new Date())
                 .build();
-
         CreateViewsServiceRequestDto requestDto = new CreateViewsServiceRequestDto(
                 year, month, views, menu, category
         );
-
         // stub
         when(viewsRepository.findByYearAndMonth(year, month)).thenReturn(Optional.of(savedViews));
-
         // when
         ApiResponse<Views> response = viewsService.createViews(requestDto);
-
         // then
         assertNotNull(response);
         assertEquals(ErrorCode.ALREADY_EXISTED_DATA.getStatus(), response.getStatus());
@@ -133,14 +118,11 @@ class ViewsServiceTest {
         savedViewsList.add(new Views(2024, 9, 1L, MenuTitle.ABOUT, ArtworkCategory.ALL, new Date()));
         savedViewsList.add(new Views(2024, 10, 1L, MenuTitle.ABOUT, ArtworkCategory.ALL, new Date()));
         savedViewsList.add(new Views(2024, 11, 1L, MenuTitle.ABOUT, ArtworkCategory.ALL, new Date()));
-
         // stub
         when(viewsRepository.findAll()).thenReturn(savedViewsList);
-
         // when
         ApiResponse<List<Views>> response = viewsService.retrieveAllViews();
         List<Views> findViews = response.getData();
-
         // then
         assertNotNull(response);
         assertNotNull(findViews);
@@ -156,14 +138,11 @@ class ViewsServiceTest {
     void retrieveAllViewsFail() {
         // given
         List<Views> savedViewsList = new ArrayList<>();
-
         // stub
         when(viewsRepository.findAll()).thenReturn(savedViewsList);
-
         // when
         ApiResponse<List<Views>> response = viewsService.retrieveAllViews();
         List<Views> findViews = response.getData();
-
         // then
         assertNotNull(response);
         assertNull(findViews);
@@ -182,7 +161,6 @@ class ViewsServiceTest {
         Long views = 1L;
         MenuTitle menu = MenuTitle.ABOUT;
         ArtworkCategory category = ArtworkCategory.ALL;
-
         Views savedViews = Views.builder()
                 .year(year)
                 .month(month)
@@ -191,14 +169,11 @@ class ViewsServiceTest {
                 .category(category)
                 .createdAt(new Date())
                 .build();
-
         // stub
         when(viewsRepository.findById(id)).thenReturn(Optional.of(savedViews));
-
         // when
         ApiResponse<Views> response = viewsService.retrieveViewsById(id);
         Views findViews = response.getData();
-
         // then
         assertNotNull(response);
         assertNotNull(findViews);
@@ -219,14 +194,11 @@ class ViewsServiceTest {
     void retrieveViewsByIdFail() {
         // given
         Long id = 1L;
-
         // stub
         when(viewsRepository.findById(id)).thenReturn(Optional.empty());
-
         // when
         ApiResponse<Views> response = viewsService.retrieveViewsById(id);
         Views findViews = response.getData();
-
         // then
         assertNotNull(response);
         assertNull(findViews);
@@ -240,7 +212,6 @@ class ViewsServiceTest {
     void retrieveViewsByYearSuccess() {
         // given
         Integer year = 2024;
-
         List<Views> savedViewsList = new ArrayList<>();
         savedViewsList.add(new Views(year, 1, 1L, MenuTitle.ABOUT, ArtworkCategory.ALL, new Date()));
         savedViewsList.add(new Views(year, 2, 1L, MenuTitle.ABOUT, ArtworkCategory.ALL, new Date()));
@@ -253,14 +224,11 @@ class ViewsServiceTest {
         savedViewsList.add(new Views(year, 9, 1L, MenuTitle.ABOUT, ArtworkCategory.ALL, new Date()));
         savedViewsList.add(new Views(year, 10, 1L, MenuTitle.ABOUT, ArtworkCategory.ALL, new Date()));
         savedViewsList.add(new Views(year, 11, 1L, MenuTitle.ABOUT, ArtworkCategory.ALL, new Date()));
-
         // stub
         when(viewsRepository.findByYear(year)).thenReturn(savedViewsList);
-
         // when
         ApiResponse<List<Views>> response = viewsService.retrieveViewsByYear(year);
         List<Views> findViews = response.getData();
-
         // then
         assertNotNull(response);
         assertNotNull(findViews);
@@ -276,16 +244,12 @@ class ViewsServiceTest {
     void retrieveViewsByYearFail() {
         // given
         Integer year = 2024;
-
         List<Views> savedViewsList = new ArrayList<>();
-
         // stub
         when(viewsRepository.findByYear(year)).thenReturn(savedViewsList);
-
         // when
         ApiResponse<List<Views>> response = viewsService.retrieveViewsByYear(year);
         List<Views> findViews = response.getData();
-
         // then
         assertNotNull(response);
         assertNull(findViews);
@@ -303,7 +267,6 @@ class ViewsServiceTest {
         Long views = 1L;
         MenuTitle menu = MenuTitle.ABOUT;
         ArtworkCategory category = ArtworkCategory.ALL;
-
         Views savedViews = Views.builder()
                 .year(year)
                 .month(month)
@@ -312,14 +275,11 @@ class ViewsServiceTest {
                 .category(category)
                 .createdAt(new Date())
                 .build();
-
         // stub
         when(viewsRepository.findByYearAndMonth(year, month)).thenReturn(Optional.of(savedViews));
-
         // when
         ApiResponse<Views> response = viewsService.retrieveViewsByYearMonth(year, month);
         Views findViews = response.getData();
-
         // then
         assertNotNull(response);
         assertNotNull(findViews);
@@ -341,15 +301,11 @@ class ViewsServiceTest {
         // given
         Integer year = 2024;
         Integer month = 11;
-
-
         // stub
         when(viewsRepository.findByYearAndMonth(year, month)).thenReturn(Optional.empty());
-
         // when
         ApiResponse<Views> response = viewsService.retrieveViewsByYearMonth(year, month);
         Views findViews = response.getData();
-
         // then
         assertNotNull(response);
         assertNull(findViews);
@@ -375,12 +331,10 @@ class ViewsServiceTest {
             public Integer getYear() {
                 return 2024;
             }
-
             @Override
             public Integer getMonth() {
                 return 7;
             }
-
             @Override
             public Long getViews() {
                 return 2L;
@@ -391,12 +345,10 @@ class ViewsServiceTest {
             public Integer getYear() {
                 return 2024;
             }
-
             @Override
             public Integer getMonth() {
                 return 8;
             }
-
             @Override
             public Long getViews() {
                 return 8L;
@@ -407,25 +359,20 @@ class ViewsServiceTest {
             public Integer getYear() {
                 return 2024;
             }
-
             @Override
             public Integer getMonth() {
                 return 11;
             }
-
             @Override
             public Long getViews() {
                 return 24L;
             }
         });
-
         // stub
         when(viewsRepository.findByYearAndMonthBetweenAndMenuAndCategory(startYear, startMonth, endYear, endMonth, menu, category)).thenReturn(savedViewsList);
-
         // when
         ApiResponse<List<ViewsSummary>> response = viewsService.retrieveAllMenuCategoryViewsByPeriod(startYear, startMonth, endYear, endMonth, menu, category);
         List<ViewsSummary> findViews = response.getData();
-
         // then
         assertNotNull(response);
         assertNotNull(findViews);
@@ -446,11 +393,9 @@ class ViewsServiceTest {
         Integer endMonth = 13;
         MenuTitle menu = MenuTitle.ABOUT;
         ArtworkCategory category = ArtworkCategory.ALL;
-
         // when
         ApiResponse<List<ViewsSummary>> response = viewsService.retrieveAllMenuCategoryViewsByPeriod(startYear, startMonth, endYear, endMonth, menu, category);
         List<ViewsSummary> findViews = response.getData();
-
         // then
         assertNotNull(response);
         assertNull(findViews);
@@ -469,11 +414,9 @@ class ViewsServiceTest {
         Integer endMonth = 9;
         MenuTitle menu = MenuTitle.ABOUT;
         ArtworkCategory category = ArtworkCategory.ALL;
-
         // when
         ApiResponse<List<ViewsSummary>> response = viewsService.retrieveAllMenuCategoryViewsByPeriod(startYear, startMonth, endYear, endMonth, menu, category);
         List<ViewsSummary> findViews = response.getData();
-
         // then
         assertNotNull(response);
         assertNull(findViews);
@@ -488,13 +431,10 @@ class ViewsServiceTest {
         // given
         MenuTitle menu = MenuTitle.ABOUT;
         ArtworkCategory category = ArtworkCategory.ALL;
-
         UpdateViewsServiceRequestDto requestDto = new UpdateViewsServiceRequestDto(menu, category);
-
         // when
         ApiResponse<Views> response = viewsService.updateThisMonthViews(requestDto);
         Views findViews = response.getData();
-
         // then
         assertNotNull(response);
         assertNull(findViews);
@@ -512,7 +452,6 @@ class ViewsServiceTest {
         // given
         MenuTitle menu = MenuTitle.ABOUT;
         ArtworkCategory category = ArtworkCategory.ALL;
-
         UpdateViewsServiceRequestDto requestDto = new UpdateViewsServiceRequestDto(menu, category);
         Views mockViews = Views.builder()
                 .year(2024)
@@ -522,17 +461,14 @@ class ViewsServiceTest {
                 .category(category)
                 .createdAt(new Date())
                 .build();
-
         // stub
         when(viewsRepository.findByYearAndMonthAndMenuAndCategory(Integer.parseInt(
                 new SimpleDateFormat("yyyy").format(new Date().getTime())),
                 Integer.parseInt(new SimpleDateFormat("MM").format(new Date().getTime())),
                 requestDto.menu(), requestDto.category())).thenReturn(Optional.of(mockViews));
-
         // when
         ApiResponse<Views> response = viewsService.updateThisMonthViews(requestDto);
         Views findViews = response.getData();
-
         // then
         assertNotNull(response);
         assertNull(findViews);
@@ -550,13 +486,10 @@ class ViewsServiceTest {
         // given
         MenuTitle menu = MenuTitle.ABOUT;
         ArtworkCategory category = ArtworkCategory.ENTERTAINMENT;
-
         UpdateViewsServiceRequestDto requestDto = new UpdateViewsServiceRequestDto(menu, category);
-
         // when
         ApiResponse<Views> response = viewsService.updateThisMonthViews(requestDto);
         Views findViews = response.getData();
-
         // then
         assertNotNull(response);
         assertNull(findViews);
