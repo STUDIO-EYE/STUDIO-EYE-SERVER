@@ -148,52 +148,6 @@ class MenuServiceTest {
         Mockito.verify(menuRepository, never()).save(any(Menu.class));
     }
 
-//    @Test
-//    @DisplayName("메뉴 생성 성공 테스트")
-//    void createMenuSuccess() {
-//        // given
-//        CreateMenuServiceRequestDto requestDto = new CreateMenuServiceRequestDto(
-//                MenuTitle.ALL,
-//                true
-//        );
-//        // stub
-//        when(menuRepository.save(any(Menu.class))).thenReturn(requestDto.toEntity(0));
-//
-//        // when
-//        ApiResponse<Menu> response = menuService.createMenu(requestDto);
-//        Menu menu = response.getData();
-//
-//        // then
-//        assertNotNull(menu);
-//        Assertions.assertThat(menu.getMenuTitle()).isEqualTo(requestDto.menuTitle());
-//        Assertions.assertThat(menu.getVisibility()).isEqualTo(requestDto.visibility());
-//        assertEquals(HttpStatus.OK, response.getStatus());
-//        // verify
-//        Mockito.verify(menuRepository, times(1)).save(any(Menu.class));
-//    }
-//
-//    @Test
-//    @DisplayName("메뉴 생성 실패 테스트 - 중복된 메뉴가 이미 존재")
-//    void createMenuFail() {
-//        // given
-//        CreateMenuServiceRequestDto requestDto = new CreateMenuServiceRequestDto(
-//                MenuTitle.ALL,
-//                true
-//        );
-//        // stub
-//        when(menuRepository.existsByMenuTitle(requestDto.menuTitle())).thenReturn(true);
-//
-//        // when, then
-//        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-//            menuService.createMenu(requestDto);
-//        });
-//
-//        // then
-//        assertEquals("이미 동일한 메뉴가 존재합니다.", exception.getMessage());
-//        // verify
-//        verify(menuRepository, never()).save(any(Menu.class));
-//    }
-
     @Test
     @DisplayName("PA 메뉴 목록 조회 성공 테스트")
     void retrieveAllMenuSuccess() {
