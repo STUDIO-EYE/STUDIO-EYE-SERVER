@@ -110,7 +110,7 @@ class NewsServiceTest {
             newsService.retrieveNewsPage(page, size);
         });
 
-        Assertions.assertThat("Database Error").isEqualTo(exception.getMessage());
+        Assertions.assertThat(exception.getMessage()).isEqualTo("Database Error");
 
         Mockito.verify(newsRepository, times(1)).findAll(pageable);
     }
