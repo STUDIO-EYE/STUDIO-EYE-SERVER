@@ -108,7 +108,7 @@ class NotificationServiceTest {
     // 알림 생성 관련 테스트
     @Test
     @DisplayName("알림 생성 성공 테스트")
-    void createNotificationSuccess() throws IOException {
+    void createNotificationSuccess() {
         Notification notification = Notification.builder().build();
         Collection<SseEmitter> emitters = List.of(new SseEmitter());
         when(notificationRepository.save(any())).thenReturn(notification);
