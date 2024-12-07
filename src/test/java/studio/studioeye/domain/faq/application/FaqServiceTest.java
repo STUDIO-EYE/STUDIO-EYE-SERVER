@@ -420,6 +420,7 @@ class FaqServiceTest {
         // when & then
         assertThrows(IOException.class, () -> faqService.convert(invalidBase64Image));
     }
+
     @Test
     @DisplayName("createFaq 실패 테스트 - visibility가 null인 경우")
     void createFaqFail_NullVisibility() {
@@ -447,5 +448,4 @@ class FaqServiceTest {
         assertThrows(IllegalArgumentException.class, () -> faqService.retrieveFaqPage(invalidPage, pageSize));
         verify(faqRepository, never()).findAll(any(Pageable.class));
     }
-
 }
