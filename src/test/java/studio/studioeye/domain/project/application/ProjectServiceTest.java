@@ -19,8 +19,6 @@ import studio.studioeye.domain.project.dao.ProjectRepository;
 import studio.studioeye.domain.project.domain.Project;
 import studio.studioeye.domain.project.domain.ProjectImage;
 import studio.studioeye.domain.project.dto.request.*;
-import studio.studioeye.domain.recruitment.dao.RecruitmentTitle;
-import studio.studioeye.domain.recruitment.domain.Status;
 import studio.studioeye.global.common.response.ApiResponse;
 import studio.studioeye.global.exception.error.ErrorCode;
 import studio.studioeye.infrastructure.s3.S3Adapter;
