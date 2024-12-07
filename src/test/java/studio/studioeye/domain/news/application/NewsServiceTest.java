@@ -366,7 +366,6 @@ class NewsServiceTest {
         Assertions.assertThat(response.getStatus()).isEqualTo(ErrorCode.INVALID_NEWS_ID.getStatus());
         Assertions.assertThat(response.getMessage()).isEqualTo(ErrorCode.INVALID_NEWS_ID.getMessage());
         // method call verify
-//        Mockito.verify(newsRepository, Mockito.never()).delete(Mockito.any());
         Mockito.verify(newsRepository, times(1)).delete(any());
     }
 }
