@@ -46,10 +46,6 @@ class MenuServiceTest {
         dtoList.add(new CreateMenuServiceRequestDto(MenuTitle.RECRUITMENT, true));
         dtoList.add(new CreateMenuServiceRequestDto(MenuTitle.NEWS, true));
 
-        for(CreateMenuServiceRequestDto dto : dtoList) {
-            System.out.println(dto);
-        }
-
         // stub
         when(menuRepository.save(any(Menu.class)))
                 .thenReturn(dtoList.get(0).toEntity(0))
@@ -62,10 +58,6 @@ class MenuServiceTest {
         // when
         ApiResponse<List<Menu>> response = menuService.createMenu(dtoList);
         List<Menu> menuList = response.getData();
-
-        for(Menu menu : menuList) {
-            System.out.println(menu);
-        }
 
         // then
         assertEquals(HttpStatus.OK, response.getStatus());
