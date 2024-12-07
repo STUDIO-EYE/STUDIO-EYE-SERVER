@@ -32,7 +32,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class ClientServiceTest {
+class ClientServiceTest {
 
     @InjectMocks
     private ClientService clientService;
@@ -51,7 +51,7 @@ public class ClientServiceTest {
 
     @Test
     @DisplayName("Client 생성 성공")
-    public void createClientSuccess() throws IOException {
+    void createClientSuccess() throws IOException {
         // given
         CreateClientServiceRequestDto requestDto = new CreateClientServiceRequestDto("Test_Client", true);
 
@@ -73,7 +73,7 @@ public class ClientServiceTest {
 
     @Test
     @DisplayName("Client 생성 실패 - 이미지 업로드 실패")
-    public void createClientFailDueToImageUpload() throws IOException {
+    void createClientFailDueToImageUpload() throws IOException {
         // given
         CreateClientServiceRequestDto requestDto = new CreateClientServiceRequestDto("Test_Client", true);
 
