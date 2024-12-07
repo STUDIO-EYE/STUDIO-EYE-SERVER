@@ -371,8 +371,6 @@ class ClientServiceTest {
         Client clientToDelete = new Client("Client", "http://example.com/logo.jpg", true);
 
         when(clientRepository.findById(clientId)).thenReturn(Optional.of(clientToDelete));
-//        when(s3Adapter.deleteFile(clientToDelete.getLogoImg())).thenReturn(ApiResponse.ok("S3에서 파일 삭제 성공"));
-
         // when
         ApiResponse<String> response = clientService.deleteClient(clientId);
 
