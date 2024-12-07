@@ -1413,9 +1413,6 @@ class ProjectServiceTest {
                 .isPosted(true)
                 .projectType("top")
                 .build();
-        // 리플렉션으로 ID 설정
-//        ReflectionTestUtils.setField(newProject, "id", 1L);
-
         String newType = "main"; // 변경할 타입
 
         Project mockProject = Project.builder()
