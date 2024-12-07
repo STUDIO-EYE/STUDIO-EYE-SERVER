@@ -116,7 +116,7 @@ class NewsServiceTest {
 
     @Test
     @DisplayName("News 수정 성공 테스트")
-    void updateNewsSuccess() throws IOException {
+    void updateNewsSuccess() {
         // given
         Long id = 1L;
         String newTitle = "Test Title2";
@@ -146,7 +146,7 @@ class NewsServiceTest {
 
     @Test
     @DisplayName("News 수정 실패 테스트")
-    void updateNewsFail() throws IOException {
+    void updateNewsFail() {
         // given
         Long invalidId = 999L;
         News savedNews = new News("Test Title1", "Test Source1", LocalDate.of(2022, 1, 1), "Test URL1", true);
