@@ -35,7 +35,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class ProjectServiceTest {
+class ProjectServiceTest {
 
     @InjectMocks
     private ProjectService projectService;
@@ -56,7 +56,7 @@ public class ProjectServiceTest {
 
     @Test
     @DisplayName("Project 생성 성공 테스트_mainType인 경우")
-    public void createProjectSuccess_mainType() throws IOException {
+    void createProjectSuccess_mainType() throws IOException {
         // given
         CreateProjectServiceRequestDto requestDto = new CreateProjectServiceRequestDto(
                 "Test Department",
@@ -103,7 +103,7 @@ public class ProjectServiceTest {
 
     @Test
     @DisplayName("Project 생성 성공 테스트_topType인 경우")
-    public void createProjectSuccess_topType() throws IOException {
+    void createProjectSuccess_topType() throws IOException {
         // given
         CreateProjectServiceRequestDto requestDto = new CreateProjectServiceRequestDto(
                 "Test Department",
@@ -150,7 +150,7 @@ public class ProjectServiceTest {
 
     @Test
     @DisplayName("Project 생성 성공 테스트_othersType인 경우")
-    public void createProjectSuccess_othersType() throws IOException {
+    void createProjectSuccess_othersType() throws IOException {
         // given
         CreateProjectServiceRequestDto requestDto = new CreateProjectServiceRequestDto(
                 "Test Department",
@@ -197,7 +197,7 @@ public class ProjectServiceTest {
 
     @Test
     @DisplayName("Project 생성 실패 테스트 - 이미지 업로드 실패")
-    public void createProjectFail() throws IOException {
+    void createProjectFail() throws IOException {
         // given
         CreateProjectServiceRequestDto requestDto = new CreateProjectServiceRequestDto(
                 "Test Department",
@@ -227,7 +227,7 @@ public class ProjectServiceTest {
 
     @Test
     @DisplayName("Project 생성 실패 테스트 - 유효하지 않은 projectType인 경우")
-    public void createProjectFail_invalidProjectType() throws IOException {
+    void createProjectFail_invalidProjectType() throws IOException {
         // given
         CreateProjectServiceRequestDto requestDto = new CreateProjectServiceRequestDto(
                 "Test Department",
@@ -258,7 +258,7 @@ public class ProjectServiceTest {
 
     @Test
     @DisplayName("Project 생성 실패 테스트 - TOP 프로젝트가 이미 존재하는 경우")
-    public void createProjectFail_alreadyExistedTop() throws IOException {
+    void createProjectFail_alreadyExistedTop() throws IOException {
         // given
         CreateProjectServiceRequestDto requestDto = new CreateProjectServiceRequestDto(
                 "Test Department",
@@ -301,7 +301,7 @@ public class ProjectServiceTest {
 
     @Test
     @DisplayName("Project 생성 실패 테스트 - isPosted가 false인 TOP 프로젝트의 경우")
-    public void createProjectFail_isPostedFalseTop() throws IOException {
+    void createProjectFail_isPostedFalseTop() throws IOException {
         // given
         CreateProjectServiceRequestDto requestDto = new CreateProjectServiceRequestDto(
                 "Test Department",
@@ -334,7 +334,7 @@ public class ProjectServiceTest {
 
     @Test
     @DisplayName("Project 생성 실패 테스트 - main인 프로젝트가 이미 5개 이상인 경우")
-    public void createProjectFail_overMainProjectCount() throws IOException {
+    void createProjectFail_overMainProjectCount() throws IOException {
         // given
         CreateProjectServiceRequestDto requestDto = new CreateProjectServiceRequestDto(
                 "Test Department",
@@ -378,7 +378,7 @@ public class ProjectServiceTest {
 
     @Test
     @DisplayName("Project 생성 실패 테스트 - main인데 isPosted를 false로 할 경우")
-    public void createProjectFail_isPostedFalseMain() throws IOException {
+    void createProjectFail_isPostedFalseMain() throws IOException {
         // given
         CreateProjectServiceRequestDto requestDto = new CreateProjectServiceRequestDto(
                 "Test Department",
