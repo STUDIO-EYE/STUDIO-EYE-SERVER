@@ -228,7 +228,7 @@ class NewsServiceTest {
 
         // then
         Assertions.assertThat(findNews).isEqualTo(savedNews);
-        Assertions.assertThat(findNews.size()).isEqualTo(3);
+        Assertions.assertThat(findNews).hasSize(3);
     }
 
     @Test
