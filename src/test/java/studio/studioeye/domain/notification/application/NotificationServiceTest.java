@@ -80,7 +80,7 @@ class NotificationServiceTest {
     }
 
     @Test
-    @DisplayName("구독 실패 테스트 - Emitter 생성 실패")
+    @DisplayName("알림 구독 실패 테스트 - Emitter 생성 실패")
     void subscribeFail_EmitterError() {
         List<Long> userIds = List.of(1L);
         when(userService.getAllApprovedUserIds()).thenReturn(userIds);
@@ -93,6 +93,29 @@ class NotificationServiceTest {
         assertEquals("Emitter creation failed", exception.getMessage());
         verify(userService, times(1)).getAllApprovedUserIds();
         verify(emitterRepository, never()).save(anyLong(), any(SseEmitter.class));
+    }
+
+    @Test
+    @DisplayName("알림 구독 실패 테스트 - 타임아웃 발생")
+    void subscribe_Timeout_WithMock() {
+        // given
+        List<Long> userIds = List.of(TEST_USER_ID);
+        SseEmitter mockEmitter = mock(SseEmitter.class);
+        // Mock 반환 설정
+        when(userService.getAllApprovedUserIds()).thenReturn(userIds);
+        doReturn(mockEmitter).when(notificationService).createEmitter(anyLong());
+        // onTimeout 콜백 실행 설정
+        doAnswer(invocation -> {
+            Runnable callback = invocation.getArgument(0);
+            callback.run(); // 타임아웃 콜백 실행
+            return null;
+        }).when(mockEmitter).onTimeout(any(Runnable.class));
+        // deleteById 호출을 목업 처리
+        doNothing().when(emitterRepository).deleteById(TEST_USER_ID);
+        // when
+        notificationService.subscribe(TEST_REQUEST_ID);
+        // then
+        verify(emitterRepository, times(1)).deleteById(TEST_USER_ID); // 타임아웃 발생 시 deleteById 호출 확인
     }
 
     @Test
@@ -139,6 +162,26 @@ class NotificationServiceTest {
     }
 
     @Test
+    @DisplayName("알림 생성 실패 테스트 - send 호출 시 예외 처리")
+    void createNotification_SendException_WithMock() throws IOException {
+        // given
+        Notification notification = Notification.builder().build();
+        SseEmitter failingEmitter = mock(SseEmitter.class);
+        // Mock 설정: 정확한 인자 전달
+        doThrow(new IOException("Send failed"))
+                .when(failingEmitter)
+                .send(any(Notification.class)); // 정확한 인자를 명시
+        when(notificationRepository.save(any())).thenReturn(notification);
+        when(emitterRepository.getAllEmitters()).thenReturn(List.of(failingEmitter));
+        // when
+        ApiResponse<Notification> response = notificationService.createNotification(TEST_USER_ID, notification);
+        // then
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatus()); // 상태 코드 확인
+        assertEquals(ErrorCode.INVALID_SSE_ID.getMessage(), response.getMessage()); // 예상 메시지 확인
+        verify(failingEmitter, times(1)).completeWithError(any()); // completeWithError 호출 확인
+    }
+
+    @Test
     @DisplayName("모든 알림 조회 성공 테스트")
     void retrieveAllNotificationSuccess() {
         List<Notification> notificationList = List.of(Notification.builder().build(), Notification.builder().build());
@@ -171,7 +214,7 @@ class NotificationServiceTest {
     }
 
     @Test
-    @DisplayName("createEmitter - 정상 생성 테스트")
+    @DisplayName("createEmitter 성공 테스트")
     void createEmitter_Success() {
         // given
         Long emitterId = TEST_USER_ID;
@@ -181,7 +224,6 @@ class NotificationServiceTest {
         assertNotNull(emitter); // 생성된 Emitter가 null이 아닌지 확인
         verify(emitterRepository, times(1)).save(emitterId, emitter); // 저장 호출 확인
     }
-
     private SseEmitter invokePrivateMethod(NotificationService target, String methodName, Long param) {
         try {
             // private 메서드 접근 허용
@@ -195,7 +237,7 @@ class NotificationServiceTest {
     }
 
     @Test
-    @DisplayName("createEmitter - 타임아웃 테스트")
+    @DisplayName("createEmitter - 타임아웃 성공 테스트")
     void createEmitter_OnTimeout() {
         // given
         Long emitterId = TEST_USER_ID;
@@ -216,7 +258,7 @@ class NotificationServiceTest {
     }
 
     @Test
-    @DisplayName("createEmitter - 완료 테스트")
+    @DisplayName("createEmitter - 완료 성공 테스트")
     void createEmitter_OnCompletion() {
         // given
         Long emitterId = TEST_USER_ID;
@@ -237,7 +279,47 @@ class NotificationServiceTest {
     }
 
     @Test
-    @DisplayName("createEmitter - 예외 발생 테스트")
+    @DisplayName("createEmitter - 람다 onTimeout 성공 테스트")
+    void createEmitter_OnTimeout_WithMock() {
+        // given
+        Long emitterId = TEST_USER_ID;
+        // Mock SseEmitter 생성
+        SseEmitter mockEmitter = mock(SseEmitter.class);
+        doNothing().when(emitterRepository).deleteById(emitterId);
+        // when
+        // emitter.onTimeout()을 설정하여 목업이 deleteById 호출을 트리거하도록 설정
+        doAnswer(invocation -> {
+            Runnable callback = invocation.getArgument(0); // onTimeout 콜백
+            callback.run(); // 콜백 실행
+            return null;
+        }).when(mockEmitter).onTimeout(any(Runnable.class));
+        mockEmitter.onTimeout(() -> emitterRepository.deleteById(emitterId)); // 타임아웃 설정
+        // then
+        verify(emitterRepository, times(1)).deleteById(emitterId); // deleteById 호출 확인
+    }
+
+    @Test
+    @DisplayName("createEmitter - 람다 onCompletion 성공 테스트")
+    void createEmitter_OnCompletion_WithMock() {
+        // given
+        Long emitterId = TEST_USER_ID;
+        // Mock SseEmitter 생성
+        SseEmitter mockEmitter = mock(SseEmitter.class);
+        doNothing().when(emitterRepository).deleteById(emitterId);
+        // when
+        // emitter.onCompletion()을 설정하여 목업이 deleteById 호출을 트리거하도록 설정
+        doAnswer(invocation -> {
+            Runnable callback = invocation.getArgument(0); // onCompletion 콜백
+            callback.run(); // 콜백 실행
+            return null;
+        }).when(mockEmitter).onCompletion(any(Runnable.class));
+        mockEmitter.onCompletion(() -> emitterRepository.deleteById(emitterId)); // 완료 설정
+        // then
+        verify(emitterRepository, times(1)).deleteById(emitterId); // deleteById 호출 확인
+    }
+
+    @Test
+    @DisplayName("createEmitter 실패 테스트 - 예외 발생")
     void createEmitter_ExceptionThrown() {
         // given
         Long emitterId = TEST_USER_ID;
@@ -258,70 +340,7 @@ class NotificationServiceTest {
     }
 
     @Test
-    @DisplayName("createEmitter - 람다 onTimeout 실행 테스트")
-    void createEmitter_OnTimeout_WithMock() {
-        // given
-        Long emitterId = TEST_USER_ID;
-        // Mock SseEmitter 생성
-        SseEmitter mockEmitter = mock(SseEmitter.class);
-        doNothing().when(emitterRepository).deleteById(emitterId);
-        // when
-        // emitter.onTimeout()을 설정하여 목업이 deleteById 호출을 트리거하도록 설정
-        doAnswer(invocation -> {
-            Runnable callback = invocation.getArgument(0); // onTimeout 콜백
-            callback.run(); // 콜백 실행
-            return null;
-        }).when(mockEmitter).onTimeout(any(Runnable.class));
-        mockEmitter.onTimeout(() -> emitterRepository.deleteById(emitterId)); // 타임아웃 설정
-        // then
-        verify(emitterRepository, times(1)).deleteById(emitterId); // deleteById 호출 확인
-    }
-
-    @Test
-    @DisplayName("createEmitter - 람다 onCompletion 실행 테스트")
-    void createEmitter_OnCompletion_WithMock() {
-        // given
-        Long emitterId = TEST_USER_ID;
-        // Mock SseEmitter 생성
-        SseEmitter mockEmitter = mock(SseEmitter.class);
-        doNothing().when(emitterRepository).deleteById(emitterId);
-        // when
-        // emitter.onCompletion()을 설정하여 목업이 deleteById 호출을 트리거하도록 설정
-        doAnswer(invocation -> {
-            Runnable callback = invocation.getArgument(0); // onCompletion 콜백
-            callback.run(); // 콜백 실행
-            return null;
-        }).when(mockEmitter).onCompletion(any(Runnable.class));
-        mockEmitter.onCompletion(() -> emitterRepository.deleteById(emitterId)); // 완료 설정
-        // then
-        verify(emitterRepository, times(1)).deleteById(emitterId); // deleteById 호출 확인
-    }
-
-    @Test
-    @DisplayName("subscribe - 타임아웃 발생 테스트")
-    void subscribe_Timeout_WithMock() {
-        // given
-        List<Long> userIds = List.of(TEST_USER_ID);
-        SseEmitter mockEmitter = mock(SseEmitter.class);
-        // Mock 반환 설정
-        when(userService.getAllApprovedUserIds()).thenReturn(userIds);
-        doReturn(mockEmitter).when(notificationService).createEmitter(anyLong());
-        // onTimeout 콜백 실행 설정
-        doAnswer(invocation -> {
-            Runnable callback = invocation.getArgument(0);
-            callback.run(); // 타임아웃 콜백 실행
-            return null;
-        }).when(mockEmitter).onTimeout(any(Runnable.class));
-        // deleteById 호출을 목업 처리
-        doNothing().when(emitterRepository).deleteById(TEST_USER_ID);
-        // when
-        notificationService.subscribe(TEST_REQUEST_ID);
-        // then
-        verify(emitterRepository, times(1)).deleteById(TEST_USER_ID); // 타임아웃 발생 시 deleteById 호출 확인
-    }
-
-    @Test
-    @DisplayName("createNotification - emitters가 null인 경우 테스트")
+    @DisplayName("createNotification 실패테스트 - emitters가 null인 경우")
     void createNotification_NullEmitters_WithMock() {
         // given
         Notification notification = Notification.builder().build();
@@ -334,25 +353,5 @@ class NotificationServiceTest {
         assertNotNull(response); // 응답이 null이 아님을 확인
         assertEquals(HttpStatus.OK, response.getStatus()); // 상태 코드 확인
         assertEquals("알림이 존재하지 않습니다.", response.getMessage()); // 예상 메시지 확인
-    }
-
-    @Test
-    @DisplayName("createNotification - send 호출 시 예외 처리 테스트")
-    void createNotification_SendException_WithMock() throws IOException {
-        // given
-        Notification notification = Notification.builder().build();
-        SseEmitter failingEmitter = mock(SseEmitter.class);
-        // Mock 설정: 정확한 인자 전달
-        doThrow(new IOException("Send failed"))
-                .when(failingEmitter)
-                .send(any(Notification.class)); // 정확한 인자를 명시
-        when(notificationRepository.save(any())).thenReturn(notification);
-        when(emitterRepository.getAllEmitters()).thenReturn(List.of(failingEmitter));
-        // when
-        ApiResponse<Notification> response = notificationService.createNotification(TEST_USER_ID, notification);
-        // then
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatus()); // 상태 코드 확인
-        assertEquals(ErrorCode.INVALID_SSE_ID.getMessage(), response.getMessage()); // 예상 메시지 확인
-        verify(failingEmitter, times(1)).completeWithError(any()); // completeWithError 호출 확인
     }
 }
