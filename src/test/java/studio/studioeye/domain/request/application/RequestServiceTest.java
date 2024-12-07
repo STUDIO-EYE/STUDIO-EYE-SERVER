@@ -37,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class RequestServiceTest {
+class RequestServiceTest {
 	@InjectMocks
 	private RequestService requestService;
 	@Mock
@@ -60,7 +60,7 @@ public class RequestServiceTest {
 
 	@Test
 	@DisplayName("createRequest 성공 테스트 - 이메일과 파일 업로드 성공")
-	public void createRequestSuccess() throws IOException {
+	void createRequestSuccess() throws IOException {
 		// given
 		CreateRequestServiceDto dto = new CreateRequestServiceDto(
 				"Category", "ProjectName", "ClientName",
@@ -98,7 +98,7 @@ public class RequestServiceTest {
 
 	@Test
 	@DisplayName("createRequest 실패 테스트 - 잘못된 이메일 형식")
-	public void createRequestFail_InvalidEmail() throws IOException {
+	void createRequestFail_InvalidEmail() throws IOException {
 		// given
 		CreateRequestServiceDto dto = new CreateRequestServiceDto(
 				"Category", "ProjectName", "ClientName",
@@ -118,7 +118,7 @@ public class RequestServiceTest {
 
 	@Test
 	@DisplayName("createRequest 실패 테스트 - 파일 업로드 실패")
-	public void createRequestFail_FileUploadError() throws IOException {
+	void createRequestFail_FileUploadError() throws IOException {
 		// given
 		CreateRequestServiceDto dto = new CreateRequestServiceDto(
 				"Category", "ProjectName", "ClientName",
@@ -140,7 +140,7 @@ public class RequestServiceTest {
 
 	@Test
 	@DisplayName("createRequest 실패 테스트 - 이메일 전송 실패")
-	public void createRequestFail_EmailSendError() throws IOException {
+	void createRequestFail_EmailSendError() throws IOException {
 		// given
 		CreateRequestServiceDto dto = new CreateRequestServiceDto(
 				"Category", "ProjectName", "ClientName",
@@ -319,7 +319,7 @@ public class RequestServiceTest {
 
 	@Test
 	@DisplayName("문의 삭제 실패 테스트")
-	public void deleteRequestFail() {
+	void deleteRequestFail() {
 		// given
 		Long id = 1L;
 
