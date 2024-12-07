@@ -28,17 +28,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class BenefitServiceTest {
-
+class BenefitServiceTest {
     @InjectMocks
     private BenefitService benefitService;
-
     @Mock
     private BenefitRepository benefitRepository;
     @Mock
     private S3Adapter s3Adapter;
-
-    // Mock MultipartFile 생성
     MockMultipartFile mockFile = new MockMultipartFile(
             "file",
             "testImage.jpg",
@@ -48,20 +44,17 @@ public class BenefitServiceTest {
 
     @Test
     @DisplayName("Benefit 생성 성공")
-    public void createBenefitSuccess() throws IOException {
+    void createBenefitSuccess() throws IOException {
         //given
         CreateBenefitServiceRequestDto requestDto = new CreateBenefitServiceRequestDto(
                 "Test_Title",
                 "Test_Content"
         );
-
         // Mock S3 upload 동작 설정
         when(s3Adapter.uploadFile(any(MultipartFile.class)))
                 .thenReturn(ApiResponse.ok("S3 버킷에 이미지 업로드를 성공하였습니다.", "http://example.com/testImage.jpg"));
-
         //when
         ApiResponse<Benefit> response = benefitService.createBenefit(requestDto, mockFile);
-
         //then
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatus());
@@ -70,20 +63,17 @@ public class BenefitServiceTest {
 
     @Test
     @DisplayName("Benefit 생성 실패 - 이미지 업로드 실패")
-    public void createBenefitFailDueToImageUpload() throws IOException {
+    void createBenefitFailDueToImageUpload() throws IOException {
         //given
         CreateBenefitServiceRequestDto requestDto = new CreateBenefitServiceRequestDto(
                 "Test_Title",
                 "Test_Content"
         );
-
         //stub
         when(s3Adapter.uploadFile(any(MultipartFile.class)))
                 .thenReturn(ApiResponse.withError(ErrorCode.ERROR_S3_UPDATE_OBJECT));
-
         //when
         ApiResponse<Benefit> response = benefitService.createBenefit(requestDto, mockFile);
-
         //then
         assertNotNull(response);
         assertEquals(ErrorCode.ERROR_S3_UPDATE_OBJECT.getStatus(), response.getStatus());
@@ -98,19 +88,15 @@ public class BenefitServiceTest {
         benefitList.add(new Benefit("Test ImageUrl1", "Test ImageFileName1", "Test Title1", "Test Content1"));
         benefitList.add(new Benefit("Test ImageUrl2", "Test ImageFileName2", "Test Title2", "Test Content2"));
         benefitList.add(new Benefit("Test ImageUrl3", "Test ImageFileName3", "Test Title3", "Test Content3"));
-
         List<Benefit> savedBenefit = benefitList;
-
         // stub
         when(benefitRepository.findAll()).thenReturn(savedBenefit);
-
         // when
         ApiResponse<List<Benefit>> response = benefitService.retrieveBenefit();
         List<Benefit> findBenefit = response.getData();
-
         // then
         Assertions.assertThat(findBenefit).isEqualTo(savedBenefit);
-        Assertions.assertThat(findBenefit.size()).isEqualTo(3);
+        Assertions.assertThat(findBenefit).hasSize(3);
     }
 
     @Test
@@ -118,13 +104,10 @@ public class BenefitServiceTest {
     void retrieveNewsByIdFail() {
         // given
         List<Benefit> benefitList = new ArrayList<>();
-
         // stub
         when(benefitRepository.findAll()).thenReturn(benefitList);
-
         // when
         ApiResponse<List<Benefit>> response = benefitService.retrieveBenefit();
-
         // then
         Assertions.assertThat(response.getData()).isNull();
         Assertions.assertThat(response.getMessage()).isEqualTo("혜택 정보가 존재하지 않습니다.");
@@ -138,17 +121,14 @@ public class BenefitServiceTest {
         UpdateBenefitServiceRequestDto requestDto = new UpdateBenefitServiceRequestDto(
                 id, "Updated_Title","Updated_Content");
         Benefit savedBenefit = new Benefit("Test ImageUrl1", "Test ImageFileName1", "Test Title1", "Test Content1");
-
         // stub
         when(benefitRepository.findById(requestDto.id())).thenReturn(Optional.of(savedBenefit));
         when(s3Adapter.deleteFile(savedBenefit.getImageFileName())).thenReturn(ApiResponse.ok("S3에서 파일 삭제 성공"));
         when(s3Adapter.uploadFile(any(MultipartFile.class)))
                 .thenReturn(ApiResponse.ok("S3에 이미지 업로드 성공", "Updated Test ImageUrl"));
         when(benefitRepository.save(any(Benefit.class))).thenReturn(savedBenefit);
-
         //when
         ApiResponse<Benefit> response = benefitService.updateBenefit(requestDto, mockFile);
-
         //then
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatus());
@@ -163,13 +143,10 @@ public class BenefitServiceTest {
         Long id = 1L;
         UpdateBenefitServiceRequestDto requestDto = new UpdateBenefitServiceRequestDto(
                 id, "Updated_Title", "Updated_Content");
-
         // stub
         when(benefitRepository.findById(requestDto.id())).thenReturn(Optional.empty());
-
         // when
         ApiResponse<Benefit> response = benefitService.updateBenefit(requestDto, mockFile);
-
         // then
         assertNotNull(response);
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatus());
@@ -183,14 +160,11 @@ public class BenefitServiceTest {
         Long id = 1L;
         UpdateBenefitServiceRequestDto requestDto = new UpdateBenefitServiceRequestDto(id, "Updated_Title", "Updated_Content");
         Benefit savedBenefit = new Benefit("Test ImageUrl", "Test ImageFileName", "Test Title", "Test Content");
-
         // stub
         when(benefitRepository.findById(requestDto.id())).thenReturn(Optional.of(savedBenefit));
         when(benefitRepository.save(any(Benefit.class))).thenReturn(savedBenefit);
-
         // when
         ApiResponse<Benefit> response = benefitService.updateBenefitText(requestDto);
-
         // then
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatus());
@@ -205,13 +179,10 @@ public class BenefitServiceTest {
         // given
         Long id = 1L;
         UpdateBenefitServiceRequestDto requestDto = new UpdateBenefitServiceRequestDto(id, "Updated_Title", "Updated_Content");
-
         // stub
         when(benefitRepository.findById(requestDto.id())).thenReturn(Optional.empty());
-
         // when
         ApiResponse<Benefit> response = benefitService.updateBenefitText(requestDto);
-
         // then
         assertNotNull(response);
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatus());
@@ -224,19 +195,15 @@ public class BenefitServiceTest {
         // given
         Long benefitId = 1L;
         Benefit benefitToDelete = new Benefit("Test ImageUrl", "Test ImageFileName", "Test Title", "Test Content");
-
         // stub
         when(benefitRepository.findById(benefitId)).thenReturn(Optional.of(benefitToDelete));
         when(s3Adapter.deleteFile(benefitToDelete.getImageFileName())).thenReturn(ApiResponse.ok("S3에서 파일 삭제 성공"));
-
         // when
         ApiResponse<String> response = benefitService.deleteBenefit(benefitId);
-
         // then
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatus());
         assertEquals("혜택 정보를 성공적으로 삭제했습니다.", response.getMessage());
-
         verify(benefitRepository).delete(benefitToDelete);
     }
 
@@ -245,19 +212,14 @@ public class BenefitServiceTest {
     void deleteBenefitFail() {
         // given
         Long benefitId = 1L;
-
         // stub
         when(benefitRepository.findById(benefitId)).thenReturn(Optional.empty());
-
         // when
         ApiResponse<String> response = benefitService.deleteBenefit(benefitId);
-
         // then
         assertNotNull(response);
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatus());
         assertEquals(ErrorCode.INVALID_BENEFIT_ID.getMessage(), response.getMessage());
-
         verify(benefitRepository, never()).delete(any(Benefit.class));
     }
-
 }

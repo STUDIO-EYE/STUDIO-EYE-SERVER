@@ -12,7 +12,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 import studio.studioeye.domain.faq.dao.FaqQuestions;
 import studio.studioeye.domain.faq.dao.FaqRepository;
@@ -421,6 +420,7 @@ class FaqServiceTest {
         // when & then
         assertThrows(IOException.class, () -> faqService.convert(invalidBase64Image));
     }
+
     @Test
     @DisplayName("createFaq 실패 테스트 - visibility가 null인 경우")
     void createFaqFail_NullVisibility() {
@@ -448,5 +448,4 @@ class FaqServiceTest {
         assertThrows(IllegalArgumentException.class, () -> faqService.retrieveFaqPage(invalidPage, pageSize));
         verify(faqRepository, never()).findAll(any(Pageable.class));
     }
-
 }

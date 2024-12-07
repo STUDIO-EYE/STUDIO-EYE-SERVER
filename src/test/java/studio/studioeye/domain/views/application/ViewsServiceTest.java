@@ -10,11 +10,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import studio.studioeye.domain.menu.domain.MenuTitle;
 import studio.studioeye.domain.project.domain.ArtworkCategory;
-import studio.studioeye.domain.recruitment.application.RecruitmentService;
-import studio.studioeye.domain.recruitment.dao.RecruitmentRepository;
-import studio.studioeye.domain.recruitment.domain.Recruitment;
-import studio.studioeye.domain.recruitment.domain.Status;
-import studio.studioeye.domain.recruitment.dto.request.CreateRecruitmentServiceRequestDto;
 import studio.studioeye.domain.views.dao.ViewsRepository;
 import studio.studioeye.domain.views.dao.ViewsSummary;
 import studio.studioeye.domain.views.domain.Views;
@@ -34,31 +29,25 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class ViewsServiceTest {
+class ViewsServiceTest {
     @InjectMocks
     private ViewsService viewsService;
-
     @Mock
     private ViewsRepository viewsRepository;
-
     @Test
     @DisplayName("조회수 생성 성공 테스트")
-    public void createViewsSuccess() {
+    void createViewsSuccess() {
         // given
         Integer year = 2024;
         Integer month = 11;
         Long views = 1L;
         MenuTitle menu = MenuTitle.ABOUT;
         ArtworkCategory category = ArtworkCategory.ALL;
-
-
         CreateViewsServiceRequestDto requestDto = new CreateViewsServiceRequestDto(
                 year, month, views, menu, category
         );
-
         // when
         ApiResponse<Views> response = viewsService.createViews(requestDto);
-
         // then
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatus());
@@ -68,22 +57,18 @@ public class ViewsServiceTest {
 
     @Test
     @DisplayName("조회수 생성 실패 테스트 - 유효하지 않은 월 형식(1~12)인 경우")
-    public void createViewsFail_invalidMonth() {
+    void createViewsFail_invalidMonth() {
         // given
         Integer year = 2024;
         Integer month = 13;
         Long views = 1L;
         MenuTitle menu = MenuTitle.ABOUT;
         ArtworkCategory category = ArtworkCategory.ALL;
-
-
         CreateViewsServiceRequestDto requestDto = new CreateViewsServiceRequestDto(
                 year, month, views, menu, category
         );
-
         // when
         ApiResponse<Views> response = viewsService.createViews(requestDto);
-
         // then
         assertNotNull(response);
         assertEquals(ErrorCode.INVALID_VIEWS_MONTH.getStatus(), response.getStatus());
@@ -93,14 +78,13 @@ public class ViewsServiceTest {
 
     @Test
     @DisplayName("조회수 생성 실패 테스트 - 이미 해당 연월의 조회수가 존재하는 경우")
-    public void createViewsFail_alreadyExisted() {
+    void createViewsFail_alreadyExisted() {
         // given
         Integer year = 2024;
         Integer month = 11;
         Long views = 1L;
         MenuTitle menu = MenuTitle.ABOUT;
         ArtworkCategory category = ArtworkCategory.ALL;
-
         Views savedViews = Views.builder()
                 .year(year)
                 .month(month)
@@ -109,17 +93,13 @@ public class ViewsServiceTest {
                 .category(category)
                 .createdAt(new Date())
                 .build();
-
         CreateViewsServiceRequestDto requestDto = new CreateViewsServiceRequestDto(
                 year, month, views, menu, category
         );
-
         // stub
         when(viewsRepository.findByYearAndMonth(year, month)).thenReturn(Optional.of(savedViews));
-
         // when
         ApiResponse<Views> response = viewsService.createViews(requestDto);
-
         // then
         assertNotNull(response);
         assertEquals(ErrorCode.ALREADY_EXISTED_DATA.getStatus(), response.getStatus());
@@ -129,7 +109,7 @@ public class ViewsServiceTest {
 
     @Test
     @DisplayName("조회수 전체 조회 성공 테스트")
-    public void retrieveAllViewsSuccess() {
+    void retrieveAllViewsSuccess() {
         // given
         List<Views> savedViewsList = new ArrayList<>();
         savedViewsList.add(new Views(2024, 6, 1L, MenuTitle.ABOUT, ArtworkCategory.ALL, new Date()));
@@ -138,14 +118,11 @@ public class ViewsServiceTest {
         savedViewsList.add(new Views(2024, 9, 1L, MenuTitle.ABOUT, ArtworkCategory.ALL, new Date()));
         savedViewsList.add(new Views(2024, 10, 1L, MenuTitle.ABOUT, ArtworkCategory.ALL, new Date()));
         savedViewsList.add(new Views(2024, 11, 1L, MenuTitle.ABOUT, ArtworkCategory.ALL, new Date()));
-
         // stub
         when(viewsRepository.findAll()).thenReturn(savedViewsList);
-
         // when
         ApiResponse<List<Views>> response = viewsService.retrieveAllViews();
         List<Views> findViews = response.getData();
-
         // then
         assertNotNull(response);
         assertNotNull(findViews);
@@ -158,17 +135,14 @@ public class ViewsServiceTest {
 
     @Test
     @DisplayName("조회수 전체 조회 실패 테스트")
-    public void retrieveAllViewsFail() {
+    void retrieveAllViewsFail() {
         // given
         List<Views> savedViewsList = new ArrayList<>();
-
         // stub
         when(viewsRepository.findAll()).thenReturn(savedViewsList);
-
         // when
         ApiResponse<List<Views>> response = viewsService.retrieveAllViews();
         List<Views> findViews = response.getData();
-
         // then
         assertNotNull(response);
         assertNull(findViews);
@@ -179,7 +153,7 @@ public class ViewsServiceTest {
 
     @Test
     @DisplayName("단일 조회수 조회 성공 테스트")
-    public void retrieveViewsByIdSuccess() {
+    void retrieveViewsByIdSuccess() {
         // given
         Long id = 1L;
         Integer year = 2024;
@@ -187,7 +161,6 @@ public class ViewsServiceTest {
         Long views = 1L;
         MenuTitle menu = MenuTitle.ABOUT;
         ArtworkCategory category = ArtworkCategory.ALL;
-
         Views savedViews = Views.builder()
                 .year(year)
                 .month(month)
@@ -196,14 +169,11 @@ public class ViewsServiceTest {
                 .category(category)
                 .createdAt(new Date())
                 .build();
-
         // stub
         when(viewsRepository.findById(id)).thenReturn(Optional.of(savedViews));
-
         // when
         ApiResponse<Views> response = viewsService.retrieveViewsById(id);
         Views findViews = response.getData();
-
         // then
         assertNotNull(response);
         assertNotNull(findViews);
@@ -221,17 +191,14 @@ public class ViewsServiceTest {
 
     @Test
     @DisplayName("단일 조회수 조회 실패 테스트")
-    public void retrieveViewsByIdFail() {
+    void retrieveViewsByIdFail() {
         // given
         Long id = 1L;
-
         // stub
         when(viewsRepository.findById(id)).thenReturn(Optional.empty());
-
         // when
         ApiResponse<Views> response = viewsService.retrieveViewsById(id);
         Views findViews = response.getData();
-
         // then
         assertNotNull(response);
         assertNull(findViews);
@@ -242,10 +209,9 @@ public class ViewsServiceTest {
 
     @Test
     @DisplayName("해당 연도 조회수 전체 조회 성공 테스트")
-    public void retrieveViewsByYearSuccess() {
+    void retrieveViewsByYearSuccess() {
         // given
         Integer year = 2024;
-
         List<Views> savedViewsList = new ArrayList<>();
         savedViewsList.add(new Views(year, 1, 1L, MenuTitle.ABOUT, ArtworkCategory.ALL, new Date()));
         savedViewsList.add(new Views(year, 2, 1L, MenuTitle.ABOUT, ArtworkCategory.ALL, new Date()));
@@ -258,14 +224,11 @@ public class ViewsServiceTest {
         savedViewsList.add(new Views(year, 9, 1L, MenuTitle.ABOUT, ArtworkCategory.ALL, new Date()));
         savedViewsList.add(new Views(year, 10, 1L, MenuTitle.ABOUT, ArtworkCategory.ALL, new Date()));
         savedViewsList.add(new Views(year, 11, 1L, MenuTitle.ABOUT, ArtworkCategory.ALL, new Date()));
-
         // stub
         when(viewsRepository.findByYear(year)).thenReturn(savedViewsList);
-
         // when
         ApiResponse<List<Views>> response = viewsService.retrieveViewsByYear(year);
         List<Views> findViews = response.getData();
-
         // then
         assertNotNull(response);
         assertNotNull(findViews);
@@ -278,19 +241,15 @@ public class ViewsServiceTest {
 
     @Test
     @DisplayName("해당 연도 조회수 전체 조회 실패 테스트")
-    public void retrieveViewsByYearFail() {
+    void retrieveViewsByYearFail() {
         // given
         Integer year = 2024;
-
         List<Views> savedViewsList = new ArrayList<>();
-
         // stub
         when(viewsRepository.findByYear(year)).thenReturn(savedViewsList);
-
         // when
         ApiResponse<List<Views>> response = viewsService.retrieveViewsByYear(year);
         List<Views> findViews = response.getData();
-
         // then
         assertNotNull(response);
         assertNull(findViews);
@@ -301,15 +260,13 @@ public class ViewsServiceTest {
 
     @Test
     @DisplayName("연도, 월로 조회수 상세 조회 성공 테스트")
-    public void retrieveViewsByYearMonthSuccess() {
+    void retrieveViewsByYearMonthSuccess() {
         // given
-        Long id = 1L;
         Integer year = 2024;
         Integer month = 11;
         Long views = 1L;
         MenuTitle menu = MenuTitle.ABOUT;
         ArtworkCategory category = ArtworkCategory.ALL;
-
         Views savedViews = Views.builder()
                 .year(year)
                 .month(month)
@@ -318,14 +275,11 @@ public class ViewsServiceTest {
                 .category(category)
                 .createdAt(new Date())
                 .build();
-
         // stub
         when(viewsRepository.findByYearAndMonth(year, month)).thenReturn(Optional.of(savedViews));
-
         // when
         ApiResponse<Views> response = viewsService.retrieveViewsByYearMonth(year, month);
         Views findViews = response.getData();
-
         // then
         assertNotNull(response);
         assertNotNull(findViews);
@@ -343,19 +297,15 @@ public class ViewsServiceTest {
 
     @Test
     @DisplayName("연도, 월로 조회수 상세 조회 실패 테스트")
-    public void retrieveViewsByYearMonthFail() {
+    void retrieveViewsByYearMonthFail() {
         // given
         Integer year = 2024;
         Integer month = 11;
-
-
         // stub
         when(viewsRepository.findByYearAndMonth(year, month)).thenReturn(Optional.empty());
-
         // when
         ApiResponse<Views> response = viewsService.retrieveViewsByYearMonth(year, month);
         Views findViews = response.getData();
-
         // then
         assertNotNull(response);
         assertNull(findViews);
@@ -366,7 +316,7 @@ public class ViewsServiceTest {
 
     @Test
     @DisplayName("기간(시작점(연도,월), 종료점(연도,월))으로 카테고리별, 메뉴별 전체 조회수 조회 성공 테스트")
-    public void retrieveAllMenuCategoryViewsByPeriodSuccess() {
+    void retrieveAllMenuCategoryViewsByPeriodSuccess() {
         // given
         Integer startYear = 2024;
         Integer startMonth = 7;
@@ -381,12 +331,10 @@ public class ViewsServiceTest {
             public Integer getYear() {
                 return 2024;
             }
-
             @Override
             public Integer getMonth() {
                 return 7;
             }
-
             @Override
             public Long getViews() {
                 return 2L;
@@ -397,12 +345,10 @@ public class ViewsServiceTest {
             public Integer getYear() {
                 return 2024;
             }
-
             @Override
             public Integer getMonth() {
                 return 8;
             }
-
             @Override
             public Long getViews() {
                 return 8L;
@@ -413,25 +359,20 @@ public class ViewsServiceTest {
             public Integer getYear() {
                 return 2024;
             }
-
             @Override
             public Integer getMonth() {
                 return 11;
             }
-
             @Override
             public Long getViews() {
                 return 24L;
             }
         });
-
         // stub
         when(viewsRepository.findByYearAndMonthBetweenAndMenuAndCategory(startYear, startMonth, endYear, endMonth, menu, category)).thenReturn(savedViewsList);
-
         // when
         ApiResponse<List<ViewsSummary>> response = viewsService.retrieveAllMenuCategoryViewsByPeriod(startYear, startMonth, endYear, endMonth, menu, category);
         List<ViewsSummary> findViews = response.getData();
-
         // then
         assertNotNull(response);
         assertNotNull(findViews);
@@ -444,7 +385,7 @@ public class ViewsServiceTest {
 
     @Test
     @DisplayName("기간(시작점(연도,월), 종료점(연도,월))으로 카테고리별, 메뉴별 전체 조회수 조회 실패 테스트 - 유효하지 않은 월 형식(1~12)인 경우")
-    public void retrieveAllMenuCategoryViewsByPeriodFail_InvalidMonth() {
+    void retrieveAllMenuCategoryViewsByPeriodFail_InvalidMonth() {
         // given
         Integer startYear = 2024;
         Integer startMonth = 9;
@@ -452,11 +393,9 @@ public class ViewsServiceTest {
         Integer endMonth = 13;
         MenuTitle menu = MenuTitle.ABOUT;
         ArtworkCategory category = ArtworkCategory.ALL;
-
         // when
         ApiResponse<List<ViewsSummary>> response = viewsService.retrieveAllMenuCategoryViewsByPeriod(startYear, startMonth, endYear, endMonth, menu, category);
         List<ViewsSummary> findViews = response.getData();
-
         // then
         assertNotNull(response);
         assertNull(findViews);
@@ -467,7 +406,7 @@ public class ViewsServiceTest {
 
     @Test
     @DisplayName("기간(시작점(연도,월), 종료점(연도,월))으로 카테고리별, 메뉴별 전체 조회수 조회 실패 테스트 - 종료점이 시작점보다 앞에 있는 경우")
-    public void retrieveAllMenuCategoryViewsByPeriodFail_invalidPeriod() {
+    void retrieveAllMenuCategoryViewsByPeriodFail_invalidPeriod() {
         // given
         Integer startYear = 2024;
         Integer startMonth = 11;
@@ -475,11 +414,9 @@ public class ViewsServiceTest {
         Integer endMonth = 9;
         MenuTitle menu = MenuTitle.ABOUT;
         ArtworkCategory category = ArtworkCategory.ALL;
-
         // when
         ApiResponse<List<ViewsSummary>> response = viewsService.retrieveAllMenuCategoryViewsByPeriod(startYear, startMonth, endYear, endMonth, menu, category);
         List<ViewsSummary> findViews = response.getData();
-
         // then
         assertNotNull(response);
         assertNull(findViews);
@@ -490,17 +427,14 @@ public class ViewsServiceTest {
 
     @Test
     @DisplayName("이번 월 조회수 1 상승 성공 테스트 - 이번 월 조회수 데이터가 없는 경우")
-    public void updateThisMonthViewsSuccess_viewsNotExisted() {
+    void updateThisMonthViewsSuccess_viewsNotExisted() {
         // given
         MenuTitle menu = MenuTitle.ABOUT;
         ArtworkCategory category = ArtworkCategory.ALL;
-
         UpdateViewsServiceRequestDto requestDto = new UpdateViewsServiceRequestDto(menu, category);
-
         // when
         ApiResponse<Views> response = viewsService.updateThisMonthViews(requestDto);
         Views findViews = response.getData();
-
         // then
         assertNotNull(response);
         assertNull(findViews);
@@ -514,11 +448,10 @@ public class ViewsServiceTest {
 
     @Test
     @DisplayName("이번 월 조회수 1 상승 성공 테스트 - 이번 월 조회수 데이터가 이미 존재하는 경우")
-    public void updateThisMonthViewsSuccess_alreadyViewsExisted() {
+    void updateThisMonthViewsSuccess_alreadyViewsExisted() {
         // given
         MenuTitle menu = MenuTitle.ABOUT;
         ArtworkCategory category = ArtworkCategory.ALL;
-
         UpdateViewsServiceRequestDto requestDto = new UpdateViewsServiceRequestDto(menu, category);
         Views mockViews = Views.builder()
                 .year(2024)
@@ -528,17 +461,14 @@ public class ViewsServiceTest {
                 .category(category)
                 .createdAt(new Date())
                 .build();
-
         // stub
         when(viewsRepository.findByYearAndMonthAndMenuAndCategory(Integer.parseInt(
                 new SimpleDateFormat("yyyy").format(new Date().getTime())),
                 Integer.parseInt(new SimpleDateFormat("MM").format(new Date().getTime())),
                 requestDto.menu(), requestDto.category())).thenReturn(Optional.of(mockViews));
-
         // when
         ApiResponse<Views> response = viewsService.updateThisMonthViews(requestDto);
         Views findViews = response.getData();
-
         // then
         assertNotNull(response);
         assertNull(findViews);
@@ -552,17 +482,14 @@ public class ViewsServiceTest {
 
     @Test
     @DisplayName("이번 월 조회수 1 상승 실패 테스트 - 잘못된 메뉴와 카테고리 조합인 경우")
-    public void updateThisMonthViewsFail_invalidMenuAndCategory() {
+    void updateThisMonthViewsFail_invalidMenuAndCategory() {
         // given
         MenuTitle menu = MenuTitle.ABOUT;
         ArtworkCategory category = ArtworkCategory.ENTERTAINMENT;
-
         UpdateViewsServiceRequestDto requestDto = new UpdateViewsServiceRequestDto(menu, category);
-
         // when
         ApiResponse<Views> response = viewsService.updateThisMonthViews(requestDto);
         Views findViews = response.getData();
-
         // then
         assertNotNull(response);
         assertNull(findViews);
