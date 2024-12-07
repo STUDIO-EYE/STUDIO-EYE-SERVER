@@ -38,7 +38,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class RecruitmentServiceTest {
+class RecruitmentServiceTest {
     @InjectMocks
     private RecruitmentService recruitmentService;
 
@@ -47,7 +47,7 @@ public class RecruitmentServiceTest {
 
     @Test
     @DisplayName("채용공고 생성 성공 테스트")
-    public void createRecruitmentSuccess() {
+    void createRecruitmentSuccess() {
         //given
         String startDateString = "2024-10-02 23:39:40.281000";
         String deadLineString = "2024-10-31 13:39:40.281000";
@@ -75,7 +75,7 @@ public class RecruitmentServiceTest {
 
     @Test
     @DisplayName("채용공고 생성 실패 테스트 - 제목이 비어 있는 경우")
-    public void createRecruitmentFail_emptyTitle() {
+    void createRecruitmentFail_emptyTitle() {
         // given
         Date startDate = new Date(System.currentTimeMillis() + 100000);
         Date deadline = new Date(System.currentTimeMillis());
@@ -97,7 +97,7 @@ public class RecruitmentServiceTest {
 
     @Test
     @DisplayName("채용공고 생성 실패 테스트 - 시작일이 마감일보다 이후인 경우")
-    public void createRecruitmentFail_invalidDate() {
+    void createRecruitmentFail_invalidDate() {
         // given
         Date startDate = new Date(System.currentTimeMillis() + 100000);
         Date deadline = new Date(System.currentTimeMillis());
@@ -120,7 +120,7 @@ public class RecruitmentServiceTest {
 
     @Test
     @DisplayName("채용공고 페이지네이션 조회 성공 테스트")
-    public void retrieveRecruitmentListSuccess() {
+    void retrieveRecruitmentListSuccess() {
         // given
         int page = 0;
         int size = 2;
@@ -214,7 +214,7 @@ public class RecruitmentServiceTest {
 
     @Test
     @DisplayName("채용공고 페이지네이션 조회 실패 테스트 - page가 음수인 경우")
-    public void retrieveRecruitmentListFail_InvalidPage() {
+    void retrieveRecruitmentListFail_InvalidPage() {
         // given
         int page = -1;
         int size = 2;
@@ -231,7 +231,7 @@ public class RecruitmentServiceTest {
 
     @Test
     @DisplayName("채용공고 페이지네이션 조회 실패 테스트 - size가 0이하인 경우")
-    public void retrieveRecruitmentListFail_InvalidSize() {
+    void retrieveRecruitmentListFail_InvalidSize() {
         // given
         int page = 0;
         int size = 0;
@@ -249,7 +249,7 @@ public class RecruitmentServiceTest {
 
     @Test
     @DisplayName("단일 채용공고 조회 성공 테스트")
-    public void retrieveRecruitmentByIdSuccess() {
+    void retrieveRecruitmentByIdSuccess() {
         // given
         Long id = 1L;
         Recruitment savedRecruitment = new Recruitment("Test Title1", new Date(System.currentTimeMillis() - 100000), new Date(System.currentTimeMillis() + 100000), "Test URL1", new Date(), Status.OPEN);
@@ -273,7 +273,7 @@ public class RecruitmentServiceTest {
 
     @Test
     @DisplayName("단일 채용공고 조회 실패 테스트")
-    public void retrieveRecruitmentByIdFail() {
+    void retrieveRecruitmentByIdFail() {
         // given
         Long id = 2L;
         Recruitment savedRecruitment = new Recruitment("Test Title1", new Date(System.currentTimeMillis() - 100000), new Date(System.currentTimeMillis() + 100000), "Test URL1", new Date(), Status.OPEN);
@@ -293,7 +293,7 @@ public class RecruitmentServiceTest {
 
     @Test
     @DisplayName("최근 채용공고 조회 성공 테스트")
-    public void retrieveRecentRecruitmentSuccess() {
+    void retrieveRecentRecruitmentSuccess() {
         // given
         Recruitment savedRecruitment = new Recruitment("Test Title1", new Date(System.currentTimeMillis() - 100000), new Date(System.currentTimeMillis() + 100000), "Test URL1", new Date(), Status.OPEN);
 
@@ -317,7 +317,7 @@ public class RecruitmentServiceTest {
 
     @Test
     @DisplayName("최근 채용공고 조회 실패 테스트")
-    public void retrieveRecentRecruitmentFail() {
+    void retrieveRecentRecruitmentFail() {
         // given
         Recruitment savedRecruitment = new Recruitment("Test Title1", new Date(System.currentTimeMillis() - 100000), new Date(System.currentTimeMillis() + 100000), "Test URL1", new Date(), Status.OPEN);
 
@@ -336,7 +336,7 @@ public class RecruitmentServiceTest {
 
     @Test
     @DisplayName("채용공고 수정 성공 테스트")
-    public void updateRecruitmentSuccess() {
+    void updateRecruitmentSuccess() {
         // given
         String startDateString = "2024-10-02 23:39:40.281000";
         String deadLineString = "2024-10-31 13:39:40.281000";
@@ -375,7 +375,7 @@ public class RecruitmentServiceTest {
 
     @Test
     @DisplayName("채용공고 수정 실패 테스트")
-    public void updateRecruitmentFail() {
+    void updateRecruitmentFail() {
         // given
         Long invalidId = 999L;
 
@@ -411,7 +411,7 @@ public class RecruitmentServiceTest {
 
     @Test
     @DisplayName("채용공고 삭제 성공 테스트")
-    public void deleteRecruitmentSuccess() {
+    void deleteRecruitmentSuccess() {
         // given
         Long id = 1L;
         Recruitment savedRecruitment = new Recruitment("Test Title1", new Date(System.currentTimeMillis() - 100000), new Date(System.currentTimeMillis() + 100000), "Test URL1", new Date(), Status.OPEN);
@@ -429,7 +429,7 @@ public class RecruitmentServiceTest {
 
     @Test
     @DisplayName("채용공고 삭제 실패 테스트")
-    public void deleteRecruitmentFail() {
+    void deleteRecruitmentFail() {
         // given
         Long id = 1L;
         // stub
