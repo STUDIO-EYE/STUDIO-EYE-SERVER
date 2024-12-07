@@ -176,7 +176,6 @@ class UserServiceImplTest {
         // given
         Long userId = 1L;
         String email = "email@google.com";
-        String password = "password";
         String name = "홍길동";
         String phoneNumber = "010-1234-5678";
         userResponse = new UserResponse(userId, email, name, phoneNumber, LocalDate.now(), true);
@@ -209,7 +208,6 @@ class UserServiceImplTest {
         // given
         Long userId = 1L;
         String email = "email@google.com";
-        String password = "password";
         String name = "홍길동";
         String phoneNumber = "010-1234-5678";
         userResponse = new UserResponse(userId, email, name, phoneNumber, LocalDate.now(), true);
@@ -272,7 +270,6 @@ class UserServiceImplTest {
     @DisplayName("중복 이메일 체크 테스트")
     void sendCodeToEmailDuplicateCheck() {
         // given
-        Long userId = 1L;
         String email = "email@google.com";
         String password = "password";
         String name = "홍길동";
@@ -397,7 +394,6 @@ class UserServiceImplTest {
         // given
         Long userId = 1L;
         String email = "email@google.com";
-        String password = "password";
         String name = "홍길동";
         String phoneNumber = "010-1234-5678";
         userResponse = new UserResponse(userId, email, name, phoneNumber, LocalDate.now(), true);
