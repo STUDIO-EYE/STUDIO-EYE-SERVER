@@ -110,7 +110,7 @@ class BenefitServiceTest {
 
         // then
         Assertions.assertThat(findBenefit).isEqualTo(savedBenefit);
-        Assertions.assertThat(findBenefit.size()).isEqualTo(3);
+        Assertions.assertThat(findBenefit).hasSize(3);
     }
 
     @Test
