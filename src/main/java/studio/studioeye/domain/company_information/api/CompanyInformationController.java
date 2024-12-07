@@ -74,7 +74,7 @@ public class CompanyInformationController {
     }
     @Operation(summary = "회사 전체 텍스트 정보(이미지 제외) 수정 API")
     @PutMapping("/company/information/modify")
-    public ApiResponse<CompanyInformation> updateAllCompanyInformation(@Valid @RequestPart("request") UpdateAllCompanyInformationRequestDto dto) throws IOException {
+    public ApiResponse<CompanyInformation> updateAllCompanyInformation(@Valid @RequestPart("request") UpdateAllCompanyInformationRequestDto dto) {
         return companyInformationService.updateAllCompanyTextInformation(dto.toServiceRequest());
     }
 
