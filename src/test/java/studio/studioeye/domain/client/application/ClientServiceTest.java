@@ -51,7 +51,7 @@ class ClientServiceTest {
 
     @Test
     @DisplayName("Client 생성 성공")
-    void createClientSuccess() throws IOException {
+    void createClientSuccess() {
         // given
         CreateClientServiceRequestDto requestDto = new CreateClientServiceRequestDto("Test_Client", true);
 
@@ -73,7 +73,7 @@ class ClientServiceTest {
 
     @Test
     @DisplayName("Client 생성 실패 - 이미지 업로드 실패")
-    void createClientFailDueToImageUpload() throws IOException {
+    void createClientFailDueToImageUpload() {
         // given
         CreateClientServiceRequestDto requestDto = new CreateClientServiceRequestDto("Test_Client", true);
 
@@ -234,7 +234,7 @@ class ClientServiceTest {
 
     @Test
     @DisplayName("Client 수정 성공")
-    void updateClientSuccess() throws IOException {
+    void updateClientSuccess() {
         // given
         Long clientId = 1L;
         UpdateClientServiceRequestDto requestDto = new UpdateClientServiceRequestDto(clientId, "Updated_Client", false);
@@ -262,7 +262,7 @@ class ClientServiceTest {
 
     @Test
     @DisplayName("Client 수정 실패 - 유효하지 않은 ID")
-    void updateClientFail_InvalidId() throws IOException {
+    void updateClientFail_InvalidId() {
         // given
         Long clientId = 1L;
         UpdateClientServiceRequestDto requestDto = new UpdateClientServiceRequestDto(clientId, "Updated_Client", false);
@@ -321,7 +321,7 @@ class ClientServiceTest {
 
     @Test
     @DisplayName("클라이언트 로고 이미지 수정 성공")
-    void updateClientLogoImgSuccess() throws IOException {
+    void updateClientLogoImgSuccess() {
         // given
         Long clientId = 1L;
         MultipartFile mockFile = new MockMultipartFile("logo", "logo.png", "image/png", "test image content".getBytes());
@@ -347,7 +347,7 @@ class ClientServiceTest {
 
     @Test
     @DisplayName("클라이언트 로고 이미지 수정 실패 - 클라이언트가 존재하지 않음")
-    void updateClientLogoImgClientNotFound() throws IOException {
+    void updateClientLogoImgClientNotFound() {
         // given
         Long clientId = 1L;
         MultipartFile mockFile = new MockMultipartFile("logo", "logo.png", "image/png", "test image content".getBytes());
