@@ -27,13 +27,10 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class MenuServiceTest {
-
     @InjectMocks
     private MenuService menuService;
-
     @Mock
     private MenuRepository menuRepository;
-
 //    @Test
 //    @DisplayName("메뉴 생성 성공 테스트")
 //    void createMenuSuccess() {
@@ -44,11 +41,9 @@ class MenuServiceTest {
 //        );
 //        // stub
 //        when(menuRepository.save(any(Menu.class))).thenReturn(requestDto.toEntity(0));
-//
 //        // when
 //        ApiResponse<Menu> response = menuService.createMenu(requestDto);
 //        Menu menu = response.getData();
-//
 //        // then
 //        assertNotNull(menu);
 //        Assertions.assertThat(menu.getMenuTitle()).isEqualTo(requestDto.menuTitle());
@@ -68,12 +63,10 @@ class MenuServiceTest {
 //        );
 //        // stub
 //        when(menuRepository.existsByMenuTitle(requestDto.menuTitle())).thenReturn(true);
-//
 //        // when, then
 //        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
 //            menuService.createMenu(requestDto);
 //        });
-//
 //        // then
 //        assertEquals("이미 동일한 메뉴가 존재합니다.", exception.getMessage());
 //        // verify
@@ -90,11 +83,9 @@ class MenuServiceTest {
         menuList.add(new Menu(MenuTitle.ABOUT, true, 3));
         // stub
         when(menuRepository.findAll()).thenReturn(menuList);
-
         // when
         ApiResponse<List<Menu>> response = menuService.retrieveAllMenu();
         List<Menu> findMenuList = response.getData();
-
         // then
         Assertions.assertThat(findMenuList).isEqualTo(menuList);
         Assertions.assertThat(findMenuList).hasSize(3);
@@ -107,10 +98,8 @@ class MenuServiceTest {
         List<Menu> menuList = new ArrayList<>();
         // stub
         when(menuRepository.findAll()).thenReturn(menuList);
-
         // when
         ApiResponse<List<Menu>> response = menuService.retrieveAllMenu();
-
         // then
         Assertions.assertThat(response.getData()).isNull();
         Assertions.assertThat(response.getMessage()).isEqualTo("메뉴가 존재하지 않습니다.");
@@ -126,11 +115,9 @@ class MenuServiceTest {
         menuTitleList.add(MenuTitle.ABOUT);
         // stub
         when(menuRepository.findTitleByVisibilityTrue()).thenReturn(menuTitleList);
-
         // when
         ApiResponse<List<MenuTitle>> response = menuService.retrieveMenu();
         List<MenuTitle> findMenutitleList = response.getData();
-
         // then
         Assertions.assertThat(findMenutitleList).isEqualTo(menuTitleList);
         Assertions.assertThat(findMenutitleList).hasSize(3);
@@ -143,10 +130,8 @@ class MenuServiceTest {
         List<MenuTitle> menuTitleList = new ArrayList<>();
         // stub
         when(menuRepository.findTitleByVisibilityTrue()).thenReturn(menuTitleList);
-
         // when
         ApiResponse<List<MenuTitle>> response = menuService.retrieveMenu();
-
         // then
         Assertions.assertThat(response.getData()).isNull();
         Assertions.assertThat(response.getMessage()).isEqualTo("공개된 메뉴가 존재하지 않습니다.");
@@ -159,23 +144,19 @@ class MenuServiceTest {
         List<UpdateMenuRequestDto> dtos = List.of(
                 new UpdateMenuRequestDto(1L, false, 2) // id, visibility, sequence
         );
-
         Menu existingMenu = new Menu(MenuTitle.ALL, true, 1); // 기존 메뉴: sequence 1
         // stub
         when(menuRepository.findById(1L)).thenReturn(Optional.of(existingMenu));
         when(menuRepository.save(any(Menu.class))).thenReturn(existingMenu);
-
         // when
         ApiResponse<List<Menu>> response = menuService.updateMenu(dtos);
         List<Menu> updatedMenus = response.getData();
-
         // then:
         assertNotNull(updatedMenus);
         assertEquals(1, updatedMenus.size());
         Menu updatedMenu = updatedMenus.get(0);
         assertFalse(updatedMenu.getVisibility());
         assertEquals(2, updatedMenu.getSequence());
-
         // verify
         verify(menuRepository, times(1)).findById(1L);
         verify(menuRepository, times(1)).save(any(Menu.class));
@@ -190,15 +171,12 @@ class MenuServiceTest {
         );
         // stub
         when(menuRepository.findById(99L)).thenReturn(Optional.empty());
-
         // when, then:
         ApiResponse<List<Menu>> response = menuService.updateMenu(dtos);
-
         // then
         assertNotNull(response);
         assertEquals(ErrorCode.INVALID_MENU_ID.getStatus(), response.getStatus());
         assertEquals(ErrorCode.INVALID_MENU_ID.getMessage(), response.getMessage());
-
         // verify
         verify(menuRepository, times(1)).findById(99L);
         verify(menuRepository, never()).save(any(Menu.class));
@@ -213,7 +191,6 @@ class MenuServiceTest {
         when(menuRepository.findById(menuId)).thenReturn(Optional.of(existingMenu)); // 존재하는 메뉴를 반환
         // when
         ApiResponse<Menu> response = menuService.deleteMenu(menuId);
-
         // then
         assertEquals(HttpStatus.OK, response.getStatus());
         assertEquals("메뉴를 성공적으로 삭제했습니다.", response.getMessage());
@@ -227,16 +204,12 @@ class MenuServiceTest {
         // given
         Long menuId = 1L;
         when(menuRepository.findById(menuId)).thenReturn(Optional.empty()); // 존재하지 않는 메뉴를 반환
-
         // when
         ApiResponse<Menu> response = menuService.deleteMenu(menuId);
-
         // then
         assertEquals(ErrorCode.INVALID_MENU_ID.getStatus(), response.getStatus()); // 오류 코드 확인
         assertEquals(ErrorCode.INVALID_MENU_ID.getMessage(), response.getMessage()); // 오류 코드 확인
         // verify
         Mockito.verify(menuRepository, never()).delete(any(Menu.class)); // delete 호출되지 않음 확인
     }
-
-
 }
