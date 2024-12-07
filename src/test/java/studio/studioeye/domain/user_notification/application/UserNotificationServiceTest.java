@@ -1,10 +1,13 @@
 package studio.studioeye.domain.user_notification.application;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 import studio.studioeye.domain.notification.dao.NotificationRepository;
 import studio.studioeye.domain.notification.domain.Notification;
 import studio.studioeye.domain.user_notification.dao.UserNotificationRepository;
@@ -126,5 +129,63 @@ class UserNotificationServiceTest {
         ApiResponse<Optional<UserNotification>> response = userNotificationService.deleteUserNotification(userId, notificationId);
 
         assertEquals(ErrorCode.INVALID_USER_NOTIFICATION_ID.getStatus(), response.getStatus());
+    }
+
+    @Test
+    @DisplayName("알림 id로 사용자 알림 삭제 성공 테스트")
+    void deleteUserNotificationByNotificationIdSuccess() {
+        // given
+        Long notificationId = 1L;
+        UserNotification userNotification1 = UserNotification.builder()
+                .notificationId(notificationId)
+                .userId(1L)
+                .isRead(false)
+                .build();
+
+        UserNotification userNotification2 = UserNotification.builder()
+                .notificationId(notificationId)
+                .userId(2L)
+                .isRead(false)
+                .build();
+
+        UserNotification userNotification3 = UserNotification.builder()
+                .notificationId(notificationId)
+                .userId(2L)
+                .isRead(false)
+                .build();
+
+        // stub
+        when(userNotificationRepository.findByNotificationId(notificationId)).thenReturn(
+                List.of(userNotification1, userNotification2, userNotification3));
+
+        // when
+        ApiResponse<String> response = userNotificationService.deleteUserNotificationByNotificationId(notificationId);
+
+        // then
+        assertEquals(HttpStatus.OK, response.getStatus());
+        assertEquals("성공적으로 사용자 알림을 삭제했습니다.", response.getMessage());
+        assertNull(response.getData());
+        Mockito.verify(userNotificationRepository, times(1)).findByNotificationId(any(Long.class));
+        Mockito.verify(userNotificationRepository, times(3)).delete(any(UserNotification.class));
+    }
+
+    @Test
+    @DisplayName("알림 id로 사용자 알림 삭제 실패 테스트")
+    void deleteUserNotificationByNotificationIdFail() {
+        // given
+        Long notificationId = 1L;
+
+        // stub
+        when(userNotificationRepository.findByNotificationId(notificationId)).thenReturn(List.of());
+
+        // when
+        ApiResponse<String> response = userNotificationService.deleteUserNotificationByNotificationId(notificationId);
+
+        // then
+        assertEquals(HttpStatus.OK, response.getStatus());
+        assertEquals("해당 알림의 사용자 알림이 없습니다.", response.getMessage());
+        assertNull(response.getData());
+        Mockito.verify(userNotificationRepository, times(1)).findByNotificationId(any(Long.class));
+        Mockito.verify(userNotificationRepository, never()).delete(any(UserNotification.class));
     }
 }
