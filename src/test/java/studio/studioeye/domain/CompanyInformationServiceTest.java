@@ -90,7 +90,6 @@ class CompanyInformationServiceTest {
 
         // when
         ApiResponse<CompanyInformation> response = companyInformationService.createCompanyInformation(requestDto, mockFile, mockFile, mockFile);
-        CompanyInformation findCompanyInformation = response.getData();
 
         // then
         assertNotNull(response);
@@ -211,7 +210,6 @@ class CompanyInformationServiceTest {
 
         // when
         ApiResponse<CompanyInformation> response = companyInformationService.updateAllCompanyInformation(requestDto, mockFile, mockFile, mockFile);
-        CompanyInformation findCompanyInformation = response.getData();
 
         // then
         assertNotNull(response);
