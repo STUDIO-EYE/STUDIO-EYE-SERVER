@@ -354,4 +354,59 @@ class NotificationServiceTest {
         assertEquals(HttpStatus.OK, response.getStatus()); // 상태 코드 확인
         assertEquals("알림이 존재하지 않습니다.", response.getMessage()); // 예상 메시지 확인
     }
+
+    @Test
+    @DisplayName("알림 삭제 성공 테스트")
+    void deleteNotificationSuccess() {
+        // given
+        Notification notification = Notification.builder().requestId(TEST_REQUEST_ID).build();
+        when(notificationRepository.findByRequestId(TEST_REQUEST_ID)).thenReturn(Optional.of(notification));
+        when(userNotificationService.deleteUserNotificationByNotificationId(notification.getId()))
+                .thenReturn(ApiResponse.ok("유저 알림 삭제 성공"));
+        doNothing().when(notificationRepository).delete(notification);
+        // when
+        ApiResponse<String> response = notificationService.deleteNotification(TEST_REQUEST_ID);
+        // then
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatus());
+        assertEquals("성공적으로 알림을 삭제했습니다.", response.getMessage());
+        // verify
+        verify(notificationRepository, times(1)).findByRequestId(TEST_REQUEST_ID);
+        verify(userNotificationService, times(1)).deleteUserNotificationByNotificationId(notification.getId());
+        verify(notificationRepository, times(1)).delete(notification);
+    }
+
+    @Test
+    @DisplayName("알림 삭제 실패 테스트 - 알림 없음")
+    void deleteNotificationFail_NotFound() {
+        // given
+        when(notificationRepository.findByRequestId(TEST_REQUEST_ID)).thenReturn(Optional.empty());
+        // when
+        ApiResponse<String> response = notificationService.deleteNotification(TEST_REQUEST_ID);
+        // then
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatus());
+        assertEquals("해당 문의의 존재하는 알림이 없습니다.", response.getMessage());
+        verify(notificationRepository, times(1)).findByRequestId(TEST_REQUEST_ID);
+        verify(userNotificationService, never()).deleteUserNotificationByNotificationId(anyLong());
+        verify(notificationRepository, never()).delete(any(Notification.class));
+    }
+
+    @Test
+    @DisplayName("알림 삭제 실패 테스트 - 예외 발생")
+    void deleteNotificationFail_Exception() {
+        // given
+        Notification notification = Notification.builder().requestId(TEST_REQUEST_ID).build();
+        when(notificationRepository.findByRequestId(TEST_REQUEST_ID)).thenReturn(Optional.of(notification));
+        doThrow(new RuntimeException("Database error"))
+                .when(notificationRepository).delete(notification);
+        // when
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+            notificationService.deleteNotification(TEST_REQUEST_ID);
+        });
+        // then
+        assertEquals("Database error", exception.getMessage());
+        verify(notificationRepository, times(1)).findByRequestId(TEST_REQUEST_ID);
+        verify(notificationRepository, times(1)).delete(notification);
+    }
 }
