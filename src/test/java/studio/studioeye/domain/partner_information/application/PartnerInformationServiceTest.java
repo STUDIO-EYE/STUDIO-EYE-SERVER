@@ -50,7 +50,7 @@ class PartnerInformationServiceTest {
 
     @Test
     @DisplayName("파트너 정보 생성 성공 테스트")
-    void createPartnerInfoSuccess() throws IOException {
+    void createPartnerInfoSuccess() {
         // given
         CreatePartnerInfoServiceRequestDto requestDto = new CreatePartnerInfoServiceRequestDto(
                 "PartnerName",
@@ -81,7 +81,7 @@ class PartnerInformationServiceTest {
 
     @Test
     @DisplayName("파트너 정보 생성 실패 테스트 - S3 업로드 실패")
-    void createPartnerInfoFailDueToS3UploadFailure() throws IOException {
+    void createPartnerInfoFailDueToS3UploadFailure() {
         // given
         CreatePartnerInfoServiceRequestDto requestDto = new CreatePartnerInfoServiceRequestDto(
                 "PartnerName",
@@ -257,7 +257,7 @@ class PartnerInformationServiceTest {
 
     @Test
     @DisplayName("협력사 정보 업데이트 성공 테스트")
-    void updatePartnerInfoSuccess() throws IOException {
+    void updatePartnerInfoSuccess() {
         // given
         Long validPartnerId = 1L;
         String oldLogoImageUrl = "https://example-bucket.s3.amazonaws.com/path/to/old-logo.png";
@@ -316,7 +316,7 @@ class PartnerInformationServiceTest {
 
     @Test
     @DisplayName("협력사 정보 업데이트 실패 테스트 - S3 이미지 업데이트 실패")
-    void updatePartnerInfoS3UpdateFail() throws IOException {
+    void updatePartnerInfoS3UpdateFail() {
         // given
         PartnerInformation partnerInformation = new PartnerInformation("Logo1", "Partner1", true, "http://link1.com");
         UpdatePartnerInfoServiceRequestDto requestDto = new UpdatePartnerInfoServiceRequestDto(1L, "UpdatedName", true, "http://updated-link.com");
@@ -370,7 +370,7 @@ class PartnerInformationServiceTest {
 
     @Test
     @DisplayName("협력사 로고 이미지 업데이트 성공 테스트")
-    void updatePartnerLogoImgSuccess() throws IOException {
+    void updatePartnerLogoImgSuccess() {
         // given
         PartnerInformation existingPartner = new PartnerInformation("Logo1", "Partner1", true, "http://link1.com");
         String newLogoImgUrl = "http://example.com/new-logo.png";
@@ -408,7 +408,7 @@ class PartnerInformationServiceTest {
 
     @Test
     @DisplayName("협력사 로고 이미지 업데이트 실패 테스트 - S3 이미지 업데이트 실패")
-    void updatePartnerLogoImgS3UpdateFail() throws IOException {
+    void updatePartnerLogoImgS3UpdateFail() {
         // given
         PartnerInformation partnerInformation = new PartnerInformation("Logo1", "Partner1", true, "http://link1.com");
         when(partnerInformationRepository.findById(1L)).thenReturn(Optional.of(partnerInformation));
