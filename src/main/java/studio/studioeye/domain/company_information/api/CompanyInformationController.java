@@ -36,8 +36,8 @@ public class CompanyInformationController {
 
     @Operation(summary = "회사 전체 정보 조회 API")
     @GetMapping("/company/information")
-    public ApiResponse<CompanyInformation> retrieveAllCampanyInformation() {
-        return companyInformationService.retrieveAllCampanyInformation();
+    public ApiResponse<CompanyInformation> retrieveAllCompanyInformation() {
+        return companyInformationService.retrieveAllCompanyInformation();
     }
 
     @Operation(summary = "회사 로고 이미지 조회 API")

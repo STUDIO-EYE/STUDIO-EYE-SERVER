@@ -1090,7 +1090,7 @@ public class CompanyInformationServiceTest {
         when(companyInformationRepository.findAll()).thenReturn(companyInformationList);
 
         // when
-        ApiResponse<CompanyInformation> response = companyInformationService.retrieveAllCampanyInformation();
+        ApiResponse<CompanyInformation> response = companyInformationService.retrieveAllCompanyInformation();
         CompanyInformation retrievedCompanyInformation = response.getData();
 
         // then
@@ -1105,7 +1105,7 @@ public class CompanyInformationServiceTest {
         when(companyInformationRepository.findAll()).thenReturn(Collections.emptyList());
 
         // when
-        ApiResponse<CompanyInformation> response = companyInformationService.retrieveAllCampanyInformation();
+        ApiResponse<CompanyInformation> response = companyInformationService.retrieveAllCompanyInformation();
 
         // then
         assertNull(response.getData());

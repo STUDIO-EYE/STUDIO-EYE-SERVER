@@ -77,7 +77,7 @@ public class CompanyInformationService {
         return ApiResponse.ok("회사 정보를 성공적으로 등록하였습니다.", savedCompanyInformation);
     }
 
-    public ApiResponse<CompanyInformation> retrieveAllCampanyInformation() {
+    public ApiResponse<CompanyInformation> retrieveAllCompanyInformation() {
         List<CompanyInformation> companyInformations = companyInformationRepository.findAll();
         if(companyInformations.isEmpty()) {
             return ApiResponse.ok("회사 정보가 존재하지 않습니다.");
