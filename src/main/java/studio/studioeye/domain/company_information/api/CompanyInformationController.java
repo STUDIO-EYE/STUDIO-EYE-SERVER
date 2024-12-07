@@ -42,7 +42,7 @@ public class CompanyInformationController {
 
     @Operation(summary = "회사 로고 이미지 조회 API")
     @GetMapping("/company/logo/{isLight}")
-    public ApiResponse<String> retrieveCampanyLogoImage(@PathVariable Boolean isLight) {
+    public ApiResponse<String> retrieveCampanyLogoImage(@PathVariable boolean isLight) {
         return companyInformationService.retrieveCampanyLogoImage(isLight);
     }
 
