@@ -298,7 +298,6 @@ class ViewsServiceTest {
     @DisplayName("연도, 월로 조회수 상세 조회 성공 테스트")
     void retrieveViewsByYearMonthSuccess() {
         // given
-        Long id = 1L;
         Integer year = 2024;
         Integer month = 11;
         Long views = 1L;
