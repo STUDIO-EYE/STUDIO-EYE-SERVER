@@ -276,15 +276,15 @@ class PartnerInformationServiceTest {
                 "http://new-link.com"
         );
 
-        MultipartFile mockFile = mock(MultipartFile.class);
+        MultipartFile updateMockFile = mock(MultipartFile.class);
 
         when(partnerInformationRepository.findById(validPartnerId)).thenReturn(Optional.of(mockPartnerInformation));
-        when(s3Adapter.uploadImage(mockFile)).thenReturn(ApiResponse.ok("S3 버킷에 이미지 업로드를 성공하였습니다.", newLogoImageUrl));
+        when(s3Adapter.uploadImage(updateMockFile)).thenReturn(ApiResponse.ok("S3 버킷에 이미지 업로드를 성공하였습니다.", newLogoImageUrl));
         when(s3Adapter.deleteFile("path")).thenReturn(ApiResponse.ok("S3 버킷에서 이미지를 성공적으로 삭제하였습니다."));
         when(partnerInformationRepository.save(any(PartnerInformation.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // when
-        ApiResponse<PartnerInformation> response = partnerInformationService.updatePartnerInfo(dto, mockFile);
+        ApiResponse<PartnerInformation> response = partnerInformationService.updatePartnerInfo(dto, updateMockFile);
 
         // then
         assertEquals("협력사 정보를 성공적으로 수정했습니다.", response.getMessage());
@@ -293,7 +293,7 @@ class PartnerInformationServiceTest {
         assertEquals("http://new-link.com", response.getData().getLink());
         assertTrue(response.getData().getIs_main());
         verify(s3Adapter, times(1)).deleteFile("path");
-        verify(s3Adapter, times(1)).uploadImage(mockFile);
+        verify(s3Adapter, times(1)).uploadImage(updateMockFile);
         verify(partnerInformationRepository, times(1)).save(any(PartnerInformation.class));
     }
 
@@ -319,14 +319,14 @@ class PartnerInformationServiceTest {
         // given
         PartnerInformation partnerInformation = new PartnerInformation("Logo1", "Partner1", true, "http://link1.com");
         UpdatePartnerInfoServiceRequestDto requestDto = new UpdatePartnerInfoServiceRequestDto(1L, "UpdatedName", true, "http://updated-link.com");
-        MockMultipartFile mockFile = new MockMultipartFile("file", "testImage.jpg", "image/jpeg", "Test Image Content".getBytes());
+        MockMultipartFile update2MockFile = new MockMultipartFile("file", "testImage.jpg", "image/jpeg", "Test Image Content".getBytes());
 
         when(partnerInformationRepository.findById(1L)).thenReturn(Optional.of(partnerInformation));
         when(s3Adapter.uploadImage(any(MultipartFile.class)))
                 .thenReturn(ApiResponse.withError(ErrorCode.ERROR_S3_UPDATE_OBJECT));
 
         // when
-        ApiResponse<PartnerInformation> response = partnerInformationService.updatePartnerInfo(requestDto, mockFile);
+        ApiResponse<PartnerInformation> response = partnerInformationService.updatePartnerInfo(requestDto, update2MockFile);
 
         // then
         assertEquals(ErrorCode.ERROR_S3_UPDATE_OBJECT.getStatus(), response.getStatus());
