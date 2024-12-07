@@ -28,7 +28,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class BenefitServiceTest {
+class BenefitServiceTest {
 
     @InjectMocks
     private BenefitService benefitService;
@@ -48,7 +48,7 @@ public class BenefitServiceTest {
 
     @Test
     @DisplayName("Benefit 생성 성공")
-    public void createBenefitSuccess() throws IOException {
+    void createBenefitSuccess() throws IOException {
         //given
         CreateBenefitServiceRequestDto requestDto = new CreateBenefitServiceRequestDto(
                 "Test_Title",
@@ -70,7 +70,7 @@ public class BenefitServiceTest {
 
     @Test
     @DisplayName("Benefit 생성 실패 - 이미지 업로드 실패")
-    public void createBenefitFailDueToImageUpload() throws IOException {
+    void createBenefitFailDueToImageUpload() throws IOException {
         //given
         CreateBenefitServiceRequestDto requestDto = new CreateBenefitServiceRequestDto(
                 "Test_Title",
