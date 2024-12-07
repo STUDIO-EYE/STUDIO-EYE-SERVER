@@ -70,7 +70,6 @@ class PartnerInformationServiceTest {
         PartnerInformation partnerInfo = response.getData();
 
         // then
-//        assertNotNull(partnerInfo);
         Assertions.assertThat(partnerInfo.getName()).isEqualTo(requestDto.name());
         Assertions.assertThat(partnerInfo.getIs_main()).isEqualTo(requestDto.is_main());
         Assertions.assertThat(partnerInfo.getLink()).isEqualTo(requestDto.link());
