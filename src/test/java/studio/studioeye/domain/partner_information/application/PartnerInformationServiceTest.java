@@ -134,7 +134,7 @@ class PartnerInformationServiceTest {
         ApiResponse<List<Map<String, Object>>> response = partnerInformationService.retrieveAllPartnerInfo();
 
         // then
-        assertTrue(response.getData() == null);
+        assertNull(response.getData());
         assertEquals("협력사 정보가 존재하지 않습니다.", response.getMessage());
         verify(partnerInformationRepository, times(1)).findAll();
     }
@@ -205,7 +205,7 @@ class PartnerInformationServiceTest {
         ApiResponse<List<String>> response = partnerInformationService.retrieveAllPartnerLogoImgList();
 
         // then
-        assertTrue(response.getData() == null);
+        assertNull(response.getData());
         assertEquals("협력사 정보가 존재하지 않습니다.", response.getMessage());
         verify(partnerInformationRepository, times(1)).findAll();
     }
