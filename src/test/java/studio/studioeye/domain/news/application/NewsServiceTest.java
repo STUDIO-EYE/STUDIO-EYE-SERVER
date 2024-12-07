@@ -71,8 +71,9 @@ class NewsServiceTest {
         Page<News> result = newsService.retrieveNewsPage(page, size);
 
         // then
-        Assertions.assertThat(result).isNotNull();
-        Assertions.assertThat(result).isEqualTo(newsPage);
+        Assertions.assertThat(result)
+                .isNotNull()
+                .isEqualTo(newsPage);
     }
 
     @Test
