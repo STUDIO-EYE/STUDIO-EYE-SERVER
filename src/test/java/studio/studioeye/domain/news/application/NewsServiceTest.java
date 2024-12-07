@@ -168,7 +168,7 @@ class NewsServiceTest {
 
     @Test
     @DisplayName("뉴스 생성 성공")
-    public void createNewsSuccess() {
+    void createNewsSuccess() {
         //given
         CreateNewsServiceRequestDto requestDto = new CreateNewsServiceRequestDto(
                 "title",
@@ -189,7 +189,7 @@ class NewsServiceTest {
 
     @Test
     @DisplayName("뉴스 생성 실패 - 타이틀이 비어있는 경우")
-    public void createNewsFail() {
+    void createNewsFail() {
         // given: 타이틀 필드가 비어있는 DTO를 생성
         CreateNewsServiceRequestDto requestDto = new CreateNewsServiceRequestDto(
                 "", // title이 비어있음
