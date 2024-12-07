@@ -243,7 +243,7 @@ class ClientServiceTest {
 
         when(clientRepository.findById(clientId)).thenReturn(Optional.of(savedClient));
 
-        MockMultipartFile mockFile = new MockMultipartFile("logo", "logo.png", "image/png", "test image content".getBytes());
+        MockMultipartFile requestMockFile  = new MockMultipartFile("logo", "logo.png", "image/png", "test image content".getBytes());
 
         when(s3Adapter.uploadImage(any(MultipartFile.class)))
                 .thenReturn(ApiResponse.ok("S3에 이미지 업로드 성공", "Updated Test Logo Url"));
@@ -251,7 +251,7 @@ class ClientServiceTest {
         when(clientRepository.save(any(Client.class))).thenReturn(savedClient);
 
         // when
-        ApiResponse<Client> response = clientService.updateClient(requestDto, mockFile);
+        ApiResponse<Client> response = clientService.updateClient(requestDto, requestMockFile );
 
         // then
         assertNotNull(response);
@@ -324,7 +324,7 @@ class ClientServiceTest {
     void updateClientLogoImgSuccess() {
         // given
         Long clientId = 1L;
-        MultipartFile mockFile = new MockMultipartFile("logo", "logo.png", "image/png", "test image content".getBytes());
+        MultipartFile uploadMockFile = new MockMultipartFile("logo", "logo.png", "image/png", "test image content".getBytes());
         Client existingClient = new Client("Client", "http://example.com/logo.jpg", true);
         existingClient.setId(clientId);
 
@@ -336,7 +336,7 @@ class ClientServiceTest {
         when(clientRepository.save(any(Client.class))).thenReturn(existingClient);
 
         // when
-        ApiResponse<Client> response = clientService.updateClientLogoImg(clientId, mockFile);
+        ApiResponse<Client> response = clientService.updateClientLogoImg(clientId, uploadMockFile);
 
         // then
         assertNotNull(response);
@@ -350,12 +350,12 @@ class ClientServiceTest {
     void updateClientLogoImgClientNotFound() {
         // given
         Long clientId = 1L;
-        MultipartFile mockFile = new MockMultipartFile("logo", "logo.png", "image/png", "test image content".getBytes());
+        MultipartFile testMockFile = new MockMultipartFile("logo", "logo.png", "image/png", "test image content".getBytes());
 
         when(clientRepository.findById(clientId)).thenReturn(Optional.empty());
 
         // when
-        ApiResponse<Client> response = clientService.updateClientLogoImg(clientId, mockFile);
+        ApiResponse<Client> response = clientService.updateClientLogoImg(clientId, testMockFile);
 
         // then
         assertNotNull(response);
