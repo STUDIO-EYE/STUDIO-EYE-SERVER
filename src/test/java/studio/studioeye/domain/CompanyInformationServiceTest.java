@@ -1341,19 +1341,6 @@ class CompanyInformationServiceTest {
         assertEquals("회사 기본 정보를 성공적으로 삭제했습니다.", response.getMessage());
         verify(companyInformationRepository, times(1)).save(any(CompanyInformation.class)); // 저장 호출 확인
     }
-//    @Test
-//    @DisplayName("회사 기본 정보 삭제 실패 - 회사 정보 없음")
-//    void deleteCompanyBasicInformation_emptyCompany_returnsErrorResponse() {
-//        // given
-//        when(companyInformationRepository.findAll()).thenReturn(Collections.emptyList());
-//
-//        // when
-//        ApiResponse<CompanyInformation> response = companyInformationService.deleteCompanyBasicInformation();
-//
-//        // then
-//        assertEquals(HttpStatus.BAD_REQUEST, response.getStatus());
-//        assertEquals(ErrorCode.COMPANYINFORMATION_IS_EMPTY.getMessage(), response.getMessage());
-//    }
     @Test
     @DisplayName("회사 소개 정보 삭제 성공")
     void deleteCompanyIntroductionInformationSuccess() {
