@@ -97,7 +97,7 @@ class MenuServiceTest {
 
         // then
         Assertions.assertThat(findMenuList).isEqualTo(menuList);
-        Assertions.assertThat(findMenuList.size()).isEqualTo(3);
+        Assertions.assertThat(findMenuList).hasSize(3);
     }
 
     @Test
@@ -134,7 +134,7 @@ class MenuServiceTest {
 
         // then
         Assertions.assertThat(findMenutitleList).isEqualTo(menuTitleList);
-        Assertions.assertThat(findMenutitleList.size()).isEqualTo(3);
+        Assertions.assertThat(findMenutitleList).hasSize(3);
     }
     
     @Test
