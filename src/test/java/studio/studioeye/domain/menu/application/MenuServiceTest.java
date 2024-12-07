@@ -77,6 +77,25 @@ class MenuServiceTest {
     }
 
     @Test
+    @DisplayName("메뉴 생성 실패 테스트 - 입력된 메뉴가 없는 경우")
+    void createMenuFail_EmptyInput() {
+        // given
+        List<CreateMenuServiceRequestDto> dtoList = new ArrayList<>();
+
+        // when
+        ApiResponse<List<Menu>> response = menuService.createMenu(dtoList);
+
+        // then
+        assertNotNull(response);
+        assertEquals(ErrorCode.MENU_IS_EMPTY.getStatus(), response.getStatus());
+        assertEquals(ErrorCode.MENU_IS_EMPTY.getMessage(), response.getMessage());
+
+        // verify
+        Mockito.verify(menuRepository, never()).existsByMenuTitle(any(MenuTitle.class));
+        Mockito.verify(menuRepository, never()).save(any(Menu.class));
+    }
+
+    @Test
     @DisplayName("메뉴 생성 실패 테스트 - 이미 존재하는 메뉴")
     void createMenuFail_AlreadyExisted() {
         // given
