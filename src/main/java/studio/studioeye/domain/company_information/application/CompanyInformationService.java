@@ -47,7 +47,7 @@ public class CompanyInformationService {
         String darkLogoImageUrl = null;
         String sloganImageFileName = null;
         String sloganImageUrl = null;
-        if(lightLogoImage != null && !lightLogoImage.isEmpty()) {
+        if(!lightLogoImage.isEmpty()) {
             ApiResponse<String> updateLogoFileResponse = s3Adapter.uploadFile(lightLogoImage);
             if (updateLogoFileResponse.getStatus().is5xxServerError()) {
                 return ApiResponse.withError(ErrorCode.ERROR_S3_UPDATE_OBJECT);
@@ -55,7 +55,7 @@ public class CompanyInformationService {
             lightLogoImageUrl = updateLogoFileResponse.getData();
             lightLogoImageFileName = lightLogoImage.getOriginalFilename();
         }
-        if(darkLogoImage != null && !darkLogoImage.isEmpty()) {
+        if(!darkLogoImage.isEmpty()) {
             ApiResponse<String> updateLogoFileResponse = s3Adapter.uploadFile(darkLogoImage);
             if (updateLogoFileResponse.getStatus().is5xxServerError()) {
                 return ApiResponse.withError(ErrorCode.ERROR_S3_UPDATE_OBJECT);
@@ -63,7 +63,7 @@ public class CompanyInformationService {
             darkLogoImageUrl = updateLogoFileResponse.getData();
             darkLogoImageFileName = lightLogoImage.getOriginalFilename();
         }
-        if(sloganImage != null && !sloganImage.isEmpty()) {
+        if(!sloganImage.isEmpty()) {
             ApiResponse<String> updateSloganFileResponse = s3Adapter.uploadFile(sloganImage);
 
             if (updateSloganFileResponse.getStatus().is5xxServerError()) {
