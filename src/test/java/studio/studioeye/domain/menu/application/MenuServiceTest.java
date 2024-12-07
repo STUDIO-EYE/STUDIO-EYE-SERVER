@@ -100,10 +100,10 @@ class MenuServiceTest {
     void createMenuFail_InvalidInput() {
         // given
         List<CreateMenuServiceRequestDto> dtoList = new ArrayList<>();
+        dtoList.add(new CreateMenuServiceRequestDto(null, null));
 
         // when
         ApiResponse<List<Menu>> response = menuService.createMenu(dtoList);
-        dtoList.add(new CreateMenuServiceRequestDto(null, null));
 
         // then
         assertNotNull(response);
