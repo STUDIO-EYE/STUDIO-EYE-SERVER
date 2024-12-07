@@ -50,13 +50,14 @@ class MenuServiceTest {
             System.out.println(dto);
         }
 
-        int totalCount = 0;
-
         // stub
-        for (CreateMenuServiceRequestDto dto : dtoList) {
-            when(menuRepository.save(any(Menu.class))).thenReturn(dto.toEntity(totalCount));
-            totalCount ++;
-        }
+        when(menuRepository.save(any(Menu.class)))
+                .thenReturn(dtoList.get(0).toEntity(0))
+                .thenReturn(dtoList.get(1).toEntity(1))
+                .thenReturn(dtoList.get(2).toEntity(2))
+                .thenReturn(dtoList.get(3).toEntity(3))
+                .thenReturn(dtoList.get(4).toEntity(4))
+                .thenReturn(dtoList.get(5).toEntity(5));
 
         // when
         ApiResponse<List<Menu>> response = menuService.createMenu(dtoList);
@@ -78,7 +79,7 @@ class MenuServiceTest {
         }
 
         // verify
-        Mockito.verify(menuRepository, never()).existsByMenuTitle(any(MenuTitle.class));
+        Mockito.verify(menuRepository, times(dtoList.size())).existsByMenuTitle(any(MenuTitle.class));
         Mockito.verify(menuRepository, times(dtoList.size())).save(any(Menu.class));
     }
 
