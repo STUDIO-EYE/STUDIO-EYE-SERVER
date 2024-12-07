@@ -86,7 +86,7 @@ public class CompanyInformationService {
         return ApiResponse.ok("전체 회사 정보를 성공적으로 조회하였습니다.", companyInformation);
     }
 
-    public ApiResponse<String> retrieveCampanyLogoImage(boolean isLight) {
+    public ApiResponse<String> retrieveCompanyLogoImage(boolean isLight) {
         List<String> logoImageUrls;
         if(isLight) {
             logoImageUrls = companyInformationRepository.findLightLogoImageUrl();

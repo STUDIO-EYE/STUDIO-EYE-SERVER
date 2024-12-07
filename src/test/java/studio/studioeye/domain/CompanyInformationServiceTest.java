@@ -1120,7 +1120,7 @@ public class CompanyInformationServiceTest {
         when(companyInformationRepository.findDarkLogoImageUrl()).thenReturn(darkLogoImageUrls);
 
         // when
-        ApiResponse<String> response = companyInformationService.retrieveCampanyLogoImage(false);
+        ApiResponse<String> response = companyInformationService.retrieveCompanyLogoImage(false);
         String retrievedCompanyInformation = response.getData();
 
         // then
@@ -1136,7 +1136,7 @@ public class CompanyInformationServiceTest {
         when(companyInformationRepository.findDarkLogoImageUrl()).thenReturn(Collections.emptyList());
 
         // when
-        ApiResponse<String> response = companyInformationService.retrieveCampanyLogoImage(false);
+        ApiResponse<String> response = companyInformationService.retrieveCompanyLogoImage(false);
         String retrievedCompanyInformation = response.getData();
 
         // then
