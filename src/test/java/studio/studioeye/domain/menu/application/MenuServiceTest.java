@@ -110,7 +110,6 @@ class MenuServiceTest {
 
         // when
         ApiResponse<List<Menu>> response = menuService.retrieveAllMenu();
-        List<Menu> findMenuList = response.getData();
 
         // then
         Assertions.assertThat(response.getData()).isNull();
