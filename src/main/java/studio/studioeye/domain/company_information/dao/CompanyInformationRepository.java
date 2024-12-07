@@ -7,8 +7,6 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface CompanyInformationRepository extends JpaRepository<CompanyInformation, Long> {
-//    @Query("SELECT c.logoImageUrl AS logoImageUrl FROM CompanyInformation c")
-//    List<String> findLogoImageUrl();
     @Query("SELECT c.lightLogoImageUrl AS lightLogoImageUrl FROM CompanyInformation c")
     List<String> findLightLogoImageUrl();
     @Query("SELECT c.darkLogoImageUrl AS darkLogoImageUrl FROM CompanyInformation c")
