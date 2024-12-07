@@ -47,6 +47,7 @@ class MenuServiceTest {
         dtoList.add(new CreateMenuServiceRequestDto(MenuTitle.NEWS, true));
 
         // stub
+        when(menuRepository.existsByMenuTitle(MenuTitle.ABOUT)).thenReturn(false);
         when(menuRepository.save(any(Menu.class)))
                 .thenReturn(dtoList.get(0).toEntity(0))
                 .thenReturn(dtoList.get(1).toEntity(1))
