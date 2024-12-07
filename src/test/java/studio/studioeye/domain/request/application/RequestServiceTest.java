@@ -49,7 +49,6 @@ class RequestServiceTest {
 	private NotificationService notificationService;
 	@Mock
 	private AnswerRepository answerRepository;
-
 	MockMultipartFile mockFile = new MockMultipartFile(
 			"file",
 			"testImage.jpg",
@@ -303,13 +302,10 @@ class RequestServiceTest {
 				.month(11)
 				.state(State.WAITING)
 				.build();
-
 		// stub
 		when(requestRepository.findById(id)).thenReturn(Optional.of(savedRequest));
-
 		// when
 		ApiResponse<String> response = requestService.deleteRequest(id);
-
 		assertEquals(HttpStatus.OK, response.getStatus());
 		assertEquals("문의를 성공적으로 삭제했습니다.", response.getMessage());
 		Mockito.verify(requestRepository, times(1)).findById(id);
@@ -321,13 +317,10 @@ class RequestServiceTest {
 	void deleteRequestFail() {
 		// given
 		Long id = 1L;
-
 		// stub
 		when(requestRepository.findById(id)).thenReturn(Optional.empty());
-
 		// when
 		ApiResponse<String> response = requestService.deleteRequest(id);
-
 		// then
 		assertEquals(ErrorCode.INVALID_REQUEST_ID.getStatus(), response.getStatus());
 		assertEquals(ErrorCode.INVALID_REQUEST_ID.getMessage(), response.getMessage());
