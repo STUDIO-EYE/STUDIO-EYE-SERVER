@@ -1090,7 +1090,7 @@ public class CompanyInformationServiceTest {
         when(companyInformationRepository.findAll()).thenReturn(companyInformationList);
 
         // when
-        ApiResponse<CompanyInformation> response = companyInformationService.retrieveAllCampanyInformation();
+        ApiResponse<CompanyInformation> response = companyInformationService.retrieveAllCompanyInformation();
         CompanyInformation retrievedCompanyInformation = response.getData();
 
         // then
@@ -1105,7 +1105,7 @@ public class CompanyInformationServiceTest {
         when(companyInformationRepository.findAll()).thenReturn(Collections.emptyList());
 
         // when
-        ApiResponse<CompanyInformation> response = companyInformationService.retrieveAllCampanyInformation();
+        ApiResponse<CompanyInformation> response = companyInformationService.retrieveAllCompanyInformation();
 
         // then
         assertNull(response.getData());
@@ -1120,7 +1120,7 @@ public class CompanyInformationServiceTest {
         when(companyInformationRepository.findDarkLogoImageUrl()).thenReturn(darkLogoImageUrls);
 
         // when
-        ApiResponse<String> response = companyInformationService.retrieveCampanyLogoImage(false);
+        ApiResponse<String> response = companyInformationService.retrieveCompanyLogoImage(false);
         String retrievedCompanyInformation = response.getData();
 
         // then
@@ -1136,7 +1136,7 @@ public class CompanyInformationServiceTest {
         when(companyInformationRepository.findDarkLogoImageUrl()).thenReturn(Collections.emptyList());
 
         // when
-        ApiResponse<String> response = companyInformationService.retrieveCampanyLogoImage(false);
+        ApiResponse<String> response = companyInformationService.retrieveCompanyLogoImage(false);
         String retrievedCompanyInformation = response.getData();
 
         // then

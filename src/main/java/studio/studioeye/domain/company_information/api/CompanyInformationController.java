@@ -36,14 +36,14 @@ public class CompanyInformationController {
 
     @Operation(summary = "회사 전체 정보 조회 API")
     @GetMapping("/company/information")
-    public ApiResponse<CompanyInformation> retrieveAllCampanyInformation() {
-        return companyInformationService.retrieveAllCampanyInformation();
+    public ApiResponse<CompanyInformation> retrieveAllCompanyInformation() {
+        return companyInformationService.retrieveAllCompanyInformation();
     }
 
     @Operation(summary = "회사 로고 이미지 조회 API")
     @GetMapping("/company/logo/{isLight}")
-    public ApiResponse<String> retrieveCampanyLogoImage(@PathVariable Boolean isLight) {
-        return companyInformationService.retrieveCampanyLogoImage(isLight);
+    public ApiResponse<String> retrieveCompanyLogoImage(@PathVariable boolean isLight) {
+        return companyInformationService.retrieveCompanyLogoImage(isLight);
     }
 
     @Operation(summary = "회사 기본 정보(주소, 영문주소, 유선번호, 팩스번호) 조회 API")
@@ -74,7 +74,7 @@ public class CompanyInformationController {
     }
     @Operation(summary = "회사 전체 텍스트 정보(이미지 제외) 수정 API")
     @PutMapping("/company/information/modify")
-    public ApiResponse<CompanyInformation> updateAllCompanyInformation(@Valid @RequestPart("request") UpdateAllCompanyInformationRequestDto dto) throws IOException {
+    public ApiResponse<CompanyInformation> updateAllCompanyInformation(@Valid @RequestPart("request") UpdateAllCompanyInformationRequestDto dto) {
         return companyInformationService.updateAllCompanyTextInformation(dto.toServiceRequest());
     }
 
