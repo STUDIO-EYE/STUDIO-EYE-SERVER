@@ -220,9 +220,9 @@ public class CompanyInformationService {
             return ApiResponse.withError(ErrorCode.COMPANYINFORMATION_IS_EMPTY);
         }
         String fileName = companyInformations.get(0).getLightLogoImageFileName();
-        s3Adapter.deleteFile(fileName);
+        if(fileName != null) s3Adapter.deleteFile(fileName);
         fileName = companyInformations.get(0).getDarkLogoImageFileName();
-        s3Adapter.deleteFile(fileName);
+        if(fileName != null) s3Adapter.deleteFile(fileName);
 
         ApiResponse<String> updateLightLogoFileResponse = s3Adapter.uploadFile(lightLogoImage);
         if (updateLightLogoFileResponse.getStatus().is5xxServerError()) {
