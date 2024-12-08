@@ -34,51 +34,139 @@ class MenuServiceTest {
     @Mock
     private MenuRepository menuRepository;
 
-//    @Test
-//    @DisplayName("메뉴 생성 성공 테스트")
-//    void createMenuSuccess() {
-//        // given
-//        CreateMenuServiceRequestDto requestDto = new CreateMenuServiceRequestDto(
-//                MenuTitle.ALL,
-//                true
-//        );
-//        // stub
-//        when(menuRepository.save(any(Menu.class))).thenReturn(requestDto.toEntity(0));
-//
-//        // when
-//        ApiResponse<Menu> response = menuService.createMenu(requestDto);
-//        Menu menu = response.getData();
-//
-//        // then
-//        assertNotNull(menu);
-//        Assertions.assertThat(menu.getMenuTitle()).isEqualTo(requestDto.menuTitle());
-//        Assertions.assertThat(menu.getVisibility()).isEqualTo(requestDto.visibility());
-//        assertEquals(HttpStatus.OK, response.getStatus());
-//        // verify
-//        Mockito.verify(menuRepository, times(1)).save(any(Menu.class));
-//    }
-//
-//    @Test
-//    @DisplayName("메뉴 생성 실패 테스트 - 중복된 메뉴가 이미 존재")
-//    void createMenuFail() {
-//        // given
-//        CreateMenuServiceRequestDto requestDto = new CreateMenuServiceRequestDto(
-//                MenuTitle.ALL,
-//                true
-//        );
-//        // stub
-//        when(menuRepository.existsByMenuTitle(requestDto.menuTitle())).thenReturn(true);
-//
-//        // when, then
-//        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-//            menuService.createMenu(requestDto);
-//        });
-//
-//        // then
-//        assertEquals("이미 동일한 메뉴가 존재합니다.", exception.getMessage());
-//        // verify
-//        verify(menuRepository, never()).save(any(Menu.class));
-//    }
+    @Test
+    @DisplayName("메뉴 생성 성공 테스트")
+    void createMenuSuccess() {
+        // given
+        List<CreateMenuServiceRequestDto> dtoList = new ArrayList<>();
+        dtoList.add(new CreateMenuServiceRequestDto(MenuTitle.ABOUT, true));
+        dtoList.add(new CreateMenuServiceRequestDto(MenuTitle.ARTWORK, true));
+        dtoList.add(new CreateMenuServiceRequestDto(MenuTitle.CONTACT, true));
+        dtoList.add(new CreateMenuServiceRequestDto(MenuTitle.FAQ, true));
+        dtoList.add(new CreateMenuServiceRequestDto(MenuTitle.RECRUITMENT, true));
+        dtoList.add(new CreateMenuServiceRequestDto(MenuTitle.NEWS, true));
+
+        // stub
+        when(menuRepository.existsByMenuTitle(MenuTitle.ABOUT)).thenReturn(false);
+        when(menuRepository.save(any(Menu.class)))
+                .thenReturn(dtoList.get(0).toEntity(0))
+                .thenReturn(dtoList.get(1).toEntity(1))
+                .thenReturn(dtoList.get(2).toEntity(2))
+                .thenReturn(dtoList.get(3).toEntity(3))
+                .thenReturn(dtoList.get(4).toEntity(4))
+                .thenReturn(dtoList.get(5).toEntity(5));
+
+        // when
+        ApiResponse<List<Menu>> response = menuService.createMenu(dtoList);
+        List<Menu> menuList = response.getData();
+
+        // then
+        assertEquals(HttpStatus.OK, response.getStatus());
+        assertEquals("메뉴를 성공적으로 등록하였습니다.", response.getMessage());
+        assertNotNull(menuList);
+        assertEquals(dtoList.size(), menuList.size());
+        assertEquals(dtoList.isEmpty(), menuList.isEmpty());
+        for(int i=0; i<menuList.size(); i++) {
+            assertEquals(dtoList.get(i).menuTitle(), menuList.get(i).getMenuTitle());
+            assertEquals(dtoList.get(i).visibility(), menuList.get(i).getVisibility());
+        }
+
+        // verify
+        Mockito.verify(menuRepository, times(dtoList.size())).existsByMenuTitle(any(MenuTitle.class));
+        Mockito.verify(menuRepository, times(dtoList.size())).save(any(Menu.class));
+    }
+
+    @Test
+    @DisplayName("메뉴 생성 실패 테스트 - 입력된 메뉴가 없는 경우")
+    void createMenuFail_EmptyInput() {
+        // given
+        List<CreateMenuServiceRequestDto> dtoList = new ArrayList<>();
+
+        // when
+        ApiResponse<List<Menu>> response = menuService.createMenu(dtoList);
+
+        // then
+        assertNotNull(response);
+        assertEquals(ErrorCode.MENU_IS_EMPTY.getStatus(), response.getStatus());
+        assertEquals(ErrorCode.MENU_IS_EMPTY.getMessage(), response.getMessage());
+
+        // verify
+        Mockito.verify(menuRepository, never()).existsByMenuTitle(any(MenuTitle.class));
+        Mockito.verify(menuRepository, never()).save(any(Menu.class));
+    }
+
+    @Test
+    @DisplayName("메뉴 생성 실패 테스트 - 입력된 메뉴의 항목이 없거나 누락된 경우")
+    void createMenuFail_InvalidInput() {
+        // given
+        List<CreateMenuServiceRequestDto> dtoList = new ArrayList<>();
+        dtoList.add(new CreateMenuServiceRequestDto(null, null));
+
+        // when
+        ApiResponse<List<Menu>> response = menuService.createMenu(dtoList);
+
+        // then
+        assertNotNull(response);
+        assertEquals(ErrorCode.MENU_IS_EMPTY.getStatus(), response.getStatus());
+        assertEquals(ErrorCode.MENU_IS_EMPTY.getMessage(), response.getMessage());
+
+        // verify
+        Mockito.verify(menuRepository, never()).existsByMenuTitle(any(MenuTitle.class));
+        Mockito.verify(menuRepository, never()).save(any(Menu.class));
+    }
+
+    @Test
+    @DisplayName("메뉴 생성 실패 테스트 - 입력된 메뉴에 사용할 수 없는 메뉴(ALL)을 포함하는 경우")
+    void createMenuFail_InvalidMenu() {
+        // given
+        List<CreateMenuServiceRequestDto> dtoList = new ArrayList<>();
+        dtoList.add(new CreateMenuServiceRequestDto(MenuTitle.ALL, true));
+        dtoList.add(new CreateMenuServiceRequestDto(MenuTitle.ARTWORK, true));
+        dtoList.add(new CreateMenuServiceRequestDto(MenuTitle.CONTACT, true));
+        dtoList.add(new CreateMenuServiceRequestDto(MenuTitle.FAQ, true));
+        dtoList.add(new CreateMenuServiceRequestDto(MenuTitle.RECRUITMENT, true));
+        dtoList.add(new CreateMenuServiceRequestDto(MenuTitle.NEWS, true));
+
+        // when
+        ApiResponse<List<Menu>> response = menuService.createMenu(dtoList);
+
+        // then
+        assertNotNull(response);
+        assertEquals(ErrorCode.INVALID_MENU.getStatus(), response.getStatus());
+        assertEquals(ErrorCode.INVALID_MENU.getMessage(), response.getMessage());
+
+        // verify
+        Mockito.verify(menuRepository, never()).existsByMenuTitle(any(MenuTitle.class));
+        Mockito.verify(menuRepository, never()).save(any(Menu.class));
+    }
+
+    @Test
+    @DisplayName("메뉴 생성 실패 테스트 - 이미 존재하는 메뉴")
+    void createMenuFail_AlreadyExisted() {
+        // given
+        List<CreateMenuServiceRequestDto> dtoList = new ArrayList<>();
+        dtoList.add(new CreateMenuServiceRequestDto(MenuTitle.ABOUT, true));
+        dtoList.add(new CreateMenuServiceRequestDto(MenuTitle.ARTWORK, true));
+        dtoList.add(new CreateMenuServiceRequestDto(MenuTitle.CONTACT, true));
+        dtoList.add(new CreateMenuServiceRequestDto(MenuTitle.FAQ, true));
+        dtoList.add(new CreateMenuServiceRequestDto(MenuTitle.RECRUITMENT, true));
+        dtoList.add(new CreateMenuServiceRequestDto(MenuTitle.NEWS, true));
+
+        // stub
+        when(menuRepository.existsByMenuTitle(MenuTitle.ABOUT)).thenReturn(true);
+
+        // when
+        ApiResponse<List<Menu>> response = menuService.createMenu(dtoList);
+
+        // then
+        assertNotNull(response);
+        assertEquals(ErrorCode.ALREADY_EXISTED_MENU.getStatus(), response.getStatus());
+        assertEquals(ErrorCode.ALREADY_EXISTED_MENU.getMessage(), response.getMessage());
+
+        // verify
+        Mockito.verify(menuRepository, times(1)).existsByMenuTitle(any(MenuTitle.class));
+        Mockito.verify(menuRepository, never()).save(any(Menu.class));
+    }
 
     @Test
     @DisplayName("PA 메뉴 목록 조회 성공 테스트")
