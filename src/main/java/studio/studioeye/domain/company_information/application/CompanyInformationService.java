@@ -247,7 +247,7 @@ public class CompanyInformationService {
             return ApiResponse.withError(ErrorCode.COMPANYINFORMATION_IS_EMPTY);
         }
         String fileName = companyInformations.get(0).getSloganImageFileName();
-        s3Adapter.deleteFile(fileName);
+        if(fileName != null) s3Adapter.deleteFile(fileName);
 
         ApiResponse<String> updateSloganFileResponse = s3Adapter.uploadFile(sloganImageUrl);
         if (updateSloganFileResponse.getStatus().is5xxServerError()) {
@@ -338,11 +338,11 @@ public class CompanyInformationService {
         }
         for (CompanyInformation companyInformation : companyInformations) {
             String lightLogoImageFileName = companyInformation.getLightLogoImageFileName();
-            s3Adapter.deleteFile(lightLogoImageFileName);
+            if(lightLogoImageFileName != null) s3Adapter.deleteFile(lightLogoImageFileName);
             String darkLogoImageFileName = companyInformation.getDarkLogoImageFileName();
-            s3Adapter.deleteFile(darkLogoImageFileName);
+            if(darkLogoImageFileName != null) s3Adapter.deleteFile(darkLogoImageFileName);
             String sloganFileName = companyInformation.getSloganImageFileName();
-            s3Adapter.deleteFile(sloganFileName);
+            if(sloganFileName != null) s3Adapter.deleteFile(sloganFileName);
             companyInformationRepository.delete(companyInformation);
         }
         return ApiResponse.ok("전체 회사 정보를 성공적으로 삭제했습니다.");
@@ -355,9 +355,9 @@ public class CompanyInformationService {
         }
         for (CompanyInformation companyInformation : companyInformations) {
             String lightLogoImageFileName = companyInformation.getLightLogoImageFileName();
-            s3Adapter.deleteFile(lightLogoImageFileName);
+            if(lightLogoImageFileName != null) s3Adapter.deleteFile(lightLogoImageFileName);
             String darkLogoImageFileName = companyInformation.getDarkLogoImageFileName();
-            s3Adapter.deleteFile(darkLogoImageFileName);
+            if(darkLogoImageFileName != null) s3Adapter.deleteFile(darkLogoImageFileName);
             companyInformation.deleteLogoImage();
             companyInformationRepository.save(companyInformation);
         }
@@ -382,7 +382,7 @@ public class CompanyInformationService {
         }
         for (CompanyInformation companyInformation : companyInformations) {
             String fileName = companyInformation.getSloganImageFileName();
-            s3Adapter.deleteFile(fileName);
+            if(fileName != null) s3Adapter.deleteFile(fileName);
         }
         CompanyInformation companyInformation = companyInformations.get(0);
         companyInformation.deleteCompanyIntroductionInformation();
