@@ -29,38 +29,27 @@ public class CompanyInformation {
     @Column(columnDefinition = "TEXT")
     private String commitment;
 
-    @NotNull
     private String address;
 
-    @NotNull
     private String addressEnglish;
 
-    @NotNull
     private String lightLogoImageFileName;
 
-    @NotNull
     private String lightLogoImageUrl;
 
-    @NotNull
     private String darkLogoImageFileName;
 
-    @NotNull
     private String darkLogoImageUrl;
 
-    @NotNull
     private String phone;
 
-    @NotNull
     private String fax;
 
-    @NotNull
     @Column(columnDefinition = "TEXT")
     private String introduction;
 
-    @NotNull
     private String sloganImageFileName;
 
-    @NotNull
     private String sloganImageUrl;
 
     @OneToMany(mappedBy = "companyInformation", cascade = CascadeType.ALL, orphanRemoval = true)
