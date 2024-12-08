@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
@@ -378,5 +379,48 @@ class NotificationServiceTest {
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatus()); // 상태 코드 확인
         assertEquals(ErrorCode.INVALID_SSE_ID.getMessage(), response.getMessage()); // 예상 메시지 확인
         verify(failingEmitter, times(1)).completeWithError(any()); // completeWithError 호출 확인
+    }
+
+    @Test
+    @DisplayName("Notification 삭제 성공 테스트")
+    void deleteNotificationSuccess() {
+        // given
+        Long requestId = 1L;
+        Notification notification = Notification.builder()
+                .requestId(requestId)
+                .build();
+
+        // stub
+        when(notificationRepository.findByRequestId(requestId)).thenReturn(Optional.of(notification));
+
+        // when
+        ApiResponse<String> response = notificationService.deleteNotification(requestId);
+
+        // then
+        assertEquals(HttpStatus.OK, response.getStatus());
+        assertEquals("성공적으로 알림을 삭제했습니다.", response.getMessage());
+        assertNull(response.getData());
+        Mockito.verify(notificationRepository, times(1)).findByRequestId(any(Long.class));
+        Mockito.verify(notificationRepository, times(1)).delete(any(Notification.class));
+    }
+
+    @Test
+    @DisplayName("Notification 삭제 실패 테스트")
+    void deleteNotificationFail() {
+        // given
+        Long requestId = 1L;
+
+        // stub
+        when(notificationRepository.findByRequestId(requestId)).thenReturn(Optional.empty());
+
+        // when
+        ApiResponse<String> response = notificationService.deleteNotification(requestId);
+
+        // then
+        assertEquals(HttpStatus.OK, response.getStatus());
+        assertEquals("해당 문의의 존재하는 알림이 없습니다.", response.getMessage());
+        assertNull(response.getData());
+        Mockito.verify(notificationRepository, times(1)).findByRequestId(any(Long.class));
+        Mockito.verify(notificationRepository, never()).delete(any(Notification.class));
     }
 }
