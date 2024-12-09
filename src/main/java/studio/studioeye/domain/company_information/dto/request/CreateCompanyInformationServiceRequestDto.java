@@ -35,19 +35,6 @@ public record CreateCompanyInformationServiceRequestDto(
                 .sloganImageUrl(sloganImageUrl)
                 .build();
 
-//        CompanyInformation.CompanyInformationBuilder builder = CompanyInformation.builder()
-//                .mainOverview(mainOverview)
-//                .commitment(commitment)
-//                .address(address)
-//                .addressEnglish(addressEnglish)
-//                .phone(phone)
-//                .fax(fax)
-//                .introduction(introduction)
-//                .logoImageFileName(logoImageFileName)
-//                .logoImageUrl(logoImageUrl)
-//                .sloganImageFileName(sloganImageFileName)
-//                .sloganImageUrl(sloganImageUrl);
-
         List<CompanyInformationDetailInformation> companyInformationDetails = new ArrayList<>();
         if (!detailInformation.isEmpty()) {
             for (DetailInformationDTO dto : detailInformation) {
@@ -57,12 +44,9 @@ public record CreateCompanyInformationServiceRequestDto(
                         .value(dto.getValue())
                         .build());
             }
-//            builder.detailInformation(companyInformationDetails);
         }
         companyInformation.initDetailInformation(companyInformationDetails);
         return companyInformation;
-//        return builder.build();
-
     }
 
     public UpdateAllCompanyInformationServiceRequestDto toUpdateServiceRequest() {

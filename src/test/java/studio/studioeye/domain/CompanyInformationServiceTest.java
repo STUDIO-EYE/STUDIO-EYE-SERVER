@@ -897,7 +897,7 @@ class CompanyInformationServiceTest {
         companyInformationList.add(companyInformation2);
         when(companyInformationRepository.findAll()).thenReturn(companyInformationList);
         // when
-        ApiResponse<CompanyInformation> response = companyInformationService.retrieveAllCampanyInformation();
+        ApiResponse<CompanyInformation> response = companyInformationService.retrieveAllCompanyInformation();
         CompanyInformation retrievedCompanyInformation = response.getData();
         // then
         assertNotNull(retrievedCompanyInformation);
@@ -910,7 +910,7 @@ class CompanyInformationServiceTest {
         // given
         when(companyInformationRepository.findAll()).thenReturn(Collections.emptyList());
         // when
-        ApiResponse<CompanyInformation> response = companyInformationService.retrieveAllCampanyInformation();
+        ApiResponse<CompanyInformation> response = companyInformationService.retrieveAllCompanyInformation();
         // then
         assertNull(response.getData());
         assertEquals("회사 정보가 존재하지 않습니다.", response.getMessage());
@@ -923,7 +923,7 @@ class CompanyInformationServiceTest {
         List<String> darkLogoImageUrls = List.of("darkLogoImageUrl1?v=123456789");
         when(companyInformationRepository.findDarkLogoImageUrl()).thenReturn(darkLogoImageUrls);
         // when
-        ApiResponse<String> response = companyInformationService.retrieveCampanyLogoImage(false);
+        ApiResponse<String> response = companyInformationService.retrieveCompanyLogoImage(false);
         String retrievedCompanyInformation = response.getData();
         // then
         assertNotNull(retrievedCompanyInformation);
@@ -937,7 +937,7 @@ class CompanyInformationServiceTest {
         // given
         when(companyInformationRepository.findDarkLogoImageUrl()).thenReturn(Collections.emptyList());
         // when
-        ApiResponse<String> response = companyInformationService.retrieveCampanyLogoImage(false);
+        ApiResponse<String> response = companyInformationService.retrieveCompanyLogoImage(false);
         String retrievedCompanyInformation = response.getData();
         // then
         assertNull(retrievedCompanyInformation);
