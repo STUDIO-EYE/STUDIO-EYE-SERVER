@@ -97,7 +97,6 @@ public class ViewsService {
 
                 // 해당 연도와 월에 대한 데이터가 존재하지 않는 경우, 0으로 데이터 추가
                 if (!found) {
-                    //TODO 수정 필요
                     // 데이터를 삽입한 후에는 인덱스를 증가시킴
                     int finalMonth = month;
                     int finalYear = year;
