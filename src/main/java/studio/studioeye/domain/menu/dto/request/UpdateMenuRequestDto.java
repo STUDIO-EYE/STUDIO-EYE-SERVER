@@ -5,7 +5,4 @@ public record UpdateMenuRequestDto(
         Boolean visibility,
         Integer sequence
 ) {
-//    public UpdateMenuServiceRequestDto toServiceRequest() {
-//        return new UpdateMenuServiceRequestDto(id, visibility, order);
-//    }
 }
