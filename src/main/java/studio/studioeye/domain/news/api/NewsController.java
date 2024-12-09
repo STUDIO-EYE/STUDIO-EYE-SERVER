@@ -1,18 +1,17 @@
 package studio.studioeye.domain.news.api;
 
-import studio.studioeye.domain.news.application.NewsService;
-import studio.studioeye.domain.news.domain.News;
-import studio.studioeye.domain.news.dto.CreateNewsRequestDto;
-import studio.studioeye.domain.news.dto.UpdateNewsRequestDto;
-import studio.studioeye.global.common.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
+import studio.studioeye.domain.news.application.NewsService;
+import studio.studioeye.domain.news.domain.News;
+import studio.studioeye.domain.news.dto.CreateNewsRequestDto;
+import studio.studioeye.domain.news.dto.UpdateNewsRequestDto;
+import studio.studioeye.global.common.response.ApiResponse;
 
-import java.io.IOException;
 import java.util.List;
 
 @Tag(name = "News API", description = "News 등록 / 수정 / 삭제 / 조회")
