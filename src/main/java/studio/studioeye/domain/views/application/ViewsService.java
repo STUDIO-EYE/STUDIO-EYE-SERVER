@@ -38,7 +38,6 @@ public class ViewsService {
     }
 
     private ApiResponse<Views> justCreateViews(CreateViewsServiceRequestDto dto) {
-//        if(checkMonth(dto.month())) return ApiResponse.withError(ErrorCode.INVALID_VIEWS_MONTH);
         TimeZone.setDefault(TimeZone.getTimeZone("Asia/Seoul"));
         Views views = dto.toEntity(new Date());
         Views savedViews = viewsRepository.save(views);
