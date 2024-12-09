@@ -28,7 +28,7 @@ public class PartnerInformationService {
 
 	public ApiResponse<PartnerInformation> createPartnerInfo(CreatePartnerInfoServiceRequestDto dto, MultipartFile logoImg) {
 		String logoImgStr = getImgUrl(logoImg);
-		if (logoImgStr.isEmpty()) return ApiResponse.withError(ErrorCode.ERROR_S3_UPDATE_OBJECT);
+		if (logoImgStr == null || logoImgStr.isEmpty()) return ApiResponse.withError(ErrorCode.ERROR_S3_UPDATE_OBJECT);
 
 		PartnerInformation partnerInformation = dto.toEntity(logoImgStr);
 
@@ -113,7 +113,7 @@ public class PartnerInformationService {
 
 		String logoImgStr = null;
 		if(!logoImg.isEmpty()) logoImgStr = getImgUrl(logoImg);
-		if (logoImgStr.isEmpty()) return ApiResponse.withError(ErrorCode.ERROR_S3_UPDATE_OBJECT);
+		if (logoImgStr == null || logoImgStr.isEmpty()) return ApiResponse.withError(ErrorCode.ERROR_S3_UPDATE_OBJECT);
 
 		if(!logoImgStr.equals(partnerInformation.getLogoImageUrl())) {
 			ApiResponse<String> deleteFileResponse = s3Adapter.deleteFile(partnerInformation.getLogoImageUrl().split("/")[3]);
@@ -155,7 +155,7 @@ public class PartnerInformationService {
 
 		// 새로운 로고이미지 저장
 		String logoImgStr = getImgUrl(logoImg);
-		if (logoImgStr.isEmpty()) return ApiResponse.withError(ErrorCode.ERROR_S3_UPDATE_OBJECT);
+		if (logoImgStr == null || logoImgStr.isEmpty()) return ApiResponse.withError(ErrorCode.ERROR_S3_UPDATE_OBJECT);
 		partner.setLogoImageUrl(logoImgStr);
 
 		PartnerInformation updatedPartner = partnerInformationRepository.save(partner);
