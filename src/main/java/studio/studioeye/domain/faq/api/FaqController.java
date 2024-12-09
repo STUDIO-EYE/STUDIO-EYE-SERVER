@@ -4,16 +4,13 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 import studio.studioeye.domain.faq.application.FaqService;
-import studio.studioeye.domain.faq.dao.FaqQuestions;
 import studio.studioeye.domain.faq.domain.Faq;
 import studio.studioeye.domain.faq.dto.request.CreateFaqRequestDto;
 import studio.studioeye.domain.faq.dto.request.UpdateFaqRequestDto;
 import studio.studioeye.global.common.response.ApiResponse;
 
-import java.io.IOException;
 import java.util.List;
 
 @Tag(name = "FAQ API", description = "FAQ 등록 / 수정 / 삭제 / 조회")
