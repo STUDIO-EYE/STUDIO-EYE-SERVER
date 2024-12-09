@@ -21,17 +21,6 @@ import java.util.Optional;
 public class MenuService {
     private final MenuRepository menuRepository;
 
-//    public ApiResponse<Menu> createMenu(CreateMenuServiceRequestDto dto) {
-//        // 중복 체크: 동일한 menuTitle이 이미 존재하는지 확인
-//        if (menuRepository.existsByMenuTitle(dto.menuTitle())) {
-//            throw new IllegalArgumentException("이미 동일한 메뉴가 존재합니다.");
-//        }
-//
-//        Long totalCount = menuRepository.count();
-//        Menu menu = dto.toEntity(totalCount.intValue());
-//        Menu savedMenu = menuRepository.save(menu);
-//        return ApiResponse.ok("메뉴를 성공적으로 등록하였습니다.", savedMenu);
-//    }
     public ApiResponse<List<Menu>> createMenu(List<CreateMenuServiceRequestDto> dtoList) {
         if(dtoList.isEmpty()) {
             return ApiResponse.withError(ErrorCode.MENU_IS_EMPTY);
