@@ -25,26 +25,22 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class CeoServiceTest {
+class CeoServiceTest {
     @InjectMocks
     private CeoService ceoService;
-
     @Mock
     private CeoRepository ceoRepository;
     @Mock
     private S3Adapter s3Adapter;
-
-    // Mock MultipartFile 생성
     MockMultipartFile mockFile = new MockMultipartFile(
             "file",
             "testImage.jpg",
             "image/jpeg",
             "Test Image Content".getBytes()
     );
-
     @Test
     @DisplayName("Ceo 정보 생성 성공 테스트")
-    public void createCeoInformationSuccess() throws IOException {
+    void createCeoInformationSuccess() throws IOException {
         // given
         String name = "mingi";
         String introduction = "verygood!!!";
@@ -61,7 +57,7 @@ public class CeoServiceTest {
     }
     @Test
     @DisplayName("Ceo 정보 생성 실패 - 이미지 업로드 실패")
-    public void createCeoFailDueToImageUpload() throws IOException {
+    void createCeoFailDueToImageUpload() throws IOException {
         //given
         CreateCeoServiceRequestDto requestDto = new CreateCeoServiceRequestDto(
                 "Test_Title",

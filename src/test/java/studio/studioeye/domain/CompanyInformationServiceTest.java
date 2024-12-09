@@ -32,16 +32,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class CompanyInformationServiceTest {
-
+class CompanyInformationServiceTest {
     @InjectMocks
     private CompanyInformationService companyInformationService;
-
     @Mock
     private CompanyInformationRepository companyInformationRepository;
     @Mock
     private S3Adapter s3Adapter;
-
     private final MockMultipartFile mockFile = new MockMultipartFile(
             "file",
             "testLogo.jpg",
@@ -49,10 +46,9 @@ public class CompanyInformationServiceTest {
             "Test Logo Content".getBytes()
     );
 
-
     @Test
     @DisplayName("회사 정보 등록 성공 테스트")
-    public void createCompanyInformationSuccess() throws IOException {
+    void createCompanyInformationSuccess() throws IOException {
         // given
         String mainOverview = "Test mainOverview";
         String commitment = "Test commitment";
@@ -61,37 +57,27 @@ public class CompanyInformationServiceTest {
         String phone = "Test phone";
         String fax = "Test fax";
         String introduction = "Test introduction";
-
         List<DetailInformationDTO> detailInformation = new ArrayList<>();
-
         DetailInformationDTO dto1 = new DetailInformationDTO();
         dto1.setKey("Test Key1");
         dto1.setValue("Test Value1");
         detailInformation.add(dto1);
-
         DetailInformationDTO dto2 = new DetailInformationDTO();
         dto2.setKey("Test Key2");
         dto2.setValue("Test Value2");
         detailInformation.add(dto2);
-
         DetailInformationDTO dto3 = new DetailInformationDTO();
         dto3.setKey("Test Key3");
         dto3.setValue("Test Value3");
         detailInformation.add(dto3);
-
         CreateCompanyInformationServiceRequestDto requestDto = new CreateCompanyInformationServiceRequestDto(
                 mainOverview, commitment, address, addressEnglish, phone, fax, introduction, detailInformation
         );
-
         // stub
-        // Mock S3 upload 동작 설정
         when(s3Adapter.uploadFile(any(MultipartFile.class)))
                 .thenReturn(ApiResponse.ok("S3 버킷에 이미지 업로드를 성공하였습니다.", "http://example.com/testImage.jpg"));
-
         // when
         ApiResponse<CompanyInformation> response = companyInformationService.createCompanyInformation(requestDto, mockFile, mockFile, mockFile);
-        CompanyInformation findCompanyInformation = response.getData();
-
         // then
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatus());
@@ -101,7 +87,7 @@ public class CompanyInformationServiceTest {
 
     @Test
     @DisplayName("회사 정보 등록 실패 테스트")
-    public void createCompanyInformationFail() throws IOException {
+    void createCompanyInformationFail() throws IOException {
         // given
         String mainOverview = "Test mainOverview";
         String commitment = "Test commitment";
@@ -110,31 +96,24 @@ public class CompanyInformationServiceTest {
         String phone = "Test phone";
         String fax = "Test fax";
         String introduction = "Test introduction";
-
         List<DetailInformationDTO> detailInformation = new ArrayList<>();
-
         DetailInformationDTO dto1 = new DetailInformationDTO();
         dto1.setKey("Test Key1");
         dto1.setValue("Test Value1");
         detailInformation.add(dto1);
-
         DetailInformationDTO dto2 = new DetailInformationDTO();
         dto2.setKey("Test Key2");
         dto2.setValue("Test Value2");
         detailInformation.add(dto2);
-
         DetailInformationDTO dto3 = new DetailInformationDTO();
         dto3.setKey("Test Key3");
         dto3.setValue("Test Value3");
         detailInformation.add(dto3);
-
         CreateCompanyInformationServiceRequestDto requestDto = new CreateCompanyInformationServiceRequestDto(
                 mainOverview, commitment, address, addressEnglish, phone, fax, introduction, detailInformation
         );
-
         // when
         ApiResponse<CompanyInformation> response = companyInformationService.createCompanyInformation(requestDto, null, mockFile, mockFile);
-
         // then
         assertNotNull(response);
         assertEquals(ErrorCode.NOT_EXIST_IMAGE_FILE.getStatus(), response.getStatus());
@@ -144,7 +123,7 @@ public class CompanyInformationServiceTest {
 
     @Test
     @DisplayName("회사 전체 정보 수정 성공 테스트")
-    public void updateAllCompanyInformationSuccess() throws IOException {
+    void updateAllCompanyInformationSuccess() throws IOException {
         // given
         String mainOverview = "Test mainOverview";
         String commitment = "Test commitment";
@@ -153,30 +132,23 @@ public class CompanyInformationServiceTest {
         String phone = "Test phone";
         String fax = "Test fax";
         String introduction = "Test introduction";
-
         List<DetailInformationDTO> detailInformation = new ArrayList<>();
-
         DetailInformationDTO dto1 = new DetailInformationDTO();
         dto1.setKey("Test Key1");
         dto1.setValue("Test Value1");
         detailInformation.add(dto1);
-
         DetailInformationDTO dto2 = new DetailInformationDTO();
         dto2.setKey("Test Key2");
         dto2.setValue("Test Value2");
         detailInformation.add(dto2);
-
         DetailInformationDTO dto3 = new DetailInformationDTO();
         dto3.setKey("Test Key3");
         dto3.setValue("Test Value3");
         detailInformation.add(dto3);
-
         UpdateAllCompanyInformationServiceRequestDto requestDto = new UpdateAllCompanyInformationServiceRequestDto(
                 mainOverview, commitment, address, addressEnglish, phone, fax, introduction, detailInformation
         );
-
         List<CompanyInformation> savedCompanyInformationList = new ArrayList<>();
-
         CompanyInformation savedCompanyInformation = CompanyInformation.builder()
                 .mainOverview("Test")
                 .commitment("Test")
@@ -192,27 +164,18 @@ public class CompanyInformationServiceTest {
                 .sloganImageFileName("Test")
                 .sloganImageUrl("Test")
                 .build();
-
         List<CompanyInformationDetailInformation> savedDetailInformation = new ArrayList<>();
-
         savedDetailInformation.add(new CompanyInformationDetailInformation(savedCompanyInformation, "Test Key1", "Test Value1"));
         savedDetailInformation.add(new CompanyInformationDetailInformation(savedCompanyInformation, "Test Key2", "Test Value2"));
         savedDetailInformation.add(new CompanyInformationDetailInformation(savedCompanyInformation, "Test Key3", "Test Value3"));
-
         savedCompanyInformation.initDetailInformation(savedDetailInformation);
-
         savedCompanyInformationList.add(savedCompanyInformation);
-
         // stub
         when(companyInformationRepository.findAll()).thenReturn(savedCompanyInformationList);
-        // Mock S3 upload 동작 설정
         when(s3Adapter.uploadFile(any(MultipartFile.class)))
                 .thenReturn(ApiResponse.ok("S3 버킷에 이미지 업로드를 성공하였습니다.", "http://example.com/testImage.jpg"));
-
         // when
         ApiResponse<CompanyInformation> response = companyInformationService.updateAllCompanyInformation(requestDto, mockFile, mockFile, mockFile);
-        CompanyInformation findCompanyInformation = response.getData();
-
         // then
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatus());
@@ -222,7 +185,7 @@ public class CompanyInformationServiceTest {
 
     @Test
     @DisplayName("회사 전체 정보 수정 실패 테스트")
-    public void updateAllCompanyInformationFail() throws IOException {
+    void updateAllCompanyInformationFail() throws IOException {
         // given
         String mainOverview = "Test mainOverview";
         String commitment = "Test commitment";
@@ -231,34 +194,26 @@ public class CompanyInformationServiceTest {
         String phone = "Test phone";
         String fax = "Test fax";
         String introduction = "Test introduction";
-
         List<DetailInformationDTO> detailInformation = new ArrayList<>();
-
         DetailInformationDTO dto1 = new DetailInformationDTO();
         dto1.setKey("Test Key1");
         dto1.setValue("Test Value1");
         detailInformation.add(dto1);
-
         DetailInformationDTO dto2 = new DetailInformationDTO();
         dto2.setKey("Test Key2");
         dto2.setValue("Test Value2");
         detailInformation.add(dto2);
-
         DetailInformationDTO dto3 = new DetailInformationDTO();
         dto3.setKey("Test Key3");
         dto3.setValue("Test Value3");
         detailInformation.add(dto3);
-
         UpdateAllCompanyInformationServiceRequestDto requestDto = new UpdateAllCompanyInformationServiceRequestDto(
                 mainOverview, commitment, address, addressEnglish, phone, fax, introduction, detailInformation
         );
-
         // stub
         when(companyInformationRepository.findAll()).thenReturn(List.of());
-
         // when
         ApiResponse<CompanyInformation> response = companyInformationService.updateAllCompanyInformation(requestDto, mockFile, mockFile, mockFile);
-
         // then
         assertNotNull(response);
         assertEquals(ErrorCode.COMPANYINFORMATION_IS_EMPTY.getStatus(), response.getStatus());
@@ -269,7 +224,7 @@ public class CompanyInformationServiceTest {
 
     @Test
     @DisplayName("회사 전체 텍스트 정보(이미지 제외) 수정 성공 테스트")
-    public void updateAllCompanyTextInformationSuccess() {
+    void updateAllCompanyTextInformationSuccess() {
         // given
         String mainOverview = "Test mainOverview";
         String commitment = "Test commitment";
@@ -278,30 +233,23 @@ public class CompanyInformationServiceTest {
         String phone = "Test phone";
         String fax = "Test fax";
         String introduction = "Test introduction";
-
         List<DetailInformationDTO> detailInformation = new ArrayList<>();
-
         DetailInformationDTO dto1 = new DetailInformationDTO();
         dto1.setKey("Test Key1");
         dto1.setValue("Test Value1");
         detailInformation.add(dto1);
-
         DetailInformationDTO dto2 = new DetailInformationDTO();
         dto2.setKey("Test Key2");
         dto2.setValue("Test Value2");
         detailInformation.add(dto2);
-
         DetailInformationDTO dto3 = new DetailInformationDTO();
         dto3.setKey("Test Key3");
         dto3.setValue("Test Value3");
         detailInformation.add(dto3);
-
         UpdateAllCompanyInformationServiceRequestDto requestDto = new UpdateAllCompanyInformationServiceRequestDto(
                 mainOverview, commitment, address, addressEnglish, phone, fax, introduction, detailInformation
         );
-
         List<CompanyInformation> savedCompanyInformationList = new ArrayList<>();
-
         CompanyInformation savedCompanyInformation = CompanyInformation.builder()
                 .mainOverview("Test")
                 .commitment("Test")
@@ -317,23 +265,16 @@ public class CompanyInformationServiceTest {
                 .sloganImageFileName("Test")
                 .sloganImageUrl("Test")
                 .build();
-
         List<CompanyInformationDetailInformation> savedDetailInformation = new ArrayList<>();
-
         savedDetailInformation.add(new CompanyInformationDetailInformation(savedCompanyInformation, "Test Key1", "Test Value1"));
         savedDetailInformation.add(new CompanyInformationDetailInformation(savedCompanyInformation, "Test Key2", "Test Value2"));
         savedDetailInformation.add(new CompanyInformationDetailInformation(savedCompanyInformation, "Test Key3", "Test Value3"));
-
         savedCompanyInformation.initDetailInformation(savedDetailInformation);
-
         savedCompanyInformationList.add(savedCompanyInformation);
-
         // stub
         when(companyInformationRepository.findAll()).thenReturn(savedCompanyInformationList);
-
         // when
         ApiResponse<CompanyInformation> response = companyInformationService.updateAllCompanyTextInformation(requestDto);
-
         // then
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatus());
@@ -343,7 +284,7 @@ public class CompanyInformationServiceTest {
 
     @Test
     @DisplayName("회사 전체 텍스트 정보(이미지 제외) 수정 실패 테스트")
-    public void updateAllCompanyTextInformationFail() {
+    void updateAllCompanyTextInformationFail() {
         // given
         String mainOverview = "Test mainOverview";
         String commitment = "Test commitment";
@@ -352,34 +293,26 @@ public class CompanyInformationServiceTest {
         String phone = "Test phone";
         String fax = "Test fax";
         String introduction = "Test introduction";
-
         List<DetailInformationDTO> detailInformation = new ArrayList<>();
-
         DetailInformationDTO dto1 = new DetailInformationDTO();
         dto1.setKey("Test Key1");
         dto1.setValue("Test Value1");
         detailInformation.add(dto1);
-
         DetailInformationDTO dto2 = new DetailInformationDTO();
         dto2.setKey("Test Key2");
         dto2.setValue("Test Value2");
         detailInformation.add(dto2);
-
         DetailInformationDTO dto3 = new DetailInformationDTO();
         dto3.setKey("Test Key3");
         dto3.setValue("Test Value3");
         detailInformation.add(dto3);
-
         UpdateAllCompanyInformationServiceRequestDto requestDto = new UpdateAllCompanyInformationServiceRequestDto(
                 mainOverview, commitment, address, addressEnglish, phone, fax, introduction, detailInformation
         );
-
         // stub
         when(companyInformationRepository.findAll()).thenReturn(List.of());
-
         // when
         ApiResponse<CompanyInformation> response = companyInformationService.updateAllCompanyTextInformation(requestDto);
-
         // then
         assertNotNull(response);
         assertEquals(ErrorCode.COMPANYINFORMATION_IS_EMPTY.getStatus(), response.getStatus());
@@ -390,10 +323,9 @@ public class CompanyInformationServiceTest {
 
     @Test
     @DisplayName("회사 로고 이미지 수정 성공 테스트")
-    public void updateCompanyLogoImageSuccess() throws IOException {
+    void updateCompanyLogoImageSuccess() throws IOException {
         // given
         List<CompanyInformation> savedCompanyInformationList = new ArrayList<>();
-
         CompanyInformation savedCompanyInformation = CompanyInformation.builder()
                 .mainOverview("Test")
                 .commitment("Test")
@@ -409,26 +341,18 @@ public class CompanyInformationServiceTest {
                 .sloganImageFileName("Test")
                 .sloganImageUrl("Test")
                 .build();
-
         List<CompanyInformationDetailInformation> savedDetailInformation = new ArrayList<>();
-
         savedDetailInformation.add(new CompanyInformationDetailInformation(savedCompanyInformation, "Test Key1", "Test Value1"));
         savedDetailInformation.add(new CompanyInformationDetailInformation(savedCompanyInformation, "Test Key2", "Test Value2"));
         savedDetailInformation.add(new CompanyInformationDetailInformation(savedCompanyInformation, "Test Key3", "Test Value3"));
-
         savedCompanyInformation.initDetailInformation(savedDetailInformation);
-
         savedCompanyInformationList.add(savedCompanyInformation);
-
         // stub
         when(companyInformationRepository.findAll()).thenReturn(savedCompanyInformationList);
-        // Mock S3 upload 동작 설정
         when(s3Adapter.uploadFile(any(MultipartFile.class)))
                 .thenReturn(ApiResponse.ok("S3 버킷에 이미지 업로드를 성공하였습니다.", "http://example.com/testImage.jpg"));
-
         // when
         ApiResponse<CompanyInformation> response = companyInformationService.updateCompanyLogoImage(mockFile, mockFile);
-
         // then
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatus());
@@ -438,10 +362,9 @@ public class CompanyInformationServiceTest {
 
     @Test
     @DisplayName("회사 로고 이미지 수정 실패 테스트 - 로고 이미지가 없는 경우")
-    public void updateCompanyLogoImageFail_invalidFile() throws IOException {
+    void updateCompanyLogoImageFail_invalidFile() throws IOException {
         // given
         List<CompanyInformation> savedCompanyInformationList = new ArrayList<>();
-
         CompanyInformation savedCompanyInformation = CompanyInformation.builder()
                 .mainOverview("Test")
                 .commitment("Test")
@@ -457,20 +380,14 @@ public class CompanyInformationServiceTest {
                 .sloganImageFileName("Test")
                 .sloganImageUrl("Test")
                 .build();
-
         List<CompanyInformationDetailInformation> savedDetailInformation = new ArrayList<>();
-
         savedDetailInformation.add(new CompanyInformationDetailInformation(savedCompanyInformation, "Test Key1", "Test Value1"));
         savedDetailInformation.add(new CompanyInformationDetailInformation(savedCompanyInformation, "Test Key2", "Test Value2"));
         savedDetailInformation.add(new CompanyInformationDetailInformation(savedCompanyInformation, "Test Key3", "Test Value3"));
-
         savedCompanyInformation.initDetailInformation(savedDetailInformation);
-
         savedCompanyInformationList.add(savedCompanyInformation);
-
         // when
         ApiResponse<CompanyInformation> response = companyInformationService.updateCompanyLogoImage(null, null);
-
         // then
         assertNotNull(response);
         assertEquals(ErrorCode.NOT_EXIST_IMAGE_FILE.getStatus(), response.getStatus());
@@ -481,10 +398,9 @@ public class CompanyInformationServiceTest {
 
     @Test
     @DisplayName("회사 로고 이미지 수정 실패 테스트 - 회사 데이터가 없는 경우")
-    public void updateCompanyLogoImageFail_notFound() throws IOException {
+    void updateCompanyLogoImageFail_notFound() throws IOException {
         // given
         List<CompanyInformation> savedCompanyInformationList = new ArrayList<>();
-
         CompanyInformation savedCompanyInformation = CompanyInformation.builder()
                 .mainOverview("Test")
                 .commitment("Test")
@@ -500,23 +416,16 @@ public class CompanyInformationServiceTest {
                 .sloganImageFileName("Test")
                 .sloganImageUrl("Test")
                 .build();
-
         List<CompanyInformationDetailInformation> savedDetailInformation = new ArrayList<>();
-
         savedDetailInformation.add(new CompanyInformationDetailInformation(savedCompanyInformation, "Test Key1", "Test Value1"));
         savedDetailInformation.add(new CompanyInformationDetailInformation(savedCompanyInformation, "Test Key2", "Test Value2"));
         savedDetailInformation.add(new CompanyInformationDetailInformation(savedCompanyInformation, "Test Key3", "Test Value3"));
-
         savedCompanyInformation.initDetailInformation(savedDetailInformation);
-
         savedCompanyInformationList.add(savedCompanyInformation);
-
         // stub
         when(companyInformationRepository.findAll()).thenReturn(List.of());
-
         // when
         ApiResponse<CompanyInformation> response = companyInformationService.updateCompanyLogoImage(mockFile, mockFile);
-
         // then
         assertNotNull(response);
         assertEquals(ErrorCode.COMPANYINFORMATION_IS_EMPTY.getStatus(), response.getStatus());
@@ -527,10 +436,9 @@ public class CompanyInformationServiceTest {
 
     @Test
     @DisplayName("회사 슬로건 이미지 수정 성공 테스트")
-    public void updateCompanySloganImageSuccess() throws IOException {
+    void updateCompanySloganImageSuccess() throws IOException {
         // given
         List<CompanyInformation> savedCompanyInformationList = new ArrayList<>();
-
         CompanyInformation savedCompanyInformation = CompanyInformation.builder()
                 .mainOverview("Test")
                 .commitment("Test")
@@ -546,26 +454,18 @@ public class CompanyInformationServiceTest {
                 .sloganImageFileName("Test")
                 .sloganImageUrl("Test")
                 .build();
-
         List<CompanyInformationDetailInformation> savedDetailInformation = new ArrayList<>();
-
         savedDetailInformation.add(new CompanyInformationDetailInformation(savedCompanyInformation, "Test Key1", "Test Value1"));
         savedDetailInformation.add(new CompanyInformationDetailInformation(savedCompanyInformation, "Test Key2", "Test Value2"));
         savedDetailInformation.add(new CompanyInformationDetailInformation(savedCompanyInformation, "Test Key3", "Test Value3"));
-
         savedCompanyInformation.initDetailInformation(savedDetailInformation);
-
         savedCompanyInformationList.add(savedCompanyInformation);
-
         // stub
         when(companyInformationRepository.findAll()).thenReturn(savedCompanyInformationList);
-        // Mock S3 upload 동작 설정
         when(s3Adapter.uploadFile(any(MultipartFile.class)))
                 .thenReturn(ApiResponse.ok("S3 버킷에 이미지 업로드를 성공하였습니다.", "http://example.com/testImage.jpg"));
-
         // when
         ApiResponse<CompanyInformation> response = companyInformationService.updateCompanySloganImage(mockFile);
-
         // then
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatus());
@@ -575,10 +475,9 @@ public class CompanyInformationServiceTest {
 
     @Test
     @DisplayName("회사 슬로건 이미지 수정 실패 테스트 - 슬로건 이미지가 없는 경우")
-    public void updateCompanySloganImageFail_invalidFile() throws IOException {
+    void updateCompanySloganImageFail_invalidFile() throws IOException {
         // given
         List<CompanyInformation> savedCompanyInformationList = new ArrayList<>();
-
         CompanyInformation savedCompanyInformation = CompanyInformation.builder()
                 .mainOverview("Test")
                 .commitment("Test")
@@ -594,20 +493,14 @@ public class CompanyInformationServiceTest {
                 .sloganImageFileName("Test")
                 .sloganImageUrl("Test")
                 .build();
-
         List<CompanyInformationDetailInformation> savedDetailInformation = new ArrayList<>();
-
         savedDetailInformation.add(new CompanyInformationDetailInformation(savedCompanyInformation, "Test Key1", "Test Value1"));
         savedDetailInformation.add(new CompanyInformationDetailInformation(savedCompanyInformation, "Test Key2", "Test Value2"));
         savedDetailInformation.add(new CompanyInformationDetailInformation(savedCompanyInformation, "Test Key3", "Test Value3"));
-
         savedCompanyInformation.initDetailInformation(savedDetailInformation);
-
         savedCompanyInformationList.add(savedCompanyInformation);
-
         // when
         ApiResponse<CompanyInformation> response = companyInformationService.updateCompanySloganImage(null);
-
         // then
         assertNotNull(response);
         assertEquals(ErrorCode.NOT_EXIST_IMAGE_FILE.getStatus(), response.getStatus());
@@ -618,10 +511,9 @@ public class CompanyInformationServiceTest {
 
     @Test
     @DisplayName("회사 슬로건 이미지 수정 실패 테스트 - 회사 데이터가 없는 경우")
-    public void updateCompanySloganImageFail_notFound() throws IOException {
+    void updateCompanySloganImageFail_notFound() throws IOException {
         // given
         List<CompanyInformation> savedCompanyInformationList = new ArrayList<>();
-
         CompanyInformation savedCompanyInformation = CompanyInformation.builder()
                 .mainOverview("Test")
                 .commitment("Test")
@@ -637,23 +529,16 @@ public class CompanyInformationServiceTest {
                 .sloganImageFileName("Test")
                 .sloganImageUrl("Test")
                 .build();
-
         List<CompanyInformationDetailInformation> savedDetailInformation = new ArrayList<>();
-
         savedDetailInformation.add(new CompanyInformationDetailInformation(savedCompanyInformation, "Test Key1", "Test Value1"));
         savedDetailInformation.add(new CompanyInformationDetailInformation(savedCompanyInformation, "Test Key2", "Test Value2"));
         savedDetailInformation.add(new CompanyInformationDetailInformation(savedCompanyInformation, "Test Key3", "Test Value3"));
-
         savedCompanyInformation.initDetailInformation(savedDetailInformation);
-
         savedCompanyInformationList.add(savedCompanyInformation);
-
         // stub
         when(companyInformationRepository.findAll()).thenReturn(List.of());
-
         // when
         ApiResponse<CompanyInformation> response = companyInformationService.updateCompanySloganImage(mockFile);
-
         // then
         assertNotNull(response);
         assertEquals(ErrorCode.COMPANYINFORMATION_IS_EMPTY.getStatus(), response.getStatus());
@@ -664,10 +549,9 @@ public class CompanyInformationServiceTest {
 
     @Test
     @DisplayName("회사 로고, 슬로건 이미지 수정 성공 테스트")
-    public void updateCompanyLogoAndSloganSuccess() throws IOException {
+    void updateCompanyLogoAndSloganSuccess() throws IOException {
         // given
         List<CompanyInformation> savedCompanyInformationList = new ArrayList<>();
-
         CompanyInformation savedCompanyInformation = CompanyInformation.builder()
                 .mainOverview("Test")
                 .commitment("Test")
@@ -683,26 +567,18 @@ public class CompanyInformationServiceTest {
                 .sloganImageFileName("Test")
                 .sloganImageUrl("Test")
                 .build();
-
         List<CompanyInformationDetailInformation> savedDetailInformation = new ArrayList<>();
-
         savedDetailInformation.add(new CompanyInformationDetailInformation(savedCompanyInformation, "Test Key1", "Test Value1"));
         savedDetailInformation.add(new CompanyInformationDetailInformation(savedCompanyInformation, "Test Key2", "Test Value2"));
         savedDetailInformation.add(new CompanyInformationDetailInformation(savedCompanyInformation, "Test Key3", "Test Value3"));
-
         savedCompanyInformation.initDetailInformation(savedDetailInformation);
-
         savedCompanyInformationList.add(savedCompanyInformation);
-
         // stub
         when(companyInformationRepository.findAll()).thenReturn(savedCompanyInformationList);
-        // Mock S3 upload 동작 설정
         when(s3Adapter.uploadFile(any(MultipartFile.class)))
                 .thenReturn(ApiResponse.ok("S3 버킷에 이미지 업로드를 성공하였습니다.", "http://example.com/testImage.jpg"));
-
         // when
         ApiResponse<CompanyInformation> response = companyInformationService.updateCompanyLogoAndSlogan(mockFile, mockFile, mockFile);
-
         // then
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatus());
@@ -712,10 +588,9 @@ public class CompanyInformationServiceTest {
 
     @Test
     @DisplayName("회사 로고, 슬로건 이미지 수정 실패 테스트 - 회사 데이터가 없는 경우")
-    public void updateCompanyLogoAndSloganFail_notFound() throws IOException {
+    void updateCompanyLogoAndSloganFail_notFound() throws IOException {
         // given
         List<CompanyInformation> savedCompanyInformationList = new ArrayList<>();
-
         CompanyInformation savedCompanyInformation = CompanyInformation.builder()
                 .mainOverview("Test")
                 .commitment("Test")
@@ -731,23 +606,16 @@ public class CompanyInformationServiceTest {
                 .sloganImageFileName("Test")
                 .sloganImageUrl("Test")
                 .build();
-
         List<CompanyInformationDetailInformation> savedDetailInformation = new ArrayList<>();
-
         savedDetailInformation.add(new CompanyInformationDetailInformation(savedCompanyInformation, "Test Key1", "Test Value1"));
         savedDetailInformation.add(new CompanyInformationDetailInformation(savedCompanyInformation, "Test Key2", "Test Value2"));
         savedDetailInformation.add(new CompanyInformationDetailInformation(savedCompanyInformation, "Test Key3", "Test Value3"));
-
         savedCompanyInformation.initDetailInformation(savedDetailInformation);
-
         savedCompanyInformationList.add(savedCompanyInformation);
-
         // stub
         when(companyInformationRepository.findAll()).thenReturn(List.of());
-
         // when
         ApiResponse<CompanyInformation> response = companyInformationService.updateCompanyLogoAndSlogan(mockFile, mockFile, mockFile);
-
         // then
         assertNotNull(response);
         assertEquals(ErrorCode.COMPANYINFORMATION_IS_EMPTY.getStatus(), response.getStatus());
@@ -758,19 +626,16 @@ public class CompanyInformationServiceTest {
 
     @Test
     @DisplayName("회사 기본 정보(주소, 유선번호, 팩스번호) 수정 성공 테스트")
-    public void updateCompanyBasicInformationSuccess() {
+    void updateCompanyBasicInformationSuccess() {
         // given
         String address = "Test address";
         String addressEnglish = "Test addressEnglish";
         String phone = "Test phone";
         String fax = "Test fax";
-
         UpdateCompanyBasicInformationServiceRequestDto requestDto = new UpdateCompanyBasicInformationServiceRequestDto(
                 address, addressEnglish, phone, fax
         );
-
         List<CompanyInformation> savedCompanyInformationList = new ArrayList<>();
-
         CompanyInformation savedCompanyInformation = CompanyInformation.builder()
                 .mainOverview("Test")
                 .commitment("Test")
@@ -786,23 +651,16 @@ public class CompanyInformationServiceTest {
                 .sloganImageFileName("Test")
                 .sloganImageUrl("Test")
                 .build();
-
         List<CompanyInformationDetailInformation> savedDetailInformation = new ArrayList<>();
-
         savedDetailInformation.add(new CompanyInformationDetailInformation(savedCompanyInformation, "Test Key1", "Test Value1"));
         savedDetailInformation.add(new CompanyInformationDetailInformation(savedCompanyInformation, "Test Key2", "Test Value2"));
         savedDetailInformation.add(new CompanyInformationDetailInformation(savedCompanyInformation, "Test Key3", "Test Value3"));
-
         savedCompanyInformation.initDetailInformation(savedDetailInformation);
-
         savedCompanyInformationList.add(savedCompanyInformation);
-
         // stub
         when(companyInformationRepository.findAll()).thenReturn(savedCompanyInformationList);
-
         // when
         ApiResponse<CompanyInformation> response = companyInformationService.updateCompanyBasicInformation(requestDto);
-
         // then
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatus());
@@ -812,40 +670,32 @@ public class CompanyInformationServiceTest {
 
     @Test
     @DisplayName("회사 기본 정보(주소, 유선번호, 팩스번호) 수정 실패 테스트")
-    public void updateCompanyBasicInformationFail() {
+    void updateCompanyBasicInformationFail() {
         // given
         String address = "Test address";
         String addressEnglish = "Test addressEnglish";
         String phone = "Test phone";
         String fax = "Test fax";
-
         List<DetailInformationDTO> detailInformation = new ArrayList<>();
-
         DetailInformationDTO dto1 = new DetailInformationDTO();
         dto1.setKey("Test Key1");
         dto1.setValue("Test Value1");
         detailInformation.add(dto1);
-
         DetailInformationDTO dto2 = new DetailInformationDTO();
         dto2.setKey("Test Key2");
         dto2.setValue("Test Value2");
         detailInformation.add(dto2);
-
         DetailInformationDTO dto3 = new DetailInformationDTO();
         dto3.setKey("Test Key3");
         dto3.setValue("Test Value3");
         detailInformation.add(dto3);
-
         UpdateCompanyBasicInformationServiceRequestDto requestDto = new UpdateCompanyBasicInformationServiceRequestDto(
                 address, addressEnglish, phone, fax
         );
-
         // stub
         when(companyInformationRepository.findAll()).thenReturn(List.of());
-
         // when
         ApiResponse<CompanyInformation> response = companyInformationService.updateCompanyBasicInformation(requestDto);
-
         // then
         assertNotNull(response);
         assertEquals(ErrorCode.COMPANYINFORMATION_IS_EMPTY.getStatus(), response.getStatus());
@@ -856,35 +706,28 @@ public class CompanyInformationServiceTest {
 
     @Test
     @DisplayName("회사 소개 정보(mainOverview, commitment, introduction) 수정 성공 테스트")
-    public void updateCompanyIntroductionInformationSuccess() {
+    void updateCompanyIntroductionInformationSuccess() {
         // given
         String mainOverview = "Test mainOverview";
         String commitment = "Test commitment";
         String introduction = "Test introduction";
-
         List<DetailInformationDTO> detailInformation = new ArrayList<>();
-
         DetailInformationDTO dto1 = new DetailInformationDTO();
         dto1.setKey("Test Key1");
         dto1.setValue("Test Value1");
         detailInformation.add(dto1);
-
         DetailInformationDTO dto2 = new DetailInformationDTO();
         dto2.setKey("Test Key2");
         dto2.setValue("Test Value2");
         detailInformation.add(dto2);
-
         DetailInformationDTO dto3 = new DetailInformationDTO();
         dto3.setKey("Test Key3");
         dto3.setValue("Test Value3");
         detailInformation.add(dto3);
-
         UpdateCompanyIntroductionInformationServiceRequestDto requestDto = new UpdateCompanyIntroductionInformationServiceRequestDto(
                 mainOverview, commitment, introduction
         );
-
         List<CompanyInformation> savedCompanyInformationList = new ArrayList<>();
-
         CompanyInformation savedCompanyInformation = CompanyInformation.builder()
                 .mainOverview("Test")
                 .commitment("Test")
@@ -900,23 +743,16 @@ public class CompanyInformationServiceTest {
                 .sloganImageFileName("Test")
                 .sloganImageUrl("Test")
                 .build();
-
         List<CompanyInformationDetailInformation> savedDetailInformation = new ArrayList<>();
-
         savedDetailInformation.add(new CompanyInformationDetailInformation(savedCompanyInformation, "Test Key1", "Test Value1"));
         savedDetailInformation.add(new CompanyInformationDetailInformation(savedCompanyInformation, "Test Key2", "Test Value2"));
         savedDetailInformation.add(new CompanyInformationDetailInformation(savedCompanyInformation, "Test Key3", "Test Value3"));
-
         savedCompanyInformation.initDetailInformation(savedDetailInformation);
-
         savedCompanyInformationList.add(savedCompanyInformation);
-
         // stub
         when(companyInformationRepository.findAll()).thenReturn(savedCompanyInformationList);
-
         // when
         ApiResponse<CompanyInformation> response = companyInformationService.updateCompanyIntroductionInformation(requestDto);
-
         // then
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatus());
@@ -926,39 +762,31 @@ public class CompanyInformationServiceTest {
 
     @Test
     @DisplayName("회사 소개 정보(mainOverview, commitment, introduction) 수정 실패 테스트")
-    public void updateCompanyIntroductionInformationFail() {
+    void updateCompanyIntroductionInformationFail() {
         // given
         String mainOverview = "Test mainOverview";
         String commitment = "Test commitment";
         String introduction = "Test introduction";
-
         List<DetailInformationDTO> detailInformation = new ArrayList<>();
-
         DetailInformationDTO dto1 = new DetailInformationDTO();
         dto1.setKey("Test Key1");
         dto1.setValue("Test Value1");
         detailInformation.add(dto1);
-
         DetailInformationDTO dto2 = new DetailInformationDTO();
         dto2.setKey("Test Key2");
         dto2.setValue("Test Value2");
         detailInformation.add(dto2);
-
         DetailInformationDTO dto3 = new DetailInformationDTO();
         dto3.setKey("Test Key3");
         dto3.setValue("Test Value3");
         detailInformation.add(dto3);
-
         UpdateCompanyIntroductionInformationServiceRequestDto requestDto = new UpdateCompanyIntroductionInformationServiceRequestDto(
                 mainOverview, commitment, introduction
         );
-
         // stub
         when(companyInformationRepository.findAll()).thenReturn(List.of());
-
         // when
         ApiResponse<CompanyInformation> response = companyInformationService.updateCompanyIntroductionInformation(requestDto);
-
         // then
         assertNotNull(response);
         assertEquals(ErrorCode.COMPANYINFORMATION_IS_EMPTY.getStatus(), response.getStatus());
@@ -969,31 +797,25 @@ public class CompanyInformationServiceTest {
 
     @Test
     @DisplayName("회사 5가지 상세 정보 수정 성공 테스트")
-    public void updateCompanyDetailInformationSuccess() {
+    void updateCompanyDetailInformationSuccess() {
         // given
         List<DetailInformationDTO> detailInformation = new ArrayList<>();
-
         DetailInformationDTO dto1 = new DetailInformationDTO();
         dto1.setKey("Test Key1");
         dto1.setValue("Test Value1");
         detailInformation.add(dto1);
-
         DetailInformationDTO dto2 = new DetailInformationDTO();
         dto2.setKey("Test Key2");
         dto2.setValue("Test Value2");
         detailInformation.add(dto2);
-
         DetailInformationDTO dto3 = new DetailInformationDTO();
         dto3.setKey("Test Key3");
         dto3.setValue("Test Value3");
         detailInformation.add(dto3);
-
         UpdateCompanyDetailInformationServiceRequestDto requestDto = new UpdateCompanyDetailInformationServiceRequestDto(
                 detailInformation
         );
-
         List<CompanyInformation> savedCompanyInformationList = new ArrayList<>();
-
         CompanyInformation savedCompanyInformation = CompanyInformation.builder()
                 .mainOverview("Test")
                 .commitment("Test")
@@ -1009,23 +831,16 @@ public class CompanyInformationServiceTest {
                 .sloganImageFileName("Test")
                 .sloganImageUrl("Test")
                 .build();
-
         List<CompanyInformationDetailInformation> savedDetailInformation = new ArrayList<>();
-
         savedDetailInformation.add(new CompanyInformationDetailInformation(savedCompanyInformation, "Test Key1", "Test Value1"));
         savedDetailInformation.add(new CompanyInformationDetailInformation(savedCompanyInformation, "Test Key2", "Test Value2"));
         savedDetailInformation.add(new CompanyInformationDetailInformation(savedCompanyInformation, "Test Key3", "Test Value3"));
-
         savedCompanyInformation.initDetailInformation(savedDetailInformation);
-
         savedCompanyInformationList.add(savedCompanyInformation);
-
         // stub
         when(companyInformationRepository.findAll()).thenReturn(savedCompanyInformationList);
-
         // when
         ApiResponse<CompanyInformation> response = companyInformationService.updateCompanyDetailInformation(requestDto);
-
         // then
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatus());
@@ -1035,35 +850,28 @@ public class CompanyInformationServiceTest {
 
     @Test
     @DisplayName("회사 5가지 상세 정보 수정 실패 테스트")
-    public void updateCompanyDetailInformationFail() {
+    void updateCompanyDetailInformationFail() {
         // given
         List<DetailInformationDTO> detailInformation = new ArrayList<>();
-
         DetailInformationDTO dto1 = new DetailInformationDTO();
         dto1.setKey("Test Key1");
         dto1.setValue("Test Value1");
         detailInformation.add(dto1);
-
         DetailInformationDTO dto2 = new DetailInformationDTO();
         dto2.setKey("Test Key2");
         dto2.setValue("Test Value2");
         detailInformation.add(dto2);
-
         DetailInformationDTO dto3 = new DetailInformationDTO();
         dto3.setKey("Test Key3");
         dto3.setValue("Test Value3");
         detailInformation.add(dto3);
-
         UpdateCompanyDetailInformationServiceRequestDto requestDto = new UpdateCompanyDetailInformationServiceRequestDto(
                 detailInformation
         );
-
         // stub
         when(companyInformationRepository.findAll()).thenReturn(List.of());
-
         // when
         ApiResponse<CompanyInformation> response = companyInformationService.updateCompanyDetailInformation(requestDto);
-
         // then
         assertNotNull(response);
         assertEquals(ErrorCode.COMPANYINFORMATION_IS_EMPTY.getStatus(), response.getStatus());
@@ -1088,11 +896,9 @@ public class CompanyInformationServiceTest {
         companyInformationList.add(companyInformation1);
         companyInformationList.add(companyInformation2);
         when(companyInformationRepository.findAll()).thenReturn(companyInformationList);
-
         // when
         ApiResponse<CompanyInformation> response = companyInformationService.retrieveAllCompanyInformation();
         CompanyInformation retrievedCompanyInformation = response.getData();
-
         // then
         assertNotNull(retrievedCompanyInformation);
         assertEquals("전체 회사 정보를 성공적으로 조회하였습니다.", response.getMessage());
@@ -1103,10 +909,8 @@ public class CompanyInformationServiceTest {
     void retrieveAllCompanyInformation_Fail() {
         // given
         when(companyInformationRepository.findAll()).thenReturn(Collections.emptyList());
-
         // when
         ApiResponse<CompanyInformation> response = companyInformationService.retrieveAllCompanyInformation();
-
         // then
         assertNull(response.getData());
         assertEquals("회사 정보가 존재하지 않습니다.", response.getMessage());
@@ -1118,11 +922,9 @@ public class CompanyInformationServiceTest {
         // given
         List<String> darkLogoImageUrls = List.of("darkLogoImageUrl1?v=123456789");
         when(companyInformationRepository.findDarkLogoImageUrl()).thenReturn(darkLogoImageUrls);
-
         // when
         ApiResponse<String> response = companyInformationService.retrieveCompanyLogoImage(false);
         String retrievedCompanyInformation = response.getData();
-
         // then
         assertNotNull(retrievedCompanyInformation);
         assertEquals("회사 로고 이미지를 성공적으로 조회하였습니다.", response.getMessage());
@@ -1134,11 +936,9 @@ public class CompanyInformationServiceTest {
     void retrieveCompanyLogoImageWhenLogoImageNotExists() {
         // given
         when(companyInformationRepository.findDarkLogoImageUrl()).thenReturn(Collections.emptyList());
-
         // when
         ApiResponse<String> response = companyInformationService.retrieveCompanyLogoImage(false);
         String retrievedCompanyInformation = response.getData();
-
         // then
         assertNull(retrievedCompanyInformation);
         assertEquals("회사 로고 이미지가 존재하지 않습니다.", response.getMessage());
@@ -1152,25 +952,22 @@ public class CompanyInformationServiceTest {
         when(companyBasicInformation.getAddress()).thenReturn("address1");
         when(companyBasicInformation.getPhone()).thenReturn("phone1");
         when(companyInformationRepository.findAddressAndPhoneAndFax()).thenReturn(List.of(companyBasicInformation));
-
         // when
         ApiResponse<CompanyBasicInformation> response = companyInformationService.retrieveCompanyBasicInformation();
-
         // then
         assertNotNull(response.getData());
         assertEquals("회사 기본 정보를 성공적으로 조회하였습니다.", response.getMessage());
         assertEquals("address1", response.getData().getAddress());
         assertEquals("phone1", response.getData().getPhone());
     }
+
     @Test
     @DisplayName("회사 기본 정보 조회 실패 - 정보 없음")
     void retrieveCompanyBasicInformationFailure() {
         // given
         when(companyInformationRepository.findAddressAndPhoneAndFax()).thenReturn(Collections.emptyList());
-
         // when
         ApiResponse<CompanyBasicInformation> response = companyInformationService.retrieveCompanyBasicInformation();
-
         // then
         assertNull(response.getData());
         assertEquals("회사 기본 정보가 존재하지 않습니다.", response.getMessage());
@@ -1182,10 +979,8 @@ public class CompanyInformationServiceTest {
         // given
         CompanyIntroductionInformation companyIntroductionInformation = new CompanyIntroductionInformationImpl("introduction1", "sloganImageUrl1");
         when(companyInformationRepository.findIntroductionAndSloganImageUrl()).thenReturn(List.of(companyIntroductionInformation));
-
         // when
         ApiResponse<CompanyIntroductionInformation> response = companyInformationService.retrieveCompanyIntroductionInformation();
-
         // then
         assertNotNull(response.getData());
         assertEquals("회사 소개 정보를 성공적으로 조회하였습니다.", response.getMessage());
@@ -1197,14 +992,13 @@ public class CompanyInformationServiceTest {
     void retrieveCompanyIntroductionInformationFailure() {
         // given
         when(companyInformationRepository.findIntroductionAndSloganImageUrl()).thenReturn(Collections.emptyList());
-
         // when
         ApiResponse<CompanyIntroductionInformation> response = companyInformationService.retrieveCompanyIntroductionInformation();
-
         // then
         assertNull(response.getData());
         assertEquals("회사 소개 정보가 존재하지 않습니다.", response.getMessage());
     }
+
     @Test
     @DisplayName("회사 상세 정보 조회 성공")
     void retrieveCompanyDetailInformationSuccess() {
@@ -1214,7 +1008,6 @@ public class CompanyInformationServiceTest {
                 .commitment("Our commitment")
                 .detailInformation(new ArrayList<>())
                 .build();
-
         companyInformation.getDetailInformation().add(CompanyInformationDetailInformation.builder()
                 .companyInformation(companyInformation)
                 .key("Detail Key 1")
@@ -1225,13 +1018,10 @@ public class CompanyInformationServiceTest {
                 .key("Detail Key 2")
                 .value("Detail Value 2")
                 .build());
-
         List<CompanyInformation> companyInformations = List.of(companyInformation);
         when(companyInformationRepository.findAll()).thenReturn(companyInformations);
-
         // when
         ApiResponse<List<CompanyInformationDetailInformation>> response = companyInformationService.retrieveCompanyDetailInformation();
-
         // then
         assertNotNull(response.getData());
         assertEquals("회사 상세 정보를 성공적으로 조회하였습니다.", response.getMessage());
@@ -1243,10 +1033,8 @@ public class CompanyInformationServiceTest {
     void retrieveCompanyDetailInformationFailure_NoInformation() {
         // given
         when(companyInformationRepository.findAll()).thenReturn(Collections.emptyList());
-
         // when
         ApiResponse<List<CompanyInformationDetailInformation>> response = companyInformationService.retrieveCompanyDetailInformation();
-
         // then
         assertEquals("회사 정보가 존재하지 않습니다.", response.getMessage());
         assertNull(response.getData());
@@ -1261,12 +1049,9 @@ public class CompanyInformationServiceTest {
                         .darkLogoImageFileName("dark_logo.png")
                         .sloganImageFileName("slogan.png").build()
         );
-
         when(companyInformationRepository.findAll()).thenReturn(companyInformations);
-
         // when
         ApiResponse<String> response = companyInformationService.deleteAllCompanyInformation();
-
         // then
         assertEquals("전체 회사 정보를 성공적으로 삭제했습니다.", response.getMessage());
         verify(s3Adapter, times(3)).deleteFile(anyString()); // S3 파일 삭제 호출 확인
@@ -1278,10 +1063,8 @@ public class CompanyInformationServiceTest {
     void deleteAllCompanyInformationFailure_NoCompanyInformation() {
         // given
         when(companyInformationRepository.findAll()).thenReturn(Collections.emptyList());
-
         // when
         ApiResponse<String> response = companyInformationService.deleteAllCompanyInformation();
-
         // then
         assertEquals("전체 회사 정보를 성공적으로 삭제했습니다.", response.getMessage()); // 수정된 메시지
         verify(s3Adapter, times(0)).deleteFile(anyString()); // S3 파일 삭제 호출이 없음을 확인
@@ -1297,12 +1080,9 @@ public class CompanyInformationServiceTest {
                 .lightLogoImageFileName("light_logo.png")
                 .darkLogoImageFileName("dark_logo.png")
                 .build();
-
         when(companyInformationRepository.findAll()).thenReturn(List.of(companyInformation));
-
         // when
         ApiResponse<String> response = companyInformationService.deleteCompanyLogoImage();
-
         // then
         assertEquals("회사 로고 이미지를 성공적으로 삭제했습니다.", response.getMessage());
         verify(s3Adapter, times(2)).deleteFile(anyString()); // S3 파일 삭제 호출 확인
@@ -1314,15 +1094,14 @@ public class CompanyInformationServiceTest {
     void deleteCompanyLogoImageFailure_NoCompanyInformation() {
         // given
         when(companyInformationRepository.findAll()).thenReturn(Collections.emptyList());
-
         // when
         ApiResponse<String> response = companyInformationService.deleteCompanyLogoImage();
-
         // then
         assertEquals("회사 로고 이미지를 성공적으로 삭제했습니다.", response.getMessage()); // 수정된 메시지
         verify(s3Adapter, times(0)).deleteFile(anyString()); // S3 파일 삭제 호출이 없음을 확인
         verify(companyInformationRepository, times(0)).save(any(CompanyInformation.class)); // 저장 호출이 없음을 확인
     }
+
     @Test
     @DisplayName("회사 기본 정보 삭제 성공")
     void deleteCompanyBasicInformationSuccess() {
@@ -1331,29 +1110,14 @@ public class CompanyInformationServiceTest {
                 .mainOverview("Main overview")
                 .commitment("Our commitment")
                 .build();
-
         when(companyInformationRepository.findAll()).thenReturn(List.of(companyInformation));
-
         // when
         ApiResponse<CompanyInformation> response = companyInformationService.deleteCompanyBasicInformation();
-
         // then
         assertEquals("회사 기본 정보를 성공적으로 삭제했습니다.", response.getMessage());
         verify(companyInformationRepository, times(1)).save(any(CompanyInformation.class)); // 저장 호출 확인
     }
-//    @Test
-//    @DisplayName("회사 기본 정보 삭제 실패 - 회사 정보 없음")
-//    void deleteCompanyBasicInformation_emptyCompany_returnsErrorResponse() {
-//        // given
-//        when(companyInformationRepository.findAll()).thenReturn(Collections.emptyList());
-//
-//        // when
-//        ApiResponse<CompanyInformation> response = companyInformationService.deleteCompanyBasicInformation();
-//
-//        // then
-//        assertEquals(HttpStatus.BAD_REQUEST, response.getStatus());
-//        assertEquals(ErrorCode.COMPANYINFORMATION_IS_EMPTY.getMessage(), response.getMessage());
-//    }
+
     @Test
     @DisplayName("회사 소개 정보 삭제 성공")
     void deleteCompanyIntroductionInformationSuccess() {
@@ -1361,30 +1125,27 @@ public class CompanyInformationServiceTest {
         CompanyInformation companyInformation = CompanyInformation.builder()
                 .sloganImageFileName("slogan.png")
                 .build();
-
         when(companyInformationRepository.findAll()).thenReturn(List.of(companyInformation));
-
         // when
         ApiResponse<CompanyInformation> response = companyInformationService.deleteCompanyIntroductionInformation();
-
         // then
         assertEquals("회사 소개 정보를 성공적으로 삭제했습니다.", response.getMessage());
         verify(s3Adapter, times(1)).deleteFile(anyString()); // S3 파일 삭제 호출 확인
         verify(companyInformationRepository, times(1)).save(any(CompanyInformation.class)); // 저장 호출 확인
     }
+
     @Test
     @DisplayName("회사 소개 정보 삭제 실패 - 회사 정보 없음")
     void deleteCompanyIntroductionInformation_emptyCompany_returnsErrorResponse() {
         // given
         when(companyInformationRepository.findAll()).thenReturn(Collections.emptyList());
-
         // when
         ApiResponse<CompanyInformation> response = companyInformationService.deleteCompanyIntroductionInformation();
-
         // then
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatus());
         assertEquals(ErrorCode.COMPANYINFORMATION_IS_EMPTY.getMessage(), response.getMessage());
     }
+
     @Test
     @DisplayName("회사 상세 정보 삭제 성공")
     void deleteCompanyDetailInformationSuccess() {
@@ -1392,25 +1153,21 @@ public class CompanyInformationServiceTest {
         CompanyInformation companyInformation = CompanyInformation.builder()
                 .detailInformation(new ArrayList<>()) // 예시 데이터
                 .build();
-
         when(companyInformationRepository.findAll()).thenReturn(List.of(companyInformation));
-
         // when
         ApiResponse<CompanyInformation> response = companyInformationService.deleteCompanyDetailInformation();
-
         // then
         assertEquals("회사 5가지 상세 정보를 성공적으로 삭제했습니다.", response.getMessage());
         verify(companyInformationRepository, times(1)).save(any(CompanyInformation.class)); // 저장 호출 확인
     }
+
     @Test
     @DisplayName("회사 상세 정보 삭제 실패 - 회사 정보 없음")
     void deleteCompanyDetailInformation_emptyCompany_returnsErrorResponse() {
         // given
         when(companyInformationRepository.findAll()).thenReturn(Collections.emptyList());
-
         // when
         ApiResponse<CompanyInformation> response = companyInformationService.deleteCompanyDetailInformation();
-
         // then
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatus());
         assertEquals(ErrorCode.COMPANYINFORMATION_IS_EMPTY.getMessage(), response.getMessage());

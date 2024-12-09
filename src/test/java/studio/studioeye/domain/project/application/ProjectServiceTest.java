@@ -3,6 +3,8 @@ package studio.studioeye.domain.project.application;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -19,8 +21,6 @@ import studio.studioeye.domain.project.dao.ProjectRepository;
 import studio.studioeye.domain.project.domain.Project;
 import studio.studioeye.domain.project.domain.ProjectImage;
 import studio.studioeye.domain.project.dto.request.*;
-import studio.studioeye.domain.recruitment.dao.RecruitmentTitle;
-import studio.studioeye.domain.recruitment.domain.Status;
 import studio.studioeye.global.common.response.ApiResponse;
 import studio.studioeye.global.exception.error.ErrorCode;
 import studio.studioeye.infrastructure.s3.S3Adapter;
@@ -35,17 +35,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class ProjectServiceTest {
-
+class ProjectServiceTest {
     @InjectMocks
     private ProjectService projectService;
-
     @Mock
     private ProjectRepository projectRepository;
-
     @Mock
     private S3Adapter s3Adapter;
-
     // Mock MultipartFile 생성
     MockMultipartFile mockFile = new MockMultipartFile(
             "file",
@@ -53,10 +49,14 @@ public class ProjectServiceTest {
             "image/jpeg",
             "Test Image Content".getBytes()
     );
-
-    @Test
-    @DisplayName("Project 생성 성공 테스트_mainType인 경우")
-    public void createProjectSuccess_mainType() throws IOException {
+    @ParameterizedTest
+    @CsvSource({
+            "main, main",
+            "top, top",
+            "others, others"
+    })
+    @DisplayName("Project 생성 성공 테스트")
+    void createProjectSuccess(String inputType, String expectedType) throws IOException {
         // given
         CreateProjectServiceRequestDto requestDto = new CreateProjectServiceRequestDto(
                 "Test Department",
@@ -66,13 +66,11 @@ public class ProjectServiceTest {
                 "2024-01-01",
                 "Test Link",
                 "Test Overview",
-                "main",
+                inputType,
                 true
         );
-
         // List<MultipartFile>로 변환
         List<MultipartFile> projectImages = List.of(mockFile);
-
         Project mockProject = Project.builder()
                 .name("Test Name")
                 .category("Entertainment")
@@ -81,112 +79,15 @@ public class ProjectServiceTest {
                 .link("Test Link")
                 .overView("Test Overview")
                 .isPosted(true)
-                .projectType("main")
+                .projectType(expectedType)
                 .build();
-
         // stub
         // Mock S3 upload 동작 설정
         when(s3Adapter.uploadFile(any(MultipartFile.class)))
                 .thenReturn(ApiResponse.ok("프로젝트를 성공적으로 등록하였습니다.", "http://example.com/testImage.jpg"));
         when(projectRepository.save(any(Project.class))).thenReturn(mockProject);
-
         // when
         ApiResponse<Project> response = projectService.createProject(requestDto, mockFile, mockFile, projectImages);
-
-        // then
-        assertNotNull(response);
-        assertEquals(HttpStatus.OK, response.getStatus());
-        assertNotNull(response.getData());
-        assertEquals("프로젝트를 성공적으로 등록하였습니다.", response.getMessage());
-        Mockito.verify(projectRepository, times(1)).save(any(Project.class));
-    }
-
-    @Test
-    @DisplayName("Project 생성 성공 테스트_topType인 경우")
-    public void createProjectSuccess_topType() throws IOException {
-        // given
-        CreateProjectServiceRequestDto requestDto = new CreateProjectServiceRequestDto(
-                "Test Department",
-                "Entertainment",
-                "Test Name",
-                "Test Client",
-                "2024-01-01",
-                "Test Link",
-                "Test Overview",
-                "top",
-                true
-        );
-
-        // List<MultipartFile>로 변환
-        List<MultipartFile> projectImages = List.of(mockFile);
-
-        Project mockProject = Project.builder()
-                .name("Test Name")
-                .category("Entertainment")
-                .department("Test Department")
-                .date("2024-01-01")
-                .link("Test Link")
-                .overView("Test Overview")
-                .isPosted(true)
-                .projectType("top")
-                .build();
-
-        // stub
-        // Mock S3 upload 동작 설정
-        when(s3Adapter.uploadFile(any(MultipartFile.class)))
-                .thenReturn(ApiResponse.ok("프로젝트를 성공적으로 등록하였습니다.", "http://example.com/testImage.jpg"));
-        when(projectRepository.save(any(Project.class))).thenReturn(mockProject);
-
-        // when
-        ApiResponse<Project> response = projectService.createProject(requestDto, mockFile, mockFile, projectImages);
-
-        // then
-        assertNotNull(response);
-        assertEquals(HttpStatus.OK, response.getStatus());
-        assertNotNull(response.getData());
-        assertEquals("프로젝트를 성공적으로 등록하였습니다.", response.getMessage());
-        Mockito.verify(projectRepository, times(1)).save(any(Project.class));
-    }
-
-    @Test
-    @DisplayName("Project 생성 성공 테스트_othersType인 경우")
-    public void createProjectSuccess_othersType() throws IOException {
-        // given
-        CreateProjectServiceRequestDto requestDto = new CreateProjectServiceRequestDto(
-                "Test Department",
-                "Entertainment",
-                "Test Name",
-                "Test Client",
-                "2024-01-01",
-                "Test Link",
-                "Test Overview",
-                "others",
-                true
-        );
-
-        // List<MultipartFile>로 변환
-        List<MultipartFile> projectImages = List.of(mockFile);
-
-        Project mockProject = Project.builder()
-                .name("Test Name")
-                .category("Entertainment")
-                .department("Test Department")
-                .date("2024-01-01")
-                .link("Test Link")
-                .overView("Test Overview")
-                .isPosted(true)
-                .projectType("others")
-                .build();
-
-        // stub
-        // Mock S3 upload 동작 설정
-        when(s3Adapter.uploadFile(any(MultipartFile.class)))
-                .thenReturn(ApiResponse.ok("프로젝트를 성공적으로 등록하였습니다.", "http://example.com/testImage.jpg"));
-        when(projectRepository.save(any(Project.class))).thenReturn(mockProject);
-
-        // when
-        ApiResponse<Project> response = projectService.createProject(requestDto, mockFile, mockFile, projectImages);
-
         // then
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatus());
@@ -197,7 +98,7 @@ public class ProjectServiceTest {
 
     @Test
     @DisplayName("Project 생성 실패 테스트 - 이미지 업로드 실패")
-    public void createProjectFail() throws IOException {
+    void createProjectFail() throws IOException {
         // given
         CreateProjectServiceRequestDto requestDto = new CreateProjectServiceRequestDto(
                 "Test Department",
@@ -210,14 +111,11 @@ public class ProjectServiceTest {
                 "main",
                 true
         );
-
         // stub - S3 upload 실패
         when(s3Adapter.uploadFile(any(MultipartFile.class))).thenReturn(ApiResponse.withError(ErrorCode.ERROR_S3_UPDATE_OBJECT));
-
         // when
         List<MultipartFile> projectImages = List.of(mockFile);
         ApiResponse<Project> response = projectService.createProject(requestDto, mockFile, mockFile, projectImages);
-
         // then
         assertNotNull(response);
         assertEquals(ErrorCode.ERROR_S3_UPDATE_OBJECT.getStatus(), response.getStatus()); // 적절한 상태 코드 수정
@@ -227,7 +125,7 @@ public class ProjectServiceTest {
 
     @Test
     @DisplayName("Project 생성 실패 테스트 - 유효하지 않은 projectType인 경우")
-    public void createProjectFail_invalidProjectType() throws IOException {
+    void createProjectFail_invalidProjectType() throws IOException {
         // given
         CreateProjectServiceRequestDto requestDto = new CreateProjectServiceRequestDto(
                 "Test Department",
@@ -240,15 +138,12 @@ public class ProjectServiceTest {
                 "invalidType",
                 true
         );
-
         // stub - S3 upload 실패
         when(s3Adapter.uploadFile(any(MultipartFile.class)))
                 .thenReturn(ApiResponse.ok("프로젝트를 성공적으로 등록하였습니다.", "http://example.com/testImage.jpg"));
-
         // when
         List<MultipartFile> projectImages = List.of(mockFile);
         ApiResponse<Project> response = projectService.createProject(requestDto, mockFile, mockFile, projectImages);
-
         // then
         assertNotNull(response);
         assertEquals(ErrorCode.INVALID_PROJECT_TYPE.getStatus(), response.getStatus()); // 적절한 상태 코드 수정
@@ -258,7 +153,7 @@ public class ProjectServiceTest {
 
     @Test
     @DisplayName("Project 생성 실패 테스트 - TOP 프로젝트가 이미 존재하는 경우")
-    public void createProjectFail_alreadyExistedTop() throws IOException {
+    void createProjectFail_alreadyExistedTop() throws IOException {
         // given
         CreateProjectServiceRequestDto requestDto = new CreateProjectServiceRequestDto(
                 "Test Department",
@@ -271,7 +166,6 @@ public class ProjectServiceTest {
                 "top",
                 true
         );
-
         Project mockProject = Project.builder()
                 .name("Test Name")
                 .category("Entertainment")
@@ -282,16 +176,13 @@ public class ProjectServiceTest {
                 .isPosted(true)
                 .projectType("main")
                 .build();
-
         // stub - S3 upload 실패
         when(s3Adapter.uploadFile(any(MultipartFile.class)))
                 .thenReturn(ApiResponse.ok("프로젝트를 성공적으로 등록하였습니다.", "http://example.com/testImage.jpg"));
         when(projectRepository.findByProjectType(requestDto.projectType())).thenReturn(List.of(mockProject));
-
         // when
         List<MultipartFile> projectImages = List.of(mockFile);
         ApiResponse<Project> response = projectService.createProject(requestDto, mockFile, mockFile, projectImages);
-
         // then
         assertNotNull(response);
         assertEquals(ErrorCode.TOP_PROJECT_ALREADY_EXISTS.getStatus(), response.getStatus()); // 적절한 상태 코드 수정
@@ -301,7 +192,7 @@ public class ProjectServiceTest {
 
     @Test
     @DisplayName("Project 생성 실패 테스트 - isPosted가 false인 TOP 프로젝트의 경우")
-    public void createProjectFail_isPostedFalseTop() throws IOException {
+    void createProjectFail_isPostedFalseTop() throws IOException {
         // given
         CreateProjectServiceRequestDto requestDto = new CreateProjectServiceRequestDto(
                 "Test Department",
@@ -314,17 +205,13 @@ public class ProjectServiceTest {
                 "top",
                 false
         );
-
-
         // stub - S3 upload 실패
         when(s3Adapter.uploadFile(any(MultipartFile.class)))
                 .thenReturn(ApiResponse.ok("프로젝트를 성공적으로 등록하였습니다.", "http://example.com/testImage.jpg"));
         when(projectRepository.findByProjectType(requestDto.projectType())).thenReturn(List.of());
-
         // when
         List<MultipartFile> projectImages = List.of(mockFile);
         ApiResponse<Project> response = projectService.createProject(requestDto, mockFile, mockFile, projectImages);
-
         // then
         assertNotNull(response);
         assertEquals(ErrorCode.PROJECT_TYPE_AND_IS_POSTED_MISMATCH.getStatus(), response.getStatus()); // 적절한 상태 코드 수정
@@ -334,7 +221,7 @@ public class ProjectServiceTest {
 
     @Test
     @DisplayName("Project 생성 실패 테스트 - main인 프로젝트가 이미 5개 이상인 경우")
-    public void createProjectFail_overMainProjectCount() throws IOException {
+    void createProjectFail_overMainProjectCount() throws IOException {
         // given
         CreateProjectServiceRequestDto requestDto = new CreateProjectServiceRequestDto(
                 "Test Department",
@@ -347,7 +234,6 @@ public class ProjectServiceTest {
                 "main",
                 true
         );
-
         Project mockProject = Project.builder()
                 .name("Test Name")
                 .category("Entertainment")
@@ -358,17 +244,13 @@ public class ProjectServiceTest {
                 .isPosted(true)
                 .projectType("main")
                 .build();
-
-
         // stub - S3 upload 실패
         when(s3Adapter.uploadFile(any(MultipartFile.class)))
                 .thenReturn(ApiResponse.ok("프로젝트를 성공적으로 등록하였습니다.", "http://example.com/testImage.jpg"));
         when(projectRepository.findByProjectType(requestDto.projectType())).thenReturn(List.of(mockProject, mockProject, mockProject, mockProject, mockProject));
-
         // when
         List<MultipartFile> projectImages = List.of(mockFile);
         ApiResponse<Project> response = projectService.createProject(requestDto, mockFile, mockFile, projectImages);
-
         // then
         assertNotNull(response);
         assertEquals(ErrorCode.MAIN_PROJECT_LIMIT_EXCEEDED.getStatus(), response.getStatus()); // 적절한 상태 코드 수정
@@ -378,7 +260,7 @@ public class ProjectServiceTest {
 
     @Test
     @DisplayName("Project 생성 실패 테스트 - main인데 isPosted를 false로 할 경우")
-    public void createProjectFail_isPostedFalseMain() throws IOException {
+    void createProjectFail_isPostedFalseMain() throws IOException {
         // given
         CreateProjectServiceRequestDto requestDto = new CreateProjectServiceRequestDto(
                 "Test Department",
@@ -391,7 +273,6 @@ public class ProjectServiceTest {
                 "main",
                 false
         );
-
         Project mockProject = Project.builder()
                 .name("Test Name")
                 .category("Entertainment")
@@ -402,17 +283,13 @@ public class ProjectServiceTest {
                 .isPosted(true)
                 .projectType("main")
                 .build();
-
-
         // stub - S3 upload 실패
         when(s3Adapter.uploadFile(any(MultipartFile.class)))
                 .thenReturn(ApiResponse.ok("프로젝트를 성공적으로 등록하였습니다.", "http://example.com/testImage.jpg"));
         when(projectRepository.findByProjectType(requestDto.projectType())).thenReturn(List.of(mockProject, mockProject, mockProject, mockProject));
-
         // when
         List<MultipartFile> projectImages = List.of(mockFile);
         ApiResponse<Project> response = projectService.createProject(requestDto, mockFile, mockFile, projectImages);
-
         // then
         assertNotNull(response);
         assertEquals(ErrorCode.PROJECT_TYPE_AND_IS_POSTED_MISMATCH.getStatus(), response.getStatus()); // 적절한 상태 코드 수정
@@ -427,10 +304,8 @@ public class ProjectServiceTest {
         Long id = 1L;
         UpdateProjectServiceRequestDto requestDto = new UpdateProjectServiceRequestDto(
                 id, "Updated Department", "Entertainment", "Updated Name", "Updated Client", "2024-01-02", "Updated Link", "Updated Overview", "top", true);
-
         // Mock existing images as MultipartFile
         List<MultipartFile> existingImages = List.of(mockFile);
-
         Project mockProject = Project.builder()
                 .name("Test Name")
                 .category("Entertainment")
@@ -441,16 +316,13 @@ public class ProjectServiceTest {
                 .isPosted(true)
                 .projectType("main")
                 .build();
-
         List<ProjectImage> mockProjectImages = new ArrayList<>();
         mockProjectImages.add(ProjectImage.builder()
                 .project(mockProject)
                 .fileName(mockProject.getName())
                 .imageUrlList(mockProject.getMainImg())
                 .build());
-
         mockProject.setProjectImages(mockProjectImages);
-
         List<Project> mockProjectList = new ArrayList<>();
         mockProjectList.add(Project.builder()
                 .name("Test Name")
@@ -516,7 +388,6 @@ public class ProjectServiceTest {
                 .mainSequence(4)
                 .sequence(0)
                 .build());
-
         // stub
         when(projectRepository.findById(requestDto.projectId())).thenReturn(Optional.of(mockProject));
         when(projectRepository.findAllByMainSequenceGreaterThanAndMainSequenceNot(mockProject.getMainSequence(), 999))
@@ -526,10 +397,8 @@ public class ProjectServiceTest {
         when(s3Adapter.uploadFile(any(MultipartFile.class)))
                 .thenReturn(ApiResponse.ok("S3 버킷에 이미지 업로드를 성공하였습니다.", "Updated Test ImageUrl"));
         when(projectRepository.save(any(Project.class))).thenReturn(mockProject);
-
         // when
         ApiResponse<Project> response = projectService.updateProject(requestDto, mockFile, mockFile, existingImages);
-
         // then
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatus());
@@ -545,10 +414,8 @@ public class ProjectServiceTest {
         Long id = 1L;
         UpdateProjectServiceRequestDto requestDto = new UpdateProjectServiceRequestDto(
                 id, "Updated Department", "Entertainment", "Updated Name", "Updated Client", "2024-01-02", "Updated Link", "Updated Overview", "main", true);
-
         // Mock existing images as MultipartFile
         List<MultipartFile> existingImages = List.of(mockFile);
-
         Project mockProject = Project.builder()
                 .name("Test Name")
                 .category("Entertainment")
@@ -559,16 +426,13 @@ public class ProjectServiceTest {
                 .isPosted(true)
                 .projectType("top")
                 .build();
-
         List<ProjectImage> mockProjectImages = new ArrayList<>();
         mockProjectImages.add(ProjectImage.builder()
                 .project(mockProject)
                 .fileName(mockProject.getName())
                 .imageUrlList(mockProject.getMainImg())
                 .build());
-
         mockProject.setProjectImages(mockProjectImages);
-
         // stub
         when(projectRepository.findById(requestDto.projectId())).thenReturn(Optional.of(mockProject));
         when(s3Adapter.deleteFile(any(String.class))).thenReturn(
@@ -576,10 +440,8 @@ public class ProjectServiceTest {
         when(s3Adapter.uploadFile(any(MultipartFile.class)))
                 .thenReturn(ApiResponse.ok("S3 버킷에 이미지 업로드를 성공하였습니다.", "Updated Test ImageUrl"));
         when(projectRepository.save(any(Project.class))).thenReturn(mockProject);
-
         // when
         ApiResponse<Project> response = projectService.updateProject(requestDto, mockFile, mockFile, existingImages);
-
         // then
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatus());
@@ -595,10 +457,8 @@ public class ProjectServiceTest {
         Long id = 1L;
         UpdateProjectServiceRequestDto requestDto = new UpdateProjectServiceRequestDto(
                 id, "Updated Department", "Entertainment", "Updated Name", "Updated Client", "2024-01-02", "Updated Link", "Updated Overview", "main", true);
-
         // Mock existing images as MultipartFile
         List<MultipartFile> existingImages = List.of(mockFile);
-
         Project mockProject = Project.builder()
                 .name("Test Name")
                 .category("Entertainment")
@@ -609,16 +469,13 @@ public class ProjectServiceTest {
                 .isPosted(true)
                 .projectType("main")
                 .build();
-
         List<ProjectImage> mockProjectImages = new ArrayList<>();
         mockProjectImages.add(ProjectImage.builder()
                 .project(mockProject)
                 .fileName(mockProject.getName())
                 .imageUrlList(mockProject.getMainImg())
                 .build());
-
         mockProject.setProjectImages(mockProjectImages);
-
         // stub
         when(projectRepository.findById(requestDto.projectId())).thenReturn(Optional.of(mockProject));
         when(s3Adapter.deleteFile(any(String.class))).thenReturn(
@@ -626,10 +483,8 @@ public class ProjectServiceTest {
         when(s3Adapter.uploadFile(any(MultipartFile.class)))
                 .thenReturn(ApiResponse.ok("S3 버킷에 이미지 업로드를 성공하였습니다.", "Updated Test ImageUrl"));
         when(projectRepository.save(any(Project.class))).thenReturn(mockProject);
-
         // when
         ApiResponse<Project> response = projectService.updateProject(requestDto, mockFile, mockFile, existingImages);
-
         // then
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatus());
@@ -645,10 +500,8 @@ public class ProjectServiceTest {
         Long id = 1L;
         UpdateProjectServiceRequestDto requestDto = new UpdateProjectServiceRequestDto(
                 id, "Updated Department", "Entertainment", "Updated Name", "Updated Client", "2024-01-02", "Updated Link", "Updated Overview", "others", true);
-
         // Mock existing images as MultipartFile
         List<MultipartFile> existingImages = List.of(mockFile);
-
         Project mockProject = Project.builder()
                 .name("Test Name")
                 .category("Entertainment")
@@ -659,16 +512,13 @@ public class ProjectServiceTest {
                 .isPosted(true)
                 .projectType("main")
                 .build();
-
         List<ProjectImage> mockProjectImages = new ArrayList<>();
         mockProjectImages.add(ProjectImage.builder()
                 .project(mockProject)
                 .fileName(mockProject.getName())
                 .imageUrlList(mockProject.getMainImg())
                 .build());
-
         mockProject.setProjectImages(mockProjectImages);
-
         List<Project> mockProjectList = new ArrayList<>();
         mockProjectList.add(Project.builder()
                 .name("Test Name")
@@ -734,7 +584,6 @@ public class ProjectServiceTest {
                 .mainSequence(4)
                 .sequence(0)
                 .build());
-
         // stub
         when(projectRepository.findById(requestDto.projectId())).thenReturn(Optional.of(mockProject));
         when(projectRepository.findAllByMainSequenceGreaterThanAndMainSequenceNot(mockProject.getMainSequence(), 999))
@@ -744,10 +593,8 @@ public class ProjectServiceTest {
         when(s3Adapter.uploadFile(any(MultipartFile.class)))
                 .thenReturn(ApiResponse.ok("S3 버킷에 이미지 업로드를 성공하였습니다.", "Updated Test ImageUrl"));
         when(projectRepository.save(any(Project.class))).thenReturn(mockProject);
-
         // when
         ApiResponse<Project> response = projectService.updateProject(requestDto, mockFile, mockFile, existingImages);
-
         // then
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatus());
@@ -763,10 +610,8 @@ public class ProjectServiceTest {
         Long id = 1L;
         UpdateProjectServiceRequestDto requestDto = new UpdateProjectServiceRequestDto(
                 id, "Updated Department", "Entertainment", "Updated Name", "Updated Client", "2024-01-02", "Updated Link", "Updated Overview", "main", true);
-
         // when
         ApiResponse<Project> response = projectService.updateProject(requestDto, null, mockFile, List.of(mockFile));
-
         // then
         assertNotNull(response);
         assertEquals(ErrorCode.NOT_EXIST_IMAGE_FILE.getStatus(), response.getStatus());
@@ -781,10 +626,8 @@ public class ProjectServiceTest {
         Long id = 1L;
         UpdateProjectServiceRequestDto requestDto = new UpdateProjectServiceRequestDto(
                 id, "Updated Department", "Entertainment", "Updated Name", "Updated Client", "2024-01-02", "Updated Link", "Updated Overview", "main", true);
-
         // when
         ApiResponse<Project> response = projectService.updateProject(requestDto, mockFile, null, List.of(mockFile));
-
         // then
         assertNotNull(response);
         assertEquals(ErrorCode.NOT_EXIST_IMAGE_FILE.getStatus(), response.getStatus());
@@ -799,13 +642,10 @@ public class ProjectServiceTest {
         Long id = 1L;
         UpdateProjectServiceRequestDto requestDto = new UpdateProjectServiceRequestDto(
                 id, "Updated Department", "Entertainment", "Updated Name", "Updated Client", "2024-01-02", "Updated Link", "Updated Overview", "main", true);
-
         // stub
         when(projectRepository.findById(requestDto.projectId())).thenReturn(Optional.empty());
-
         // when
         ApiResponse<Project> response = projectService.updateProject(requestDto, mockFile, mockFile, List.of(mockFile));
-
         // then
         assertNotNull(response);
         assertEquals(ErrorCode.INVALID_PROJECT_ID.getStatus(), response.getStatus());
@@ -820,7 +660,6 @@ public class ProjectServiceTest {
         Long id = 1L;
         UpdateProjectServiceRequestDto requestDto = new UpdateProjectServiceRequestDto(
                 id, "Updated Department", "Entertainment", "Updated Name", "Updated Client", "2024-01-02", "Updated Link", "Updated Overview", "invalidValue", true);
-
         Project mockProject = Project.builder()
                 .name("Test Name")
                 .category("Entertainment")
@@ -831,14 +670,10 @@ public class ProjectServiceTest {
                 .isPosted(true)
                 .projectType("other")
                 .build();
-
-
         // stub
         when(projectRepository.findById(requestDto.projectId())).thenReturn(Optional.of(mockProject));
-
         // when
         ApiResponse<Project> response = projectService.updateProject(requestDto, mockFile, mockFile, List.of(mockFile));
-
         assertEquals(ErrorCode.INVALID_PROJECT_TYPE.getStatus(), response.getStatus());
         assertEquals(ErrorCode.INVALID_PROJECT_TYPE.getMessage(), response.getMessage());
     }
@@ -850,7 +685,6 @@ public class ProjectServiceTest {
         Long id = 1L;
         UpdateProjectServiceRequestDto requestDto = new UpdateProjectServiceRequestDto(
                 id, "Updated Department", "Entertainment", "Updated Name", "Updated Client", "2024-01-02", "Updated Link", "Updated Overview", "top", true);
-
         Project mockProject = Project.builder()
                 .name("Test Name")
                 .category("Entertainment")
@@ -861,10 +695,8 @@ public class ProjectServiceTest {
                 .isPosted(true)
                 .projectType("top")
                 .build();
-
         // 리플렉션으로 ID 설정
         ReflectionTestUtils.setField(mockProject, "id", 0L);
-
         Project mockProject2 = Project.builder()
                 .name("Test Name")
                 .category("Entertainment")
@@ -875,18 +707,13 @@ public class ProjectServiceTest {
                 .isPosted(true)
                 .projectType("top")
                 .build();
-
         // 리플렉션으로 ID 설정
         ReflectionTestUtils.setField(mockProject2, "id", 1L);
-
-
         // stub
         when(projectRepository.findById(requestDto.projectId())).thenReturn(Optional.of(mockProject2));
         when(projectRepository.findByProjectType(requestDto.projectType())).thenReturn(List.of(mockProject));
-
         // when
         ApiResponse<Project> response = projectService.updateProject(requestDto, mockFile, mockFile, List.of(mockFile));
-
         assertEquals(ErrorCode.TOP_PROJECT_ALREADY_EXISTS.getStatus(), response.getStatus());
         assertEquals(ErrorCode.TOP_PROJECT_ALREADY_EXISTS.getMessage(), response.getMessage());
     }
@@ -898,10 +725,8 @@ public class ProjectServiceTest {
         Long id = 1L;
         UpdateProjectServiceRequestDto requestDto = new UpdateProjectServiceRequestDto(
                 id, "Updated Department", "Entertainment", "Updated Name", "Updated Client", "2024-01-02", "Updated Link", "Updated Overview", "main", true);
-
         // Mock existing images as MultipartFile
         List<MultipartFile> existingImages = List.of(mockFile);
-
         Project mockProject = Project.builder()
                 .name("Test Name")
                 .category("Entertainment")
@@ -912,16 +737,13 @@ public class ProjectServiceTest {
                 .isPosted(true)
                 .projectType("top")
                 .build();
-
         List<ProjectImage> mockProjectImages = new ArrayList<>();
         mockProjectImages.add(ProjectImage.builder()
                 .project(mockProject)
                 .fileName(mockProject.getName())
                 .imageUrlList(mockProject.getMainImg())
                 .build());
-
         mockProject.setProjectImages(mockProjectImages);
-
         List<Project> mockProjectList = new ArrayList<>();
         mockProjectList.add(Project.builder()
                 .name("Test Name")
@@ -1003,14 +825,11 @@ public class ProjectServiceTest {
                 .mainSequence(5)
                 .sequence(0)
                 .build());
-
         // stub
         when(projectRepository.findById(requestDto.projectId())).thenReturn(Optional.of(mockProject));
         when(projectRepository.findByProjectType(requestDto.projectType())).thenReturn(mockProjectList);
-
         // when
         ApiResponse<Project> response = projectService.updateProject(requestDto, mockFile, mockFile, existingImages);
-
         // then
         assertNotNull(response);
         assertEquals(ErrorCode.MAIN_PROJECT_LIMIT_EXCEEDED.getStatus(), response.getStatus());
@@ -1023,7 +842,6 @@ public class ProjectServiceTest {
     void UpdatePostingStatusSuccess() {
         Long projectId = 1L;
         UpdatePostingStatusDto dto = new UpdatePostingStatusDto(projectId, true);
-
         Project mockProject = Project.builder()
                 .name("Test Name")
                 .category("Entertainment")
@@ -1034,11 +852,8 @@ public class ProjectServiceTest {
                 .isPosted(true)
                 .projectType("main")
                 .build();
-
         when(projectRepository.findById(projectId)).thenReturn(Optional.of(mockProject));
-
         ApiResponse<Project> response = projectService.updatePostingStatus(dto);
-
         assertEquals("프로젝트 게시 여부를 성공적으로 변경하였습니다.", response.getMessage());
         assertTrue(mockProject.getIsPosted()); // 게시 상태가 true로 변경되었는지 확인
     }
@@ -1047,11 +862,8 @@ public class ProjectServiceTest {
     @DisplayName("프로젝트 게시 상태 수정 실패 테스트 - 유효하지 않은 ID")
     void UpdatePostingStatusFail_invalidID() {
         UpdatePostingStatusDto dto = new UpdatePostingStatusDto(999L, true); // 유효하지 않은 ID
-
         when(projectRepository.findById(dto.projectId())).thenReturn(Optional.empty());
-
         ApiResponse<Project> response = projectService.updatePostingStatus(dto);
-
         assertEquals(ErrorCode.INVALID_PROJECT_ID.getStatus(), response.getStatus());
     }
 
@@ -1071,7 +883,6 @@ public class ProjectServiceTest {
                 .isPosted(true)
                 .projectType("top")
                 .build();
-
         when(projectRepository.findById(projectId)).thenReturn(Optional.of(mockProject));
         when(projectRepository.findByProjectType(newType)).thenReturn(new ArrayList<>());
 
@@ -1098,7 +909,6 @@ public class ProjectServiceTest {
                 .projectType("main")
                 .mainSequence(0)
                 .build();
-
         List<Project> mockProjectList = new ArrayList<>();
         mockProjectList.add(Project.builder()
                 .name("Test Name")
@@ -1164,13 +974,10 @@ public class ProjectServiceTest {
                 .mainSequence(4)
                 .sequence(0)
                 .build());
-
         when(projectRepository.findById(projectId)).thenReturn(Optional.of(mockProject));
         when(projectRepository.findAllByMainSequenceGreaterThanAndMainSequenceNot(mockProject.getMainSequence(), 999))
                 .thenReturn(mockProjectList);
-
         ApiResponse<Project> response = projectService.updateProjectType(dto);
-
         assertEquals("프로젝트 타입을 성공적으로 변경하였습니다.", response.getMessage());
         assertEquals(newType, mockProject.getProjectType()); // 타입이 변경되었는지 확인
     }
@@ -1192,7 +999,6 @@ public class ProjectServiceTest {
                 .projectType("main")
                 .mainSequence(0)
                 .build();
-
         List<Project> mockProjectList = new ArrayList<>();
         mockProjectList.add(Project.builder()
                 .name("Test Name")
@@ -1258,13 +1064,10 @@ public class ProjectServiceTest {
                 .mainSequence(4)
                 .sequence(0)
                 .build());
-
         when(projectRepository.findById(projectId)).thenReturn(Optional.of(mockProject));
         when(projectRepository.findAllByMainSequenceGreaterThanAndMainSequenceNot(mockProject.getMainSequence(), 999))
                 .thenReturn(mockProjectList);
-
         ApiResponse<Project> response = projectService.updateProjectType(dto);
-
         assertEquals("프로젝트 타입을 성공적으로 변경하였습니다.", response.getMessage());
         assertEquals(newType, mockProject.getProjectType()); // 타입이 변경되었는지 확인
     }
@@ -1285,11 +1088,8 @@ public class ProjectServiceTest {
                 .isPosted(true)
                 .projectType("main")
                 .build();
-
         when(projectRepository.findById(projectId)).thenReturn(Optional.of(mockProject));
-
         ApiResponse<Project> response = projectService.updateProjectType(dto);
-
         assertEquals("프로젝트 타입을 성공적으로 변경하였습니다.", response.getMessage());
         assertEquals(newType, mockProject.getProjectType()); // 타입이 변경되었는지 확인
     }
@@ -1310,12 +1110,9 @@ public class ProjectServiceTest {
                 .isPosted(true)
                 .projectType("others")
                 .build();
-
         when(projectRepository.findById(projectId)).thenReturn(Optional.of(mockProject));
         when(projectRepository.findByProjectType(newType)).thenReturn(new ArrayList<>());
-
         ApiResponse<Project> response = projectService.updateProjectType(dto);
-
         assertEquals("프로젝트 타입을 성공적으로 변경하였습니다.", response.getMessage());
         assertEquals(newType, mockProject.getProjectType()); // 타입이 변경되었는지 확인
     }
@@ -1324,11 +1121,8 @@ public class ProjectServiceTest {
     @DisplayName("프로젝트 타입 수정 실패 테스트 - 유효하지 않은 ID")
     void UpdateProjectTypeFail_invalidID() {
         UpdateProjectTypeDto dto = new UpdateProjectTypeDto(999L, "top"); // 유효하지 않은 ID
-
         when(projectRepository.findById(dto.projectId())).thenReturn(Optional.empty());
-
         ApiResponse<Project> response = projectService.updateProjectType(dto);
-
         assertEquals(ErrorCode.INVALID_PROJECT_ID.getStatus(), response.getStatus());
         assertEquals(ErrorCode.INVALID_PROJECT_ID.getMessage(), response.getMessage());
     }
@@ -1337,7 +1131,6 @@ public class ProjectServiceTest {
     @DisplayName("프로젝트 타입 수정 실패 테스트 - 유효하지 projectType인 경우")
     void UpdateProjectTypeFail_invalidProjectType() {
         UpdateProjectTypeDto dto = new UpdateProjectTypeDto(1L, "invalidValue");
-
         Project mockProject = Project.builder()
                 .name("Test Name")
                 .category("Entertainment")
@@ -1348,11 +1141,8 @@ public class ProjectServiceTest {
                 .isPosted(true)
                 .projectType("other")
                 .build();
-
         when(projectRepository.findById(dto.projectId())).thenReturn(Optional.of(mockProject));
-
         ApiResponse<Project> response = projectService.updateProjectType(dto);
-
         assertEquals(ErrorCode.INVALID_PROJECT_TYPE.getStatus(), response.getStatus());
         assertEquals(ErrorCode.INVALID_PROJECT_TYPE.getMessage(), response.getMessage());
     }
@@ -1361,7 +1151,6 @@ public class ProjectServiceTest {
     @DisplayName("프로젝트 타입 수정 실패 테스트 - TOP 프로젝트가 이미 존재하고, 전달된 프로젝트 id가 이미 존재하는 TOP 프로젝트 id와 다른 경우")
     void UpdateProjectTypeFail_alreadyExistedTopAndinvalidTopProjectID() {
         UpdateProjectTypeDto dto = new UpdateProjectTypeDto(1L, "top");
-
         Project newProject = Project.builder()
                 .name("Test Name")
                 .category("Entertainment")
@@ -1374,9 +1163,7 @@ public class ProjectServiceTest {
                 .build();
         // 리플렉션으로 ID 설정
         ReflectionTestUtils.setField(newProject, "id", 1L);
-
         String newType = "top"; // 변경할 타입
-
         Project mockProject = Project.builder()
                 .name("Test Name")
                 .category("Entertainment")
@@ -1387,15 +1174,11 @@ public class ProjectServiceTest {
                 .isPosted(true)
                 .projectType("top")
                 .build();
-
         // 리플렉션으로 ID 설정
         ReflectionTestUtils.setField(mockProject, "id", 500L);
-
         when(projectRepository.findById(dto.projectId())).thenReturn(Optional.of(newProject));
         when(projectRepository.findByProjectType(newType)).thenReturn(List.of(mockProject));
-
         ApiResponse<Project> response = projectService.updateProjectType(dto);
-
         assertEquals(ErrorCode.TOP_PROJECT_ALREADY_EXISTS.getStatus(), response.getStatus());
         assertEquals(ErrorCode.TOP_PROJECT_ALREADY_EXISTS.getMessage(), response.getMessage());
     }
@@ -1404,7 +1187,6 @@ public class ProjectServiceTest {
     @DisplayName("프로젝트 타입 수정 실패 테스트 - main인 프로젝트가 이미 5개 이상인 경우")
     void UpdateProjectTypeFail_overMainProjectCount() {
         UpdateProjectTypeDto dto = new UpdateProjectTypeDto(1L, "main");
-
         Project newProject = Project.builder()
                 .name("Test Name")
                 .category("Entertainment")
@@ -1415,11 +1197,7 @@ public class ProjectServiceTest {
                 .isPosted(true)
                 .projectType("top")
                 .build();
-        // 리플렉션으로 ID 설정
-//        ReflectionTestUtils.setField(newProject, "id", 1L);
-
         String newType = "main"; // 변경할 타입
-
         Project mockProject = Project.builder()
                 .name("Test Name")
                 .category("Entertainment")
@@ -1430,12 +1208,9 @@ public class ProjectServiceTest {
                 .isPosted(true)
                 .projectType("main")
                 .build();
-
         when(projectRepository.findById(dto.projectId())).thenReturn(Optional.of(newProject));
         when(projectRepository.findByProjectType(newType)).thenReturn(List.of(mockProject, mockProject, mockProject, mockProject, mockProject));
-
         ApiResponse<Project> response = projectService.updateProjectType(dto);
-
         assertEquals(ErrorCode.MAIN_PROJECT_LIMIT_EXCEEDED.getStatus(), response.getStatus());
         assertEquals(ErrorCode.MAIN_PROJECT_LIMIT_EXCEEDED.getMessage(), response.getMessage());
     }
@@ -1456,16 +1231,13 @@ public class ProjectServiceTest {
                 .mainSequence(0)
                 .sequence(0)
                 .build();
-
         List<ProjectImage> mockProjectImages = new ArrayList<>();
         mockProjectImages.add(ProjectImage.builder()
                 .project(project)
                 .fileName(project.getName())
                 .imageUrlList(project.getMainImg())
                 .build());
-
         project.setProjectImages(mockProjectImages);
-
         List<Project> mockProjectList = new ArrayList<>();
         mockProjectList.add(Project.builder()
                 .name("Test Name")
@@ -1531,16 +1303,13 @@ public class ProjectServiceTest {
                 .mainSequence(4)
                 .sequence(4)
                 .build());
-
         // stub
         when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
         when(projectRepository.findAllBySequenceGreaterThan(0))
                 .thenReturn(mockProjectList);
         when(projectRepository.findAllByMainSequenceGreaterThanAndMainSequenceNot(project.getMainSequence(), 999))
                 .thenReturn(mockProjectList);
-
         ApiResponse<String> response = projectService.deleteProject(projectId);
-
         assertEquals("프로젝트를 성공적으로 삭제했습니다.", response.getMessage());
         Mockito.verify(projectRepository, times(1)).delete(project);
     }
@@ -1549,11 +1318,8 @@ public class ProjectServiceTest {
     @DisplayName("프로젝트 삭제 실패 테스트 - 유효하지 않은 ID")
     void DeleteProjectFail_invalidId() {
         Long projectId = 999L; // 유효하지 않은 ID
-
         when(projectRepository.findById(projectId)).thenReturn(Optional.empty());
-
         ApiResponse<String> response = projectService.deleteProject(projectId);
-
         assertEquals(ErrorCode.INVALID_PROJECT_ID.getStatus(), response.getStatus());
         assertEquals(ErrorCode.INVALID_PROJECT_ID.getMessage(), response.getMessage());
         Mockito.verify(projectRepository, never()).delete(any(Project.class));
@@ -1573,11 +1339,8 @@ public class ProjectServiceTest {
                 .isPosted(true)
                 .projectType("top")
                 .build());
-
         when(projectRepository.findAllWithImagesAndOrderBySequenceAsc()).thenReturn(projects);
-
         ApiResponse<List<Project>> response = projectService.retrieveAllArtworkProject();
-
         assertNotNull(response);
         assertNotNull(response.getData());
         assertEquals("프로젝트 목록을 성공적으로 조회했습니다.", response.getMessage());
@@ -1589,9 +1352,7 @@ public class ProjectServiceTest {
     @DisplayName("프로젝트 전체 조회 실패 테스트 - 프로젝트가 없는 경우")
     void RetrieveAllArtworkProjectFail() {
         when(projectRepository.findAllWithImagesAndOrderBySequenceAsc()).thenReturn(new ArrayList<>());
-
         ApiResponse<List<Project>> response = projectService.retrieveAllArtworkProject();
-
         assertNotNull(response);
         assertNull(response.getData());
         assertEquals("프로젝트가 존재하지 않습니다.", response.getMessage());
@@ -1623,12 +1384,9 @@ public class ProjectServiceTest {
                 .isPosted(true)
                 .projectType("main")
                 .build());
-
         when(projectRepository.findAllWithImagesAndOrderByMainSequenceAsc()).thenReturn(projects);
         when(projectRepository.findByProjectType("top")).thenReturn(topProjects);
-
         ApiResponse<List<Project>> response = projectService.retrieveAllMainProject();
-
         assertEquals("프로젝트 목록을 성공적으로 조회했습니다.", response.getMessage());
         assertEquals(1 + projects.size(), response.getData().size());
     }
@@ -1637,9 +1395,7 @@ public class ProjectServiceTest {
     @DisplayName("메인 프로젝트 전체 조회 실패 테스트 - 프로젝트가 없는 경우")
     void RetrieveAllMainProjectFail() {
         when(projectRepository.findAllWithImagesAndOrderByMainSequenceAsc()).thenReturn(new ArrayList<>());
-
         ApiResponse<List<Project>> response = projectService.retrieveAllMainProject();
-
         assertEquals("프로젝트가 존재하지 않습니다.", response.getMessage());
     }
 
@@ -1663,11 +1419,8 @@ public class ProjectServiceTest {
                 .mainSequence(0)
                 .sequence(0)
                 .build();
-
         when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
-
         ApiResponse<Project> response = projectService.retrieveProject(projectId);
-
         assertEquals(HttpStatus.OK, response.getStatus());
         assertEquals("프로젝트를 성공적으로 조회했습니다.", response.getMessage());
         assertEquals(project, response.getData());
@@ -1678,11 +1431,8 @@ public class ProjectServiceTest {
     @DisplayName("단일 프로젝트 조회 실패 테스트 - 유효하지 않은 ID")
     void RetrieveProjectFail() {
         Long projectId = 999L; // 유효하지 않은 ID
-
         when(projectRepository.findById(projectId)).thenReturn(Optional.empty());
-
         ApiResponse<Project> response = projectService.retrieveProject(projectId);
-
         assertEquals(ErrorCode.INVALID_PROJECT_ID.getStatus(), response.getStatus());
         assertEquals(ErrorCode.INVALID_PROJECT_ID.getMessage(), response.getMessage());
         Mockito.verify(projectRepository, times(1)).findById(any(Long.class));
@@ -1740,7 +1490,6 @@ public class ProjectServiceTest {
                 .mainSequence(1)
                 .sequence(0)
                 .build();
-
         List<ChangeSequenceProjectReq> changeSequenceProjectReqList = new ArrayList<>();
         ChangeSequenceProjectReq req1 = new ChangeSequenceProjectReq();
         req1.setProjectId(0L);
@@ -1754,15 +1503,12 @@ public class ProjectServiceTest {
         req3.setProjectId(2L);
         req3.setSequence(0);
         changeSequenceProjectReqList.add(req3);
-
         // stub
         when(projectRepository.findById(req1.getProjectId())).thenReturn(Optional.of(project1));
         when(projectRepository.findById(req2.getProjectId())).thenReturn(Optional.of(project2));
         when(projectRepository.findById(req3.getProjectId())).thenReturn(Optional.of(project3));
-
         // when
         ApiResponse<String> response = projectService.changeSequenceProject(changeSequenceProjectReqList);
-
         // then
         assertEquals(HttpStatus.OK, response.getStatus());
         assertEquals("아트워크 페이지에 보여질 프로젝트의 순서를 성공적으로 수정하였습니다.", response.getMessage());
@@ -1786,13 +1532,10 @@ public class ProjectServiceTest {
         req3.setProjectId(2L);
         req3.setSequence(0);
         changeSequenceProjectReqList.add(req3);
-
         // stub
         when(projectRepository.findById(req1.getProjectId())).thenReturn(Optional.empty());
-
         // when
         ApiResponse<String> response = projectService.changeSequenceProject(changeSequenceProjectReqList);
-
         // then
         assertEquals(ErrorCode.INVALID_PROJECT_ID.getStatus(), response.getStatus());
         assertEquals(ErrorCode.INVALID_PROJECT_ID.getMessage(), response.getMessage());
@@ -1850,7 +1593,6 @@ public class ProjectServiceTest {
                 .mainSequence(1)
                 .sequence(0)
                 .build();
-
         List<ChangeMainSequenceProjectReq> changeMainSequenceProjectReqList = new ArrayList<>();
         ChangeMainSequenceProjectReq req1 = new ChangeMainSequenceProjectReq();
         req1.setProjectId(0L);
@@ -1864,15 +1606,12 @@ public class ProjectServiceTest {
         req3.setProjectId(2L);
         req3.setMainSequence(0);
         changeMainSequenceProjectReqList.add(req3);
-
         // stub
         when(projectRepository.findById(req1.getProjectId())).thenReturn(Optional.of(project1));
         when(projectRepository.findById(req2.getProjectId())).thenReturn(Optional.of(project2));
         when(projectRepository.findById(req3.getProjectId())).thenReturn(Optional.of(project3));
-
         // when
         ApiResponse<String> response = projectService.changeMainSequenceProject(changeMainSequenceProjectReqList);
-
         // then
         assertEquals(HttpStatus.OK, response.getStatus());
         assertEquals("메인 페이지에 보여질 프로젝트의 순서를 성공적으로 수정하였습니다.", response.getMessage());
@@ -1896,13 +1635,10 @@ public class ProjectServiceTest {
         req3.setProjectId(2L);
         req3.setMainSequence(0);
         changeMainSequenceProjectReqList.add(req3);
-
         // stub
         when(projectRepository.findById(req1.getProjectId())).thenReturn(Optional.empty());
-
         // when
         ApiResponse<String> response = projectService.changeMainSequenceProject(changeMainSequenceProjectReqList);
-
         // then
         assertEquals(ErrorCode.INVALID_PROJECT_ID.getStatus(), response.getStatus());
         assertEquals(ErrorCode.INVALID_PROJECT_ID.getMessage(), response.getMessage());
@@ -1928,7 +1664,6 @@ public class ProjectServiceTest {
                 .mainSequence(1)
                 .sequence(0)
                 .build();
-
         List<ChangeMainSequenceProjectReq> changeMainSequenceProjectReqList = new ArrayList<>();
         ChangeMainSequenceProjectReq req1 = new ChangeMainSequenceProjectReq();
         req1.setProjectId(0L);
@@ -1942,13 +1677,10 @@ public class ProjectServiceTest {
         req3.setProjectId(2L);
         req3.setMainSequence(0);
         changeMainSequenceProjectReqList.add(req3);
-
         // stub
         when(projectRepository.findById(req1.getProjectId())).thenReturn(Optional.of(project1));
-
         // when
         ApiResponse<String> response = projectService.changeMainSequenceProject(changeMainSequenceProjectReqList);
-
         // then
         assertEquals(ErrorCode.INVALID_PROJECT_ID.getStatus(), response.getStatus());
         assertEquals(ErrorCode.INVALID_PROJECT_ID.getMessage(), response.getMessage());
@@ -1961,7 +1693,6 @@ public class ProjectServiceTest {
         int page = 0;
         int size = 2;
         Pageable pageable = PageRequest.of(page, size);
-
         List<Project> projectList = new ArrayList<>();
         projectList.add(Project.builder()
                 .name("Test Name")
@@ -2043,16 +1774,11 @@ public class ProjectServiceTest {
                 .mainSequence(1)
                 .sequence(0)
                 .build());
-
-
         Page<Project> projectPage = new PageImpl<>(projectList, pageable, projectList.size());
-
         // stub
         when(projectRepository.findAll(pageable)).thenReturn(projectPage);
-
         // when
         Page<Project> response = projectService.retrieveArtworkProjectPage(page, size);
-
         // then
         assertNotNull(response);
         assertEquals(response.getNumber(), page);
@@ -2066,7 +1792,6 @@ public class ProjectServiceTest {
         // given
         int page = -1; // 잘못된 페이지 번호
         int size = 10;
-
         // when & then
         Exception exception = assertThrows(IllegalArgumentException.class,
                 () -> projectService.retrieveArtworkProjectPage(page, size));
@@ -2079,7 +1804,6 @@ public class ProjectServiceTest {
         // given
         int page = 0;
         int size = 0; // 잘못된 크기
-
         // when & then
         Exception exception = assertThrows(IllegalArgumentException.class,
                 () -> projectService.retrieveArtworkProjectPage(page, size));

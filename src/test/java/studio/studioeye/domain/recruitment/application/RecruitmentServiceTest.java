@@ -38,24 +38,20 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class RecruitmentServiceTest {
+class RecruitmentServiceTest {
     @InjectMocks
     private RecruitmentService recruitmentService;
-
     @Mock
     private RecruitmentRepository recruitmentRepository;
-
     @Test
     @DisplayName("채용공고 생성 성공 테스트")
-    public void createRecruitmentSuccess() {
+    void createRecruitmentSuccess() {
         //given
         String startDateString = "2024-10-02 23:39:40.281000";
         String deadLineString = "2024-10-31 13:39:40.281000";
-
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS");
         LocalDateTime localStartDateTime = LocalDateTime.parse(startDateString, formatter);
         LocalDateTime localDeadLineTime = LocalDateTime.parse(deadLineString, formatter);
-
         CreateRecruitmentServiceRequestDto requestDto = new CreateRecruitmentServiceRequestDto(
                 "title",
                 Date.from(localStartDateTime.atZone(ZoneId.systemDefault()).toInstant()),
@@ -65,7 +61,6 @@ public class RecruitmentServiceTest {
 
         //when
         ApiResponse<Recruitment> response = recruitmentService.createRecruitment(requestDto);
-
         //then
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatus());
@@ -75,7 +70,7 @@ public class RecruitmentServiceTest {
 
     @Test
     @DisplayName("채용공고 생성 실패 테스트 - 제목이 비어 있는 경우")
-    public void createRecruitmentFail_emptyTitle() {
+    void createRecruitmentFail_emptyTitle() {
         // given
         Date startDate = new Date(System.currentTimeMillis() + 100000);
         Date deadline = new Date(System.currentTimeMillis());
@@ -88,7 +83,6 @@ public class RecruitmentServiceTest {
 
         // when & then
         ApiResponse<Recruitment> response = recruitmentService.createRecruitment(requestDto);
-
         assertNotNull(response);
         assertEquals(ErrorCode.RECRUITMENT_TITLE_IS_EMPTY.getStatus(), response.getStatus()); // 에러 코드 검증
         assertEquals(ErrorCode.RECRUITMENT_TITLE_IS_EMPTY.getMessage(), response.getMessage()); // 에러 메시지 검증
@@ -97,7 +91,7 @@ public class RecruitmentServiceTest {
 
     @Test
     @DisplayName("채용공고 생성 실패 테스트 - 시작일이 마감일보다 이후인 경우")
-    public void createRecruitmentFail_invalidDate() {
+    void createRecruitmentFail_invalidDate() {
         // given
         Date startDate = new Date(System.currentTimeMillis() + 100000);
         Date deadline = new Date(System.currentTimeMillis());
@@ -107,10 +101,8 @@ public class RecruitmentServiceTest {
                 deadline,
                 "https://www.naver.com"
         );
-
         // when
         ApiResponse<Recruitment> response = recruitmentService.createRecruitment(requestDto);
-
         // then
         assertNotNull(response);
         assertEquals(ErrorCode.INVALID_RECRUITMENT_DATE.getStatus(), response.getStatus()); // 에러 코드 검증
@@ -120,26 +112,21 @@ public class RecruitmentServiceTest {
 
     @Test
     @DisplayName("채용공고 페이지네이션 조회 성공 테스트")
-    public void retrieveRecruitmentListSuccess() {
+    void retrieveRecruitmentListSuccess() {
         // given
         int page = 0;
         int size = 2;
-
         Pageable pageable = PageRequest.of(page, size);
-
-
         List<RecruitmentTitle> recruitmentList = new ArrayList<>();
         recruitmentList.add(new RecruitmentTitle() {
             @Override
             public Long getId() {
                 return 1L;
             }
-
             @Override
             public String getTitle() {
                 return "Test Title1";
             }
-
             @Override
             public Status getStatus() {
                 return Status.OPEN;
@@ -150,12 +137,10 @@ public class RecruitmentServiceTest {
             public Long getId() {
                 return 2L;
             }
-
             @Override
             public String getTitle() {
                 return "Test Title2";
             }
-
             @Override
             public Status getStatus() {
                 return Status.OPEN;
@@ -166,12 +151,10 @@ public class RecruitmentServiceTest {
             public Long getId() {
                 return 3L;
             }
-
             @Override
             public String getTitle() {
                 return "Test Title3";
             }
-
             @Override
             public Status getStatus() {
                 return Status.OPEN;
@@ -182,29 +165,21 @@ public class RecruitmentServiceTest {
             public Long getId() {
                 return 4L;
             }
-
             @Override
             public String getTitle() {
                 return "Test Title4";
             }
-
             @Override
             public Status getStatus() {
                 return Status.OPEN;
             }
         });
-
-
         Page<RecruitmentTitle> recruitmentTitlePage = new PageImpl<>(recruitmentList, pageable, recruitmentList.size());
-
         // stub
         when(recruitmentRepository.findAllRecruitments(pageable)).thenReturn(recruitmentTitlePage);
-
         // when
         ApiResponse<Page<RecruitmentTitle>> response = recruitmentService.retrieveRecruitmentList(page, size);
-
         // then
-
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatus());
         assertEquals("채용공고 목록을 성공적으로 조회했습니다.", response.getMessage());
@@ -214,14 +189,12 @@ public class RecruitmentServiceTest {
 
     @Test
     @DisplayName("채용공고 페이지네이션 조회 실패 테스트 - page가 음수인 경우")
-    public void retrieveRecruitmentListFail_InvalidPage() {
+    void retrieveRecruitmentListFail_InvalidPage() {
         // given
         int page = -1;
         int size = 2;
-
         // when
         ApiResponse<Page<RecruitmentTitle>> response = recruitmentService.retrieveRecruitmentList(page, size);
-
         // then
         assertNotNull(response);
         assertEquals(ErrorCode.INVALID_RECRUITMENT_PAGE.getStatus(), response.getStatus()); // 에러 코드 검증
@@ -231,14 +204,12 @@ public class RecruitmentServiceTest {
 
     @Test
     @DisplayName("채용공고 페이지네이션 조회 실패 테스트 - size가 0이하인 경우")
-    public void retrieveRecruitmentListFail_InvalidSize() {
+    void retrieveRecruitmentListFail_InvalidSize() {
         // given
         int page = 0;
         int size = 0;
-
         // when
         ApiResponse<Page<RecruitmentTitle>> response = recruitmentService.retrieveRecruitmentList(page, size);
-
         // then
         assertNotNull(response);
         assertEquals(ErrorCode.INVALID_RECRUITMENT_SIZE.getStatus(), response.getStatus()); // 에러 코드 검증
@@ -249,17 +220,15 @@ public class RecruitmentServiceTest {
 
     @Test
     @DisplayName("단일 채용공고 조회 성공 테스트")
-    public void retrieveRecruitmentByIdSuccess() {
+    void retrieveRecruitmentByIdSuccess() {
         // given
         Long id = 1L;
         Recruitment savedRecruitment = new Recruitment("Test Title1", new Date(System.currentTimeMillis() - 100000), new Date(System.currentTimeMillis() + 100000), "Test URL1", new Date(), Status.OPEN);
         // stub
         when(recruitmentRepository.findById(id)).thenReturn(Optional.of(savedRecruitment));
-
         // when
         ApiResponse<Recruitment> response = recruitmentService.retrieveRecruitmentById(id);
         Recruitment findRecruitment = response.getData();
-
         // then
         Assertions.assertThat(findRecruitment).isEqualTo(savedRecruitment);
         Assertions.assertThat(findRecruitment.getTitle()).isEqualTo(savedRecruitment.getTitle());
@@ -273,7 +242,7 @@ public class RecruitmentServiceTest {
 
     @Test
     @DisplayName("단일 채용공고 조회 실패 테스트")
-    public void retrieveRecruitmentByIdFail() {
+    void retrieveRecruitmentByIdFail() {
         // given
         Long id = 2L;
         Recruitment savedRecruitment = new Recruitment("Test Title1", new Date(System.currentTimeMillis() - 100000), new Date(System.currentTimeMillis() + 100000), "Test URL1", new Date(), Status.OPEN);
@@ -293,17 +262,14 @@ public class RecruitmentServiceTest {
 
     @Test
     @DisplayName("최근 채용공고 조회 성공 테스트")
-    public void retrieveRecentRecruitmentSuccess() {
+    void retrieveRecentRecruitmentSuccess() {
         // given
         Recruitment savedRecruitment = new Recruitment("Test Title1", new Date(System.currentTimeMillis() - 100000), new Date(System.currentTimeMillis() + 100000), "Test URL1", new Date(), Status.OPEN);
-
         // stub
         when(recruitmentRepository.findTopByOrderByCreatedAtDesc()).thenReturn(Optional.of(savedRecruitment));
-
         // when
         ApiResponse<Recruitment> response = recruitmentService.retrieveRecentRecruitment();
         Recruitment findRecruitment = response.getData();
-
         // then
         Assertions.assertThat(findRecruitment).isEqualTo(savedRecruitment);
         Assertions.assertThat(findRecruitment.getTitle()).isEqualTo(savedRecruitment.getTitle());
@@ -317,17 +283,14 @@ public class RecruitmentServiceTest {
 
     @Test
     @DisplayName("최근 채용공고 조회 실패 테스트")
-    public void retrieveRecentRecruitmentFail() {
+    void retrieveRecentRecruitmentFail() {
         // given
         Recruitment savedRecruitment = new Recruitment("Test Title1", new Date(System.currentTimeMillis() - 100000), new Date(System.currentTimeMillis() + 100000), "Test URL1", new Date(), Status.OPEN);
-
         // stub
         when(recruitmentRepository.findTopByOrderByCreatedAtDesc()).thenReturn(Optional.empty());
-
         // when
         ApiResponse<Recruitment> response = recruitmentService.retrieveRecentRecruitment();
         Recruitment findRecruitment = response.getData();
-
         // then
         assertNotNull(response);
         Assertions.assertThat(findRecruitment).isNotEqualTo(savedRecruitment);
@@ -336,17 +299,14 @@ public class RecruitmentServiceTest {
 
     @Test
     @DisplayName("채용공고 수정 성공 테스트")
-    public void updateRecruitmentSuccess() {
+    void updateRecruitmentSuccess() {
         // given
         String startDateString = "2024-10-02 23:39:40.281000";
         String deadLineString = "2024-10-31 13:39:40.281000";
-
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS");
         LocalDateTime localStartDateTime = LocalDateTime.parse(startDateString, formatter);
         LocalDateTime localDeadLineTime = LocalDateTime.parse(deadLineString, formatter);
-
         Recruitment savedRecruitment = new Recruitment("Test Title1", new Date(System.currentTimeMillis() - 100000), new Date(System.currentTimeMillis() + 100000), "Test URL1", new Date(), Status.OPEN);
-
         UpdateRecruitmentServiceRequestDto requestDto = new UpdateRecruitmentServiceRequestDto(
                 1L,
                 "title",
@@ -354,13 +314,10 @@ public class RecruitmentServiceTest {
                 Date.from(localDeadLineTime.atZone(ZoneId.systemDefault()).toInstant()),
                 "https://www.naver.com/"
         );
-
         // stub
         when(recruitmentRepository.findById(requestDto.id())).thenReturn(Optional.of(savedRecruitment));
-
         // when
         ApiResponse<Recruitment> response = recruitmentService.updateRecruitment(requestDto);
-
         // then
         Assertions.assertThat(response.getMessage()).isEqualTo("채용공고 게시물을 성공적으로 수정했습니다.");
         Assertions.assertThat(requestDto.title()).isEqualTo(savedRecruitment.getTitle());
@@ -368,24 +325,20 @@ public class RecruitmentServiceTest {
         Assertions.assertThat(requestDto.startDate()).isEqualTo(savedRecruitment.getStartDate());
         Assertions.assertThat(requestDto.deadline()).isEqualTo(savedRecruitment.getDeadline());
         Assertions.assertThat(requestDto.link()).isEqualTo(savedRecruitment.getLink());
-
         Mockito.verify(recruitmentRepository, times(1)).findById(requestDto.id());
         Mockito.verify(recruitmentRepository, times(1)).save(any(Recruitment.class));
     }
 
     @Test
     @DisplayName("채용공고 수정 실패 테스트")
-    public void updateRecruitmentFail() {
+    void updateRecruitmentFail() {
         // given
         Long invalidId = 999L;
-
         String startDateString = "2024-10-02 23:39:40.281000";
         String deadLineString = "2024-10-31 13:39:40.281000";
-
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS");
         LocalDateTime localStartDateTime = LocalDateTime.parse(startDateString, formatter);
         LocalDateTime localDeadLineTime = LocalDateTime.parse(deadLineString, formatter);
-
         Recruitment savedRecruitment = new Recruitment("Test Title1", new Date(System.currentTimeMillis() - 100000), new Date(System.currentTimeMillis() + 100000), "Test URL1", new Date(), Status.OPEN);
         UpdateRecruitmentServiceRequestDto requestDto = new UpdateRecruitmentServiceRequestDto(
                 invalidId,
@@ -394,14 +347,11 @@ public class RecruitmentServiceTest {
                 Date.from(localDeadLineTime.atZone(ZoneId.systemDefault()).toInstant()),
                 "https://www.naver.com/"
         );
-
         // stub
         when(recruitmentRepository.findById(invalidId)).thenReturn(Optional.empty());
-
         // when
         ApiResponse<Recruitment> response = recruitmentService.updateRecruitment(requestDto);
         Recruitment findRecruitment = response.getData();
-
         // then
         Assertions.assertThat(response.getStatus()).isEqualTo(ErrorCode.INVALID_NEWS_ID.getStatus());
         Assertions.assertThat(findRecruitment).isNotEqualTo(savedRecruitment);
@@ -411,16 +361,14 @@ public class RecruitmentServiceTest {
 
     @Test
     @DisplayName("채용공고 삭제 성공 테스트")
-    public void deleteRecruitmentSuccess() {
+    void deleteRecruitmentSuccess() {
         // given
         Long id = 1L;
         Recruitment savedRecruitment = new Recruitment("Test Title1", new Date(System.currentTimeMillis() - 100000), new Date(System.currentTimeMillis() + 100000), "Test URL1", new Date(), Status.OPEN);
         // stub
         when(recruitmentRepository.findById(id)).thenReturn(Optional.of(savedRecruitment));
-
         // when
         ApiResponse<String> response = recruitmentService.deleteRecruitment(id);
-
         // then
         Assertions.assertThat(response.getMessage()).isEqualTo("채용공고를 성공적으로 삭제하였습니다.");
         Mockito.verify(recruitmentRepository, times(1)).findById(id);
@@ -429,15 +377,13 @@ public class RecruitmentServiceTest {
 
     @Test
     @DisplayName("채용공고 삭제 실패 테스트")
-    public void deleteRecruitmentFail() {
+    void deleteRecruitmentFail() {
         // given
         Long id = 1L;
         // stub
         when(recruitmentRepository.findById(id)).thenReturn(Optional.empty());
-
         // when
         ApiResponse<String> response = recruitmentService.deleteRecruitment(id);
-
         // then
         Assertions.assertThat(response.getStatus()).isEqualTo(ErrorCode.INVALID_RECRUITMENT_ID.getStatus());
         // method call verify
@@ -459,7 +405,6 @@ public class RecruitmentServiceTest {
                 .createdAt(new Date())
                 .status(Status.OPEN)
                 .build();
-
         Recruitment recruitment2 = Recruitment.builder()
                 .title("title")
                 .startDate(Date.from(LocalDate.of(2024, 10, 1)
@@ -470,7 +415,6 @@ public class RecruitmentServiceTest {
                 .createdAt(new Date())
                 .status(Status.OPEN)
                 .build();
-
         Recruitment recruitment3 = Recruitment.builder()
                 .title("title")
                 .startDate(Date.from(LocalDate.of(2024, 11, 1)
@@ -483,12 +427,9 @@ public class RecruitmentServiceTest {
                 .build();
 
         List<Recruitment> recruitmentList = List.of(recruitment1, recruitment2, recruitment3);
-
         Mockito.when(recruitmentRepository.findByStatusNotClose()).thenReturn(recruitmentList);
-
         // When
         recruitmentService.autoUpdate();
-
         // Then
         assertEquals(Status.CLOSE, recruitment1.getStatus());
         assertEquals(Status.CLOSE, recruitment2.getStatus());
