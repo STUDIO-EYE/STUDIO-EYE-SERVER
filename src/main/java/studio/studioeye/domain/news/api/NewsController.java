@@ -1,18 +1,17 @@
 package studio.studioeye.domain.news.api;
 
-import studio.studioeye.domain.news.application.NewsService;
-import studio.studioeye.domain.news.domain.News;
-import studio.studioeye.domain.news.dto.CreateNewsRequestDto;
-import studio.studioeye.domain.news.dto.UpdateNewsRequestDto;
-import studio.studioeye.global.common.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
+import studio.studioeye.domain.news.application.NewsService;
+import studio.studioeye.domain.news.domain.News;
+import studio.studioeye.domain.news.dto.CreateNewsRequestDto;
+import studio.studioeye.domain.news.dto.UpdateNewsRequestDto;
+import studio.studioeye.global.common.response.ApiResponse;
 
-import java.io.IOException;
 import java.util.List;
 
 @Tag(name = "News API", description = "News 등록 / 수정 / 삭제 / 조회")
@@ -41,13 +40,6 @@ public class NewsController {
         return newsService.retrieveNewsById(id);
     }
 
-    @Operation(summary = "News 페이지네이션 조회 API")
-    @GetMapping("/page")
-    public Page<News> retrieveNewsPage(@RequestParam(defaultValue = "0") int page,
-                                     @RequestParam(defaultValue = "10") int size) {
-        return newsService.retrieveNewsPage(page, size);
-    }
-
     @Operation(summary = "News 수정 API")
     @PutMapping("")
     public ApiResponse<News> updateNews(@Valid @RequestBody UpdateNewsRequestDto dto) {
@@ -58,11 +50,5 @@ public class NewsController {
     @DeleteMapping("/{id}")
     public ApiResponse<String> deleteNews(@PathVariable Long id) {
         return newsService.deleteNews(id);
-    }
-
-    @Operation(summary = "id로 News 복수 삭제 API")
-    @DeleteMapping("")
-    public ApiResponse<String> deleteNewsList(@RequestBody List<Long> ids) {
-        return newsService.deleteNewsList(ids);
     }
 }
