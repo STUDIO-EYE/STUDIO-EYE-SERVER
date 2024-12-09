@@ -26,7 +26,8 @@ public class ViewsService {
 
     private final ViewsRepository viewsRepository;
     // for initial views data / for adding views
-    private static final Long num1 = 1L;
+    private static final Long INITIAL_NUM = 1L;
+    private final String RETRIEVE_VIEWS_LIST = "조회수 목록을 성공적으로 조회했습니다.";
 
     public ApiResponse<Views> createViews(CreateViewsServiceRequestDto dto) {
         if(checkMonth(dto.month())) return ApiResponse.withError(ErrorCode.INVALID_VIEWS_MONTH);
@@ -38,7 +39,6 @@ public class ViewsService {
     }
 
     private ApiResponse<Views> justCreateViews(CreateViewsServiceRequestDto dto) {
-//        if(checkMonth(dto.month())) return ApiResponse.withError(ErrorCode.INVALID_VIEWS_MONTH);
         TimeZone.setDefault(TimeZone.getTimeZone("Asia/Seoul"));
         Views views = dto.toEntity(new Date());
         Views savedViews = viewsRepository.save(views);
@@ -48,9 +48,9 @@ public class ViewsService {
     public ApiResponse<List<Views>> retrieveAllViews() {
         List<Views> viewsList = viewsRepository.findAll();
         if(viewsList.isEmpty()) {
-            return ApiResponse.ok("조회수가 존재하지 않습니다.");
+            return ApiResponse.ok(ErrorCode.EMPTY_VIEWS.getMessage());
         }
-        return ApiResponse.ok("조회수 목록을 성공적으로 조회했습니다.", viewsList);
+        return ApiResponse.ok(RETRIEVE_VIEWS_LIST, viewsList);
     }
 
 
@@ -98,7 +98,6 @@ public class ViewsService {
 
                 // 해당 연도와 월에 대한 데이터가 존재하지 않는 경우, 0으로 데이터 추가
                 if (!found) {
-                    //TODO 수정 필요
                     // 데이터를 삽입한 후에는 인덱스를 증가시킴
                     int finalMonth = month;
                     int finalYear = year;
@@ -121,21 +120,21 @@ public class ViewsService {
                 }
             }
         }
-        return ApiResponse.ok("조회수 목록을 성공적으로 조회했습니다.", viewsList);
+        return ApiResponse.ok(RETRIEVE_VIEWS_LIST, viewsList);
     }
 
     public ApiResponse<List<Views>> retrieveViewsByYear(Integer year) {
         List<Views> viewsList = viewsRepository.findByYear(year);
         if(viewsList.isEmpty()) {
-            return ApiResponse.ok("조회수가 존재하지 않습니다.");
+            return ApiResponse.ok(ErrorCode.EMPTY_VIEWS.getMessage());
         }
-        return ApiResponse.ok("조회수 목록을 성공적으로 조회했습니다.", viewsList);
+        return ApiResponse.ok(RETRIEVE_VIEWS_LIST, viewsList);
     }
 
     public ApiResponse<Views> retrieveViewsByYearMonth(Integer year, Integer month) {
         Optional<Views> optionalViews = viewsRepository.findByYearAndMonth(year, month);
         if(optionalViews.isEmpty()){
-            return ApiResponse.ok("조회수가 존재하지 않습니다.");
+            return ApiResponse.ok(ErrorCode.EMPTY_VIEWS.getMessage());
         }
         Views views = optionalViews.get();
         return ApiResponse.ok("조회수를 성공적으로 조회했습니다.", views);
@@ -151,13 +150,12 @@ public class ViewsService {
     }
 
     public ApiResponse<Views> updateViewsByYearMonth(Integer year, Integer month, UpdateViewsServiceRequestDto dto) {
-        System.out.println(dto.category());
         Optional<Views> optionalViews = viewsRepository.findByYearAndMonthAndMenuAndCategory(year, month, dto.menu(), dto.category());
         if(optionalViews.isEmpty()){
-            return this.justCreateViews(new CreateViewsServiceRequestDto(year, month, num1, dto.menu(), dto.category()));
+            return this.justCreateViews(new CreateViewsServiceRequestDto(year, month, INITIAL_NUM, dto.menu(), dto.category()));
         }
         Views views = optionalViews.get();
-        views.updateViews(views.getViews()+num1);
+        views.updateViews(views.getViews()+ INITIAL_NUM);
         Views updatedViews = viewsRepository.save(views);
         return ApiResponse.ok("조회수를 성공적으로 수정했습니다.", updatedViews);
     }
