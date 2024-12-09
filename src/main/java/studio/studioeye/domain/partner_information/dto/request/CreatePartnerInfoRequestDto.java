@@ -9,9 +9,8 @@ public record CreatePartnerInfoRequestDto(
 	@NotBlank(message = "name은 필수 값입니다.")
 	String name,
 
-	@NotNull(message = "is_main은 필수 값입니다.")
-//	@NotBlank(message = "is_main은 필수 값입니다.")
-	Boolean is_main,
+	@NotNull(message = "isMain 필수 값입니다.")
+	Boolean isMain,
 
 	@Schema(description = "협력사 링크 URL, null / 빈 값 / 공백 허용 x")
 	@NotBlank(message = "link는 필수 값입니다.")
@@ -19,6 +18,6 @@ public record CreatePartnerInfoRequestDto(
 ) {
 
 	public CreatePartnerInfoServiceRequestDto toServiceRequest() {
-		return new CreatePartnerInfoServiceRequestDto(name, is_main != null && is_main, link);
+		return new CreatePartnerInfoServiceRequestDto(name, isMain != null && isMain, link);
 	}
 }

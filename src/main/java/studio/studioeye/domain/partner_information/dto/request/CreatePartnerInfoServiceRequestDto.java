@@ -4,7 +4,7 @@ import studio.studioeye.domain.partner_information.domain.PartnerInformation;
 
 public record CreatePartnerInfoServiceRequestDto(
 	String name,
-	Boolean is_main,
+	Boolean isMain,
 	String link
 ) {
 
@@ -12,7 +12,7 @@ public record CreatePartnerInfoServiceRequestDto(
 		return PartnerInformation.builder()
 				.logoImageUrl(logoImgStr)
 				.name(name)
-				.is_main(is_main)
+				.isMain(isMain)
 				.link(link)
 				.build();
 	}

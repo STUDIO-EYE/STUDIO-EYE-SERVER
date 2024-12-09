@@ -20,15 +20,15 @@ public class PartnerInformation {
 
 	private String logoImageUrl;
 
-	private Boolean is_main;
+	private Boolean isMain;
 
 	private String link;
 
 	@Builder
-	public PartnerInformation(String logoImageUrl, String name, Boolean is_main, String link) {
+	public PartnerInformation(String logoImageUrl, String name, Boolean isMain, String link) {
 		this.name = name;
 		this.logoImageUrl = logoImageUrl;
-		this.is_main = is_main;
+		this.isMain = isMain;
 		this.link = link;
 	}
 
