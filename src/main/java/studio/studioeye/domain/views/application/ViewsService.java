@@ -26,7 +26,7 @@ public class ViewsService {
 
     private final ViewsRepository viewsRepository;
     // for initial views data / for adding views
-    private static final Long num1 = 1L;
+    private static final Long INITIAL_NUM = 1L;
 
     public ApiResponse<Views> createViews(CreateViewsServiceRequestDto dto) {
         if(checkMonth(dto.month())) return ApiResponse.withError(ErrorCode.INVALID_VIEWS_MONTH);
@@ -154,10 +154,10 @@ public class ViewsService {
         System.out.println(dto.category());
         Optional<Views> optionalViews = viewsRepository.findByYearAndMonthAndMenuAndCategory(year, month, dto.menu(), dto.category());
         if(optionalViews.isEmpty()){
-            return this.justCreateViews(new CreateViewsServiceRequestDto(year, month, num1, dto.menu(), dto.category()));
+            return this.justCreateViews(new CreateViewsServiceRequestDto(year, month, INITIAL_NUM, dto.menu(), dto.category()));
         }
         Views views = optionalViews.get();
-        views.updateViews(views.getViews()+num1);
+        views.updateViews(views.getViews()+ INITIAL_NUM);
         Views updatedViews = viewsRepository.save(views);
         return ApiResponse.ok("조회수를 성공적으로 수정했습니다.", updatedViews);
     }
