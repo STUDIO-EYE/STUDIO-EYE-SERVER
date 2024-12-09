@@ -149,7 +149,6 @@ public class ViewsService {
     }
 
     public ApiResponse<Views> updateViewsByYearMonth(Integer year, Integer month, UpdateViewsServiceRequestDto dto) {
-        System.out.println(dto.category());
         Optional<Views> optionalViews = viewsRepository.findByYearAndMonthAndMenuAndCategory(year, month, dto.menu(), dto.category());
         if(optionalViews.isEmpty()){
             return this.justCreateViews(new CreateViewsServiceRequestDto(year, month, INITIAL_NUM, dto.menu(), dto.category()));
