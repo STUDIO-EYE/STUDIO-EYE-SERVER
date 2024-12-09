@@ -63,7 +63,7 @@ class PartnerInformationServiceTest {
         PartnerInformation partnerInfo = response.getData();
         // then
         Assertions.assertThat(partnerInfo.getName()).isEqualTo(requestDto.name());
-        Assertions.assertThat(partnerInfo.getIsMain()).isEqualTo(requestDto.is_main());
+        Assertions.assertThat(partnerInfo.getIsMain()).isEqualTo(requestDto.isMain());
         Assertions.assertThat(partnerInfo.getLink()).isEqualTo(requestDto.link());
         Assertions.assertThat(partnerInfo.getLogoImageUrl()).isEqualTo(logoImageStr);
         // verify
@@ -238,7 +238,7 @@ class PartnerInformationServiceTest {
         PartnerInformation mockPartnerInformation = PartnerInformation.builder()
                 .name("Old Name")
                 .logoImageUrl(oldLogoImageUrl)
-                .is_main(false)
+                .isMain(false)
                 .link("http://old-link.com")
                 .build();
         UpdatePartnerInfoServiceRequestDto dto = new UpdatePartnerInfoServiceRequestDto(

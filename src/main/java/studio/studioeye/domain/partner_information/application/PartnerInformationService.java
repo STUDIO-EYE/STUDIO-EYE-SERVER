@@ -96,7 +96,7 @@ public class PartnerInformationService {
 		responseBody.put("partnerInfo", Map.of(
 				"id", partnerInformation.getId(),
 				"name", partnerInformation.getName(),
-				"is_main", partnerInformation.getIsMain(),
+				"isMain", partnerInformation.getIsMain(),
 				"link", partnerInformation.getLink()
 
 		));
