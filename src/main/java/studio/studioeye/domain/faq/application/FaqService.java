@@ -4,22 +4,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
-import studio.studioeye.domain.faq.dao.FaqQuestions;
 import studio.studioeye.domain.faq.dao.FaqRepository;
 import studio.studioeye.domain.faq.domain.Faq;
 import studio.studioeye.domain.faq.dto.request.CreateFaqServiceRequestDto;
 import studio.studioeye.domain.faq.dto.request.UpdateFaqServiceRequestDto;
-import studio.studioeye.infrastructure.s3.S3Adapter;
 import studio.studioeye.global.common.response.ApiResponse;
 import studio.studioeye.global.exception.error.ErrorCode;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,7 +22,6 @@ import java.util.Optional;
 public class FaqService {
 
     private final FaqRepository faqRepository;
-    private final S3Adapter s3Adapter;
 
     public ApiResponse<Faq> createFaq(CreateFaqServiceRequestDto dto){
         if(dto.question().trim().isEmpty() || dto.answer().trim().isEmpty() || dto.visibility() == null) {
@@ -46,24 +38,6 @@ public class FaqService {
             return ApiResponse.ok("FAQ가 존재하지 않습니다.");
         }
         return ApiResponse.ok("FAQ 목록을 성공적으로 조회했습니다.", faqList);
-    }
-
-
-    public ApiResponse<List<FaqQuestions>> retrieveAllFaqTitle() {
-        List<FaqQuestions> faqQuestions = faqRepository.findAllQuestions();
-        if(faqQuestions.isEmpty()) {
-            return ApiResponse.withError(ErrorCode.INVALID_FAQ_ID);
-        }
-        return ApiResponse.ok("FAQ 목록을 성공적으로 조회했습니다.", faqQuestions);
-    }
-
-    public ApiResponse<Faq> retrieveFaqById(Long id) {
-        Optional<Faq> optionalFaq = faqRepository.findById(id);
-        if(optionalFaq.isEmpty()) {
-            return ApiResponse.withError(ErrorCode.INVALID_FAQ_ID);
-        }
-        Faq faq = optionalFaq.get();
-        return ApiResponse.ok("FAQ를 성공적으로 조회했습니다.", faq);
     }
 
     public Page<Faq> retrieveFaqPage(int page, int size) {
@@ -101,17 +75,6 @@ public class FaqService {
         }
         Faq faq = optionalFaq.get();
         faqRepository.delete(faq);
-        return ApiResponse.ok("FAQ를 성공적으로 삭제했습니다.");
-    }
-    public ApiResponse<String> deleteFaqs(List<Long> ids) {
-        for(Long id : ids) {
-            Optional<Faq> optionalFaq = faqRepository.findById(id);
-            if (optionalFaq.isEmpty()) {
-                return ApiResponse.withError(ErrorCode.INVALID_FAQ_ID);
-            }
-            Faq faq = optionalFaq.get();
-            faqRepository.delete(faq);
-        }
         return ApiResponse.ok("FAQ를 성공적으로 삭제했습니다.");
     }
 }
