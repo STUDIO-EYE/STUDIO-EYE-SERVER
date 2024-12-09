@@ -40,13 +40,6 @@ public class NewsController {
         return newsService.retrieveNewsById(id);
     }
 
-    @Operation(summary = "News 페이지네이션 조회 API")
-    @GetMapping("/page")
-    public Page<News> retrieveNewsPage(@RequestParam(defaultValue = "0") int page,
-                                     @RequestParam(defaultValue = "10") int size) {
-        return newsService.retrieveNewsPage(page, size);
-    }
-
     @Operation(summary = "News 수정 API")
     @PutMapping("")
     public ApiResponse<News> updateNews(@Valid @RequestBody UpdateNewsRequestDto dto) {
@@ -57,11 +50,5 @@ public class NewsController {
     @DeleteMapping("/{id}")
     public ApiResponse<String> deleteNews(@PathVariable Long id) {
         return newsService.deleteNews(id);
-    }
-
-    @Operation(summary = "id로 News 복수 삭제 API")
-    @DeleteMapping("")
-    public ApiResponse<String> deleteNewsList(@RequestBody List<Long> ids) {
-        return newsService.deleteNewsList(ids);
     }
 }
