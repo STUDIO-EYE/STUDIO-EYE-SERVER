@@ -7,11 +7,6 @@ public record CreateFaqServiceRequestDto (
     String answer,
     Boolean visibility
 ) {
-    public CreateFaqServiceRequestDto(String question, String answer, Boolean visibility) {
-        this.question = question;
-        this.answer = answer;
-        this.visibility = visibility;
-    }
     public Faq toEntity() {
         return Faq.builder()
                 .question(question)
