@@ -71,18 +71,6 @@ public class FaqService {
         return faqRepository.findAll(pageable);
     }
 
-    public ApiResponse<String> convertBase64ToImageUrl(String base64Code) throws IOException {
-        base64Code = base64Code.replaceAll("\"", ""); // requestBody에서 문자열 앞뒤에 "" 추가되는 현상 처리
-        MultipartFile file = this.convert(base64Code);
-        ApiResponse<String> updateFileResponse = s3Adapter.uploadImage(file);
-        // imageUrl이 null인 경우 처리 추가
-        String imageUrl = updateFileResponse.getData();
-        if (imageUrl == null || imageUrl.isEmpty()) {
-            return ApiResponse.withError(ErrorCode.ERROR_S3_UPDATE_OBJECT);
-        }
-        return ApiResponse.ok("FAQ base64 이미지를 성공적으로 저장했습니다.", imageUrl);
-    }
-
     public ApiResponse<Faq> updateFaq(UpdateFaqServiceRequestDto dto) {
         String question = dto.question().trim();
         String answer = dto.answer().trim();
