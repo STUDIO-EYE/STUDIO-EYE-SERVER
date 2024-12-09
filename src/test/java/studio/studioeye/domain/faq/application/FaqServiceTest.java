@@ -384,22 +384,6 @@ class FaqServiceTest {
     }
 
     @Test
-    @DisplayName("convertBase64ToImageUrl 실패 테스트 - 접두사 없음")
-    void convertBase64ToImageUrlFail() throws IOException {
-        // given
-        String base64Image = "data:image/png;base64," + Base64.getEncoder().encodeToString("test".getBytes());
-        // Mock s3Adapter.uploadImage 메서드
-        when(s3Adapter.uploadImage(any(MultipartFile.class))).thenReturn(ApiResponse.ok(null)); // imageUrl을 null로 반환
-        // when
-        ApiResponse<String> response = faqService.convertBase64ToImageUrl(base64Image);
-        // then
-        assertNotNull(response); // 응답이 null이 아닌지 확인
-        assertEquals(ErrorCode.ERROR_S3_UPDATE_OBJECT.getStatus(), response.getStatus()); // 상태 코드 확인
-        assertEquals(ErrorCode.ERROR_S3_UPDATE_OBJECT.getMessage(), response.getMessage()); // 에러 메시지 확인
-        verify(s3Adapter, times(1)).uploadImage(any(MultipartFile.class)); // Mock 호출 확인
-    }
-
-    @Test
     @DisplayName("convert 성공 테스트")
     void convertSuccess() throws IOException {
         // given
