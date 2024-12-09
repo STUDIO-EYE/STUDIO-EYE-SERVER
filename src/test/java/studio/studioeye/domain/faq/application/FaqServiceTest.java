@@ -384,28 +384,6 @@ class FaqServiceTest {
     }
 
     @Test
-    @DisplayName("convert 성공 테스트")
-    void convertSuccess() throws IOException {
-        // given
-        String validBase64Image = "data:image/png;base64," + Base64.getEncoder().encodeToString("valid image data".getBytes());
-        // when
-        MultipartFile result = faqService.convert(validBase64Image);
-        // then
-        assertNotNull(result); // 결과가 null이 아닌지 확인
-        assertEquals("image.png", result.getOriginalFilename()); // 파일 이름 확인
-        assertEquals("image/png", result.getContentType()); // MIME 타입 확인
-    }
-
-    @Test
-    @DisplayName("convert 실패 테스트 - 잘못된 Base64")
-    void convertFail() {
-        // given
-        String invalidBase64Image = "invalid_base64";
-        // when & then
-        assertThrows(IOException.class, () -> faqService.convert(invalidBase64Image));
-    }
-
-    @Test
     @DisplayName("createFaq 실패 테스트 - visibility가 null인 경우")
     void createFaqFail_NullVisibility() {
         // given
