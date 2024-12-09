@@ -211,24 +211,22 @@ public class RequestService {
 		Request updatedRequest = requestRepository.save(request);
 		answerRepository.save(updatedAnswer);
 
-		if(!answer.isEmpty() && state != null) {
-			String subject = "[STUDIO EYE] " + updatedRequest.getClientName() + "님의 문의에 답변이 작성되었습니다."; // 이메일 제목
-			String text = "[문의 내역]\n\n"
+		String subject = "[STUDIO EYE] " + updatedRequest.getClientName() + "님의 문의에 답변이 작성되었습니다."; // 이메일 제목
+		String text = "[문의 내역]\n\n"
 
-					+ "의뢰인 성명: " + updatedRequest.getClientName() + "\n"
-					+ "기관 혹은 기업: " + updatedRequest.getOrganization() + "\n"
-					+ "직책: " + updatedRequest.getPosition() + "\n"
-					+ "연락처: " + updatedRequest.getContact() + "\n\n"
+				+ "의뢰인 성명: " + updatedRequest.getClientName() + "\n"
+				+ "기관 혹은 기업: " + updatedRequest.getOrganization() + "\n"
+				+ "직책: " + updatedRequest.getPosition() + "\n"
+				+ "연락처: " + updatedRequest.getContact() + "\n\n"
 
-					+ "카테고리: " + updatedRequest.getCategory() + "\n"
-					+ "프로젝트명: " + updatedRequest.getProjectName() + "\n"
-					+ "문의 내용: " + updatedRequest.getDescription() + "\n\n\n"
+				+ "카테고리: " + updatedRequest.getCategory() + "\n"
+				+ "프로젝트명: " + updatedRequest.getProjectName() + "\n"
+				+ "문의 내용: " + updatedRequest.getDescription() + "\n\n\n"
 
 
-					+ "[답변 내용]" + "\n"
-					+ answer + "\n";
-			emailService.sendEmail(updatedRequest.getEmail(), subject, text);
-		}
+				+ "[답변 내용]" + "\n"
+				+ answer + "\n";
+		emailService.sendEmail(updatedRequest.getEmail(), subject, text);
 
 		return ApiResponse.ok("답변을 성공적으로 작성했습니다.");
 	}
