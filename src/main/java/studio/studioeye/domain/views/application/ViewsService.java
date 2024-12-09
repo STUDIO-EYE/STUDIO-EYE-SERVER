@@ -27,6 +27,7 @@ public class ViewsService {
     private final ViewsRepository viewsRepository;
     // for initial views data / for adding views
     private static final Long INITIAL_NUM = 1L;
+    private final String RETRIEVE_VIEWS_LIST = "조회수 목록을 성공적으로 조회했습니다.";
 
     public ApiResponse<Views> createViews(CreateViewsServiceRequestDto dto) {
         if(checkMonth(dto.month())) return ApiResponse.withError(ErrorCode.INVALID_VIEWS_MONTH);
@@ -47,9 +48,9 @@ public class ViewsService {
     public ApiResponse<List<Views>> retrieveAllViews() {
         List<Views> viewsList = viewsRepository.findAll();
         if(viewsList.isEmpty()) {
-            return ApiResponse.ok("조회수가 존재하지 않습니다.");
+            return ApiResponse.ok(ErrorCode.EMPTY_VIEWS.getMessage());
         }
-        return ApiResponse.ok("조회수 목록을 성공적으로 조회했습니다.", viewsList);
+        return ApiResponse.ok(RETRIEVE_VIEWS_LIST, viewsList);
     }
 
 
@@ -119,21 +120,21 @@ public class ViewsService {
                 }
             }
         }
-        return ApiResponse.ok("조회수 목록을 성공적으로 조회했습니다.", viewsList);
+        return ApiResponse.ok(RETRIEVE_VIEWS_LIST, viewsList);
     }
 
     public ApiResponse<List<Views>> retrieveViewsByYear(Integer year) {
         List<Views> viewsList = viewsRepository.findByYear(year);
         if(viewsList.isEmpty()) {
-            return ApiResponse.ok("조회수가 존재하지 않습니다.");
+            return ApiResponse.ok(ErrorCode.EMPTY_VIEWS.getMessage());
         }
-        return ApiResponse.ok("조회수 목록을 성공적으로 조회했습니다.", viewsList);
+        return ApiResponse.ok(RETRIEVE_VIEWS_LIST, viewsList);
     }
 
     public ApiResponse<Views> retrieveViewsByYearMonth(Integer year, Integer month) {
         Optional<Views> optionalViews = viewsRepository.findByYearAndMonth(year, month);
         if(optionalViews.isEmpty()){
-            return ApiResponse.ok("조회수가 존재하지 않습니다.");
+            return ApiResponse.ok(ErrorCode.EMPTY_VIEWS.getMessage());
         }
         Views views = optionalViews.get();
         return ApiResponse.ok("조회수를 성공적으로 조회했습니다.", views);
