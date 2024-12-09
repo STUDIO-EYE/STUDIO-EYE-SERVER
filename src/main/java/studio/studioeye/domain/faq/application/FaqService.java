@@ -114,22 +114,4 @@ public class FaqService {
         }
         return ApiResponse.ok("FAQ를 성공적으로 삭제했습니다.");
     }
-
-    public MultipartFile convert(String base64Image) throws IOException {
-        // "data:image/png;base64,"와 같은 접두사 제거
-        String[] parts = base64Image.split(",");
-        // 배열 길이 확인
-        if (parts.length < 2) {
-            throw new IOException("Invalid Base64 format. Missing data or metadata.");
-        }
-        String imageString = parts[1];
-        byte[] decodedBytes = Base64.getDecoder().decode(imageString);
-
-        return new MockMultipartFile(
-                "image", // 파일 이름
-                "image.png", // 원본 파일 이름
-                "image/png", // MIME 타입
-                new ByteArrayInputStream(decodedBytes)
-        );
-    }
 }
