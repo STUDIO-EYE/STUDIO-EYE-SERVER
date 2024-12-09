@@ -20,12 +20,6 @@ import java.util.List;
 public class MenuController {
     private final MenuService menuService;
 
-//    @Operation(summary = "PA용 메뉴 생성 API", description = "menuTitle은 MAIN, ABOUT, ARTWORK, FAQ, CONTACT, NEWS, RECRUITMENT 중에서 입력")
-//    @PostMapping("/menu")
-//    public ApiResponse<Menu> createMenu(@RequestBody CreateMenuRequestDto dto) {
-//        return menuService.createMenu(dto.toServiceRequest());
-//    }
-
     @Operation(summary = "PA용 메뉴 다중 생성 API", description = "menuTitle은 MAIN, ABOUT, ARTWORK, FAQ, CONTACT, NEWS, RECRUITMENT 중에서 입력")
     @PostMapping("/menu")
     public ApiResponse<List<Menu>> createMenu(@RequestBody List<CreateMenuRequestDto> dtoList) {
@@ -45,12 +39,6 @@ public class MenuController {
     public ApiResponse<List<MenuTitle>> retrieveMenu() {
         return menuService.retrieveMenu();
     }
-
-//    @Operation(summary = "PA용 메뉴 수정 API")
-//    @PutMapping("/menu")
-//    public ApiResponse<Menu> updateMenu(@RequestBody UpdateMenuRequestDto dto) {
-//        return menuService.updateMenu(dto.toServiceRequest());
-//    }
 
     @Operation(summary = "PA용 메뉴 수정 API")
     @PutMapping("/menu")
