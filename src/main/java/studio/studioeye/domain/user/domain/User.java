@@ -40,7 +40,7 @@ public class User {
     private LocalDate createdAt;
 
     @Builder
-    public User(Long product_id, String email, String name, String phoneNumber, String encryptedPwd, boolean isApproved) {
+    public User(Long productId, String email, String name, String phoneNumber, String encryptedPwd, boolean isApproved) {
         this.productId = productId;
         this.email = email;
         this.name = name;
