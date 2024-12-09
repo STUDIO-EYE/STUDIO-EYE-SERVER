@@ -22,7 +22,6 @@ import studio.studioeye.global.common.response.ApiResponse;
 import studio.studioeye.global.exception.error.ErrorCode;
 import studio.studioeye.infrastructure.s3.S3Adapter;
 
-import java.io.IOException;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -64,7 +63,7 @@ class PartnerInformationServiceTest {
         PartnerInformation partnerInfo = response.getData();
         // then
         Assertions.assertThat(partnerInfo.getName()).isEqualTo(requestDto.name());
-        Assertions.assertThat(partnerInfo.getIs_main()).isEqualTo(requestDto.is_main());
+        Assertions.assertThat(partnerInfo.getIsMain()).isEqualTo(requestDto.is_main());
         Assertions.assertThat(partnerInfo.getLink()).isEqualTo(requestDto.link());
         Assertions.assertThat(partnerInfo.getLogoImageUrl()).isEqualTo(logoImageStr);
         // verify
@@ -260,7 +259,7 @@ class PartnerInformationServiceTest {
         assertEquals("New Name", response.getData().getName());
         assertEquals(newLogoImageUrl, response.getData().getLogoImageUrl());
         assertEquals("http://new-link.com", response.getData().getLink());
-        assertTrue(response.getData().getIs_main());
+        assertTrue(response.getData().getIsMain());
         verify(s3Adapter, times(1)).deleteFile("path");
         verify(s3Adapter, times(1)).uploadImage(updateMockFile);
         verify(partnerInformationRepository, times(1)).save(any(PartnerInformation.class));

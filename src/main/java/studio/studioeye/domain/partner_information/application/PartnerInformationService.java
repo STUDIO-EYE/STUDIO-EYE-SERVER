@@ -96,7 +96,7 @@ public class PartnerInformationService {
 		responseBody.put("partnerInfo", Map.of(
 				"id", partnerInformation.getId(),
 				"name", partnerInformation.getName(),
-				"is_main", partnerInformation.getIs_main(),
+				"is_main", partnerInformation.getIsMain(),
 				"link", partnerInformation.getLink()
 
 		));
@@ -123,7 +123,7 @@ public class PartnerInformationService {
 			partnerInformation.setLogoImageUrl(logoImgStr);
 		}
 		partnerInformation.setName(dto.name());
-		partnerInformation.setIs_main(dto.is_main());
+		partnerInformation.setIsMain(dto.is_main());
 		partnerInformation.setLink(dto.link());
 
 		PartnerInformation savedPartnerInformation = partnerInformationRepository.save(partnerInformation);
@@ -138,7 +138,7 @@ public class PartnerInformationService {
 		PartnerInformation partnerInformation = optionalPartnerInformation.get();
 
 		partnerInformation.setName(dto.name());
-		partnerInformation.setIs_main(dto.is_main());
+		partnerInformation.setIsMain(dto.is_main());
 		partnerInformation.setLink(dto.link());
 
 		PartnerInformation savedPartnerInformation = partnerInformationRepository.save(partnerInformation);
