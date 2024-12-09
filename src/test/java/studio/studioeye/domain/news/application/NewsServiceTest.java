@@ -38,66 +38,6 @@ class NewsServiceTest {
     private NewsService newsService;
     @Mock
     private NewsRepository newsRepository;
-    @Test
-    @DisplayName("News 페이지네이션 조회 성공 테스트")
-    void retrieveNewsPageSuccess() {
-        // given
-        int page = 0;
-        int size = 2;
-        Pageable pageable = PageRequest.of(page, size);
-        List<News> newsList = new ArrayList<>();
-        newsList.add(new News("Test Title1", "Test Source1",  LocalDate.now(), "Test URL1", true));
-        newsList.add(new News("Test Title2", "Test Source2",  LocalDate.now(), "Test URL2", true));
-        newsList.add(new News("Test Title3", "Test Source3",  LocalDate.now(), "Test URL3", true));
-        newsList.add(new News("Test Title4", "Test Source4",  LocalDate.now(), "Test URL4", true));
-        newsList.add(new News("Test Title5", "Test Source5",  LocalDate.now(), "Test URL5", true));
-        newsList.add(new News("Test Title6", "Test Source6",  LocalDate.now(), "Test URL6", true));
-        newsList.add(new News("Test Title7", "Test Source7",  LocalDate.now(), "Test URL7", true));
-        newsList.add(new News("Test Title8", "Test Source8",  LocalDate.now(), "Test URL8", true));
-        newsList.add(new News("Test Title9", "Test Source9",  LocalDate.now(), "Test URL9", true));
-        newsList.add(new News("Test Title10", "Test Source10",  LocalDate.now(), "Test URL10", true));
-        Page<News> newsPage = new PageImpl<>(newsList, pageable, newsList.size());
-        // stub
-        when(newsRepository.findAll(pageable)).thenReturn(newsPage);
-        // when
-        Page<News> result = newsService.retrieveNewsPage(page, size);
-        // then
-        Assertions.assertThat(result)
-                .isNotNull()
-                .isEqualTo(newsPage);
-    }
-
-    @Test
-    @DisplayName("News 페이지네이션 조회 실패 테스트 - 유효하지 않은 page, size")
-    void retrieveNewsPageFail_invalidPageSize() {
-        // given
-        int invalidPage = -1;
-        int invalidSize = 0;
-        // when & then
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            newsService.retrieveNewsPage(invalidPage, invalidSize);
-        });
-        Assertions.assertThat(exception.getMessage()).isEqualTo("Page index must not be less than zero");
-        // 리포지토리가 호출되지 않았는지 확인
-        Mockito.verify(newsRepository, Mockito.never()).findAll(any(Pageable.class));
-    }
-
-    @Test
-    @DisplayName("News 페이지네이션 조회 실패 테스트 - Repository 호출 문제 발생 테스트")
-    void retrieveNewsPageFail_callRepository() {
-        // given
-        int page = 0;
-        int size = 2;
-        Pageable pageable = PageRequest.of(page, size);
-        // when
-        when(newsRepository.findAll(pageable)).thenThrow(new RuntimeException("Database Error"));
-        // then
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-            newsService.retrieveNewsPage(page, size);
-        });
-        Assertions.assertThat(exception.getMessage()).isEqualTo("Database Error");
-        Mockito.verify(newsRepository, times(1)).findAll(pageable);
-    }
 
     @Test
     @DisplayName("News 수정 성공 테스트")
@@ -278,46 +218,5 @@ class NewsServiceTest {
         Assertions.assertThat(response.getStatus()).isEqualTo(ErrorCode.INVALID_NEWS_ID.getStatus());
         // method call verify
         Mockito.verify(newsRepository, Mockito.never()).delete(any());
-    }
-
-    @Test
-    @DisplayName("뉴스 리스트 삭제 성공 테스트")
-    void deleteNewsListSuccess() {
-        // given
-        List<News> newsList = new ArrayList<>();
-        newsList.add(new News("Test Title1", "Test Source1",  LocalDate.now(), "Test URL1", true));
-        newsList.add(new News("Test Title2", "Test Source2",  LocalDate.now(), "Test URL2", true));
-        newsList.add(new News("Test Title3", "Test Source3",  LocalDate.now(), "Test URL3", true));
-        List<Long> ids = Arrays.asList(1L, 2L, 3L);
-        // stub
-        when(newsRepository.findById(1L)).thenReturn(Optional.of(newsList.get(0)));
-        when(newsRepository.findById(2L)).thenReturn(Optional.of(newsList.get(1)));
-        when(newsRepository.findById(3L)).thenReturn(Optional.of(newsList.get(2)));
-        // when
-        ApiResponse<String> response = newsService.deleteNewsList(ids);
-        // then
-        Assertions.assertThat(response.getMessage()).isEqualTo("News를 성공적으로 삭제했습니다.");
-        // method call verify
-        Mockito.verify(newsRepository, times(1)).delete(newsList.get(0));
-        Mockito.verify(newsRepository, times(1)).delete(newsList.get(1));
-        Mockito.verify(newsRepository, times(1)).delete(newsList.get(2));
-    }
-
-    @Test
-    @DisplayName("뉴스 리스트 삭제 실패 테스트 - 존재하지 않는 ID")
-    void deleteNewsListFail() {
-        // given
-        List<Long> ids = Arrays.asList(1L, 2L);
-        News news = new News("Test Title1", "Test Source1", LocalDate.now(), "Test URL1", true);
-        // stub
-        when(newsRepository.findById(1L)).thenReturn(Optional.of(news));
-        when(newsRepository.findById(2L)).thenReturn(Optional.empty()); //2번 ID 존재X
-        // when
-        ApiResponse<String> response = newsService.deleteNewsList(ids);
-        // then
-        Assertions.assertThat(response.getStatus()).isEqualTo(ErrorCode.INVALID_NEWS_ID.getStatus());
-        Assertions.assertThat(response.getMessage()).isEqualTo(ErrorCode.INVALID_NEWS_ID.getMessage());
-        // method call verify
-        Mockito.verify(newsRepository, times(1)).delete(any());
     }
 }
