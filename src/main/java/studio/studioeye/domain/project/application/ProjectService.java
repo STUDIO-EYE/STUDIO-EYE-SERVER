@@ -29,7 +29,6 @@ public class ProjectService {
 
 	private final ProjectRepository projectRepository;
 	private final S3Adapter s3Adapter;
-	private final ViewsService viewsService;
 	private static final String TOP_PROJECT_TYPE = "top";
 	private static final String MAIN_PROJECT_TYPE = "main";
 	private static final String OTHERS_PROJECT_TYPE = "others";
