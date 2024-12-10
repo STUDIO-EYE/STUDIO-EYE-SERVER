@@ -25,7 +25,7 @@ public enum ErrorCode {
 	// notice board
 	INVALID_NOTICE_BOARD_ID(HttpStatus.BAD_REQUEST, "유효하지 않은 notice board 식별자입니다."),
 
-	// project
+	// project(artwork)
 	INVALID_PROJECT_ID(HttpStatus.BAD_REQUEST, "유효하지 않은 project 식별자입니다."),
 	INVALID_PROJECT_TYPE(HttpStatus.BAD_REQUEST, "유효하지 않은 project type입니다."),
 	TOP_PROJECT_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "TOP PROJECT가 이미 존재합니다."),
