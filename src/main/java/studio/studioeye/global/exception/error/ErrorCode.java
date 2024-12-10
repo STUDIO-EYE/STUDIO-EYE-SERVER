@@ -27,7 +27,7 @@ public enum ErrorCode {
 
 	// project(artwork)
 	INVALID_PROJECT_ID(HttpStatus.BAD_REQUEST, "유효하지 않은 project 식별자입니다."),
-	INVALID_PROJECT_TYPE(HttpStatus.BAD_REQUEST, "유효하지 않은 project type입니다."),
+	INVALID_PROJECT_TYPE(HttpStatus.BAD_REQUEST, "잘못된 아트워크 타입이 선택되었습니다. 전체, 대표, 메인 중에서 다시 선택해주세요!"),
 	TOP_PROJECT_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "대표 아트워크는 이미 설정되어 있습니다. 새로운 대표 아트워크를 설정하려면 기존 대표 아트워크를 변경하거나 삭제해주세요!"),
 	MAIN_PROJECT_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "메인 프로젝트는 최대 5개까지만 등록할 수 있습니다. 현재 등록 가능한 개수를 초과했습니다. 불필요한 프로젝트를 삭제하거나 확인해주세요!"),
 	PROJECT_TYPE_AND_IS_POSTED_MISMATCH(HttpStatus.BAD_REQUEST, "PROJECT TYPE과 IS POSTED가 상응하지 않습니다."),
