@@ -28,8 +28,8 @@ public enum ErrorCode {
 	// project(artwork)
 	INVALID_PROJECT_ID(HttpStatus.BAD_REQUEST, "유효하지 않은 project 식별자입니다."),
 	INVALID_PROJECT_TYPE(HttpStatus.BAD_REQUEST, "유효하지 않은 project type입니다."),
-	TOP_PROJECT_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "TOP PROJECT가 이미 존재합니다."),
 	MAIN_PROJECT_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "MAIN PROJECT의 개수 제한을 초과했습니다."),
+	TOP_PROJECT_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "대표 아트워크는 이미 설정되어 있습니다. 새로운 대표 아트워크를 설정하려면 기존 대표 아트워크를 변경하거나 삭제해주세요!"),
 	PROJECT_TYPE_AND_IS_POSTED_MISMATCH(HttpStatus.BAD_REQUEST, "PROJECT TYPE과 IS POSTED가 상응하지 않습니다."),
 
 	// partner information
