@@ -40,8 +40,8 @@
 ## 🧬 아키텍처 <a name = "architecture"></a>
 
 ### 개발 및 테스트
-![](https://velog.velcdn.com/images/phonil/post/67e6568b-700c-417d-aa67-39f12639abf5/image.png)
-
+![](https://velog.velcdn.com/images/phonil/post/4ddea538-72b6-4d58-bf4c-170a40ae3e42/image.png)
+ 
 학습과 특정 클라우드에 종속되지 않는 환경을 위해 AWS에서 제공하는 기능보다 직접 구축하여 사용하는 방향으로 진행했습니다.
 
 - Nginx를 로드밸런서로 3개의 스프링 서버로 트래픽 분산
@@ -60,8 +60,8 @@
 
 
 ## ⏰ 협업 방식 <a name = "cooperation"></a>
-![](https://velog.velcdn.com/images/phonil/post/e15d6ff9-34c7-4e8f-bbfd-084d8ff82c51/image.png)
-
+![](https://velog.velcdn.com/images/phonil/post/fcfcb8c5-80ff-4851-8962-dda243ba07c6/image.png)
+ 
 매주 수업 시간 기준 1주 단위 스프린트의 애자일 방식으로 개발을 진행했습니다. 돌아가는 소프트웨어를 중심으로 데모를 진행하여 작업 할당량을 조절하고 계획을 유동적으로 관리했습니다.
 전체 일정과 큰 작업들을 기반으로 할 일을 할당했고, 이를 효율적으로 관리하기 위해 Notion, Jira, Discord를 사용했습니다.
 
