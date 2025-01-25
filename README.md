@@ -40,7 +40,7 @@
 ## 🧬 아키텍처 <a name = "architecture"></a>
 
 ### 개발 및 테스트
-![](https://velog.velcdn.com/images/phonil/post/4ddea538-72b6-4d58-bf4c-170a40ae3e42/image.png)
+![](https://velog.velcdn.com/images/phonil/post/e5df826a-db6a-4e50-9dce-b53ab764ec25/image.png)
  
 학습과 특정 클라우드에 종속되지 않는 환경을 위해 AWS에서 제공하는 기능보다 직접 구축하여 사용하는 방향으로 진행했습니다.
 
