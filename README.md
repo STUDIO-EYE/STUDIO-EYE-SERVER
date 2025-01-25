@@ -40,7 +40,7 @@
 ## 🧬 아키텍처 <a name = "architecture"></a>
 
 ### 개발 및 테스트
-![](https://velog.velcdn.com/images/phonil/post/e5df826a-db6a-4e50-9dce-b53ab764ec25/image.png)
+![Image](https://github.com/user-attachments/assets/48945c31-6749-4c75-9b5a-21f8fb224818)
  
 학습과 특정 클라우드에 종속되지 않는 환경을 위해 AWS에서 제공하는 기능보다 직접 구축하여 사용하는 방향으로 진행했습니다.
 
@@ -60,7 +60,7 @@
 
 
 ## ⏰ 협업 방식 <a name = "cooperation"></a>
-![](https://velog.velcdn.com/images/phonil/post/fcfcb8c5-80ff-4851-8962-dda243ba07c6/image.png)
+![Image](https://github.com/user-attachments/assets/30a537ea-b8b2-4a3d-9231-8e07dda2219b)
  
 매주 수업 시간 기준 1주 단위 스프린트의 애자일 방식으로 개발을 진행했습니다. 돌아가는 소프트웨어를 중심으로 데모를 진행하여 작업 할당량을 조절하고 계획을 유동적으로 관리했습니다.
 전체 일정과 큰 작업들을 기반으로 할 일을 할당했고, 이를 효율적으로 관리하기 위해 Notion, Jira, Discord를 사용했습니다.
@@ -117,7 +117,7 @@ Notion에서 공간을 나누어 수업 및 프로젝트 정보와 회의록을 
 ## 💎 기술 사용 이유 <a name = "why"></a>
 
 ### Nginx / AWS ALB, Auto Scaling
-![](https://velog.velcdn.com/images/phonil/post/32eeed1d-3463-4213-901e-32654d433f99/image.png)
+![Image](https://github.com/user-attachments/assets/4f4b774a-8811-4653-957f-806f4b22f556)
  
 
 #### 개발 및 테스트
@@ -157,9 +157,7 @@ Nginx와 다중 서버가 구축된 환경에서 Jmeter로 부하 분산 및 장
 
 ### Junit5
 
-![](https://velog.velcdn.com/images/phonil/post/1f3d9859-b285-4c96-945b-6f10f70cfade/image.png)
-
- 
+![Image](https://github.com/user-attachments/assets/6f48198e-ef04-4672-9870-280534db6a94)
 
 #### 단위 테스트
 주된 로직이 존재하는 Application Layer의 Service 클래스 위주로 단위 테스트를 작성했습니다.
@@ -173,9 +171,7 @@ Nginx와 다중 서버가 구축된 환경에서 Jmeter로 부하 분산 및 장
 
 ### SonarQube & Jacoco
 
-![](https://velog.velcdn.com/images/phonil/post/04ee25d0-3e4b-43f7-9d2d-ca8d19416a0b/image.png)
- 
- 
+![Image](https://github.com/user-attachments/assets/0bbe0319-2d06-4ccd-96cd-63e2663b940a)
 
 #### 정적 분석
 
