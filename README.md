@@ -31,7 +31,7 @@
 <br />
 
 ## ⚙️ 기술 스택 <a name = "teck_stack"></a>
-![](https://velog.velcdn.com/images/phonil/post/8b88f2c8-993e-486a-a1de-0e887626440e/image.png)
+![](https://velog.velcdn.com/images/phonil/post/d085d340-3004-4fda-8234-b4dcf3657a90/image.png)
  
  
 <br />
