@@ -31,17 +31,16 @@
 <br />
 
 ## ⚙️ 기술 스택 <a name = "teck_stack"></a>
-
-![](https://velog.velcdn.com/images/phonil/post/57568acb-b410-418a-ad91-4209caadfad4/image.png)
-
-
+![](https://velog.velcdn.com/images/phonil/post/8b88f2c8-993e-486a-a1de-0e887626440e/image.png)
+ 
+ 
 <br />
 
 
 ## 🧬 아키텍처 <a name = "architecture"></a>
 
 ### 개발 및 테스트
-![](https://velog.velcdn.com/images/phonil/post/80f7445c-9af3-4489-be2d-a1a265e1aced/image.png)
+![](https://velog.velcdn.com/images/phonil/post/67e6568b-700c-417d-aa67-39f12639abf5/image.png)
 
 학습과 특정 클라우드에 종속되지 않는 환경을 위해 AWS에서 제공하는 기능보다 직접 구축하여 사용하는 방향으로 진행했습니다.
 
@@ -61,8 +60,7 @@
 
 
 ## ⏰ 협업 방식 <a name = "cooperation"></a>
-
-![](https://velog.velcdn.com/images/phonil/post/ca62f48a-dd4e-48fe-8b98-a61ae33aa98f/image.png)
+![](https://velog.velcdn.com/images/phonil/post/e15d6ff9-34c7-4e8f-bbfd-084d8ff82c51/image.png)
 
 매주 수업 시간 기준 1주 단위 스프린트의 애자일 방식으로 개발을 진행했습니다. 돌아가는 소프트웨어를 중심으로 데모를 진행하여 작업 할당량을 조절하고 계획을 유동적으로 관리했습니다.
 전체 일정과 큰 작업들을 기반으로 할 일을 할당했고, 이를 효율적으로 관리하기 위해 Notion, Jira, Discord를 사용했습니다.
@@ -119,8 +117,8 @@ Notion에서 공간을 나누어 수업 및 프로젝트 정보와 회의록을 
 ## 💎 기술 사용 이유 <a name = "why"></a>
 
 ### Nginx / AWS ALB, Auto Scaling
-
-![](https://velog.velcdn.com/images/phonil/post/b6595ec3-8c3a-46e8-a735-19b531a61f26/image.png)
+![](https://velog.velcdn.com/images/phonil/post/32eeed1d-3463-4213-901e-32654d433f99/image.png)
+ 
 
 #### 개발 및 테스트
 
@@ -159,7 +157,9 @@ Nginx와 다중 서버가 구축된 환경에서 Jmeter로 부하 분산 및 장
 
 ### Junit5
 
-![](https://velog.velcdn.com/images/phonil/post/90984ff1-33a7-4b99-9a1c-99a394e6c8f6/image.png)
+![](https://velog.velcdn.com/images/phonil/post/1f3d9859-b285-4c96-945b-6f10f70cfade/image.png)
+
+ 
 
 #### 단위 테스트
 주된 로직이 존재하는 Application Layer의 Service 클래스 위주로 단위 테스트를 작성했습니다.
@@ -173,7 +173,9 @@ Nginx와 다중 서버가 구축된 환경에서 Jmeter로 부하 분산 및 장
 
 ### SonarQube & Jacoco
 
-![](https://velog.velcdn.com/images/phonil/post/4d376b64-d828-472e-ae32-7c65f2447149/image.png)
+![](https://velog.velcdn.com/images/phonil/post/04ee25d0-3e4b-43f7-9d2d-ca8d19416a0b/image.png)
+ 
+ 
 
 #### 정적 분석
 
