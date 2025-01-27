@@ -22,6 +22,7 @@
 ### 💡 스튜디오아이 홈페이지 및 관리자 서비스
 
 주식회사 스튜디오아이의 정보 제공 및 문의를 위한 홈페이지와 이를 관리하기 위한 관리자 서비스입니다.
+관리자 페이지는 PA(Production Admin (Page)), 일반 사용자 홈페이지는 PP(Production Page)로 구분했습니다.
 
 ### 🚀 배경
 
@@ -194,3 +195,111 @@ Nginx와 다중 서버가 구축된 환경에서 Jmeter로 부하 분산 및 장
 
 
 <br />
+
+## 🎁 결과물 <a name = "outputs"></a>
+
+Artwork (작업물) : 프로모션 페이지에서 회사 외부인들이 볼 수 있는 스튜디오 아이의 작업물.
+작업물 등록이란 스튜디오 아이가 외부인들에게 노출시키고 싶은(홈페이지에 올리고싶은) 내용을 등록하는 것을 말함.
+
+Request (문의) : 외부인이 스튜디오 아이 측에 작업을 맡기고 싶을 경우 이용.
+회사는 프로모션 페이지에서 외부인이 입력한 문의 내용을 프로모션 관리 페이지에서 확인할 수 있음.
+문의 ⇒ 프로젝트로 반드시 이어지는 게 아님. 말 그대로 단순 문의임!
+
+
+일반 사용자가 방문하는 사용자 페이지(PP)는 회사의 관리자가 관리자 페이지(PA)에서 설정한 내용을 바탕으로 표시됩니다.
+
+### 관리자 페이지 Home
+
+<img src="https://velog.velcdn.com/images/phonil/post/cb211005-0c83-4343-adf5-44e9795b389e/image.jpg" alt="홈" width="600" />
+
+- 요약된 문의 내역과 기간 별 통계를 확인할 수 있습니다.
+
+<br>
+
+### 메인 화면 - 작업물
+
+<img src="https://velog.velcdn.com/images/phonil/post/e4a8da0e-8f7b-4444-b57e-c4f2e6d261b2/image.jpg" alt="메인_작업물" width="600" />
+
+#### PA
+- 작업물의 정보(제목, 설명, 고객사, 제작 날짜, 카테고리, 링크 등)를 설정할 수 있습니다.
+- 메인 화면에 표시될 작업물을 선택하며, 순서를 설정할 수 있습니다.
+- 메인 화면에 표시되지 않을 작업물을 포함한 순서를 설정할 수 있습니다.
+
+#### PP
+- 관리자 페이지(PA)에서 설정한 작업물들을 볼 수 있으며, 첨부된 링크로 이동할 수 있습니다.
+
+<br>
+
+### 메인 화면 - 메뉴, 고객
+
+<img src="https://velog.velcdn.com/images/phonil/post/152d5eee-1478-4c5c-8af3-d86efd0ee1fa/image.jpg" alt="메인_메뉴_고객" width="600" />
+
+#### PA
+- 메뉴의 공개 여부 및 순서를 변경할 수 있습니다.
+- 고객사를 등록하여 관리할 수 있습니다.
+
+#### PP
+- 관리자의 설정에 따라 공개 처리된 메뉴를 확인할 수 있습니다.
+
+<br>
+
+### 문의
+
+<img src="https://velog.velcdn.com/images/phonil/post/90307a70-d5bc-4a92-b7d0-2e58982587f8/image.jpg" alt="문의" width="600" />
+
+#### PA
+- 문의 내역을 확인하고, 답변 메일을 보낼 수 있습니다.
+
+#### PP
+- 문의를 남길 프로젝트를 입력합니다. 관리자 승인 후 PP에 등록될 수 있습니다.
+
+<br>
+
+### 회사 정보
+
+<img src="https://velog.velcdn.com/images/phonil/post/cd53d085-7494-4c55-9c25-b254347e883b/image.jpg" alt="회사정보" width="600" />
+
+#### PA
+- 회사의 정보(로고, 주소, 연락처, 설명 등)를 설정할 수 있습니다.
+- 협력사를 등록하고, 관리할 수 있습니다.
+
+#### PP
+- 관리자가 등록한 회사 정보 및 협력사를 확인할 수 있습니다.
+
+<br>
+
+### FAQ
+
+<img src="https://velog.velcdn.com/images/phonil/post/5c82fa91-2366-444d-af0a-e8640bc3e2df/image.jpg" alt="FAQ" width="600" />
+
+#### PA
+- 자주 받은 질문(FAQ)를 등록하고 관리할 수 있습니다.
+
+#### PP
+- 관리자가 등록한 자주 받은 질문(FAQ)를 확인할 수 있습니다.
+
+<br>
+
+### 채용 정보
+
+<img src="https://velog.velcdn.com/images/phonil/post/860901e6-429d-4f97-9446-a8015fe202fd/image.jpg" alt="FAQ" width="600" />
+
+#### PA
+- 회사의 채용 정보 및 복지를 등록하고 관리할 수 있습니다.
+
+#### PP
+- 관리자가 등록한 회사의 채용 정보 및 복지를 확인할 수 있습니다.
+
+<br>
+
+### 뉴스
+
+<img src="https://velog.velcdn.com/images/phonil/post/fabaec39-2ec9-4e55-9e02-4c492b1161d8/image.jpg" alt="FAQ" width="600" />
+
+#### PA
+- 회사 관련 뉴스를 링크와 함께 등록할 수 있습니다.
+
+#### PP
+- 관리자가 등록한 회사 관련 뉴스를 확인할 수 있으며, 첨부된 링크로 이동할 수 있습니다.
+
+<br>
